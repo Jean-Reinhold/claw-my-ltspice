@@ -23,18 +23,19 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
         )
 
     renderer_command = [command]
-    ltspice_lib = os.environ.get("LTSPICE_LIB_PATH")
-    if not ltspice_lib:
-        docker_ltspice_lib = Path("/opt/ltspice/lib/sym")
-        if docker_ltspice_lib.exists():
-            ltspice_lib = str(docker_ltspice_lib)
+    ltspice_lib = _ltspice_library_path()
     if ltspice_lib:
         renderer_command.extend(["--ltspice-lib", ltspice_lib])
     renderer_command.append(str(source))
 
+    env = os.environ.copy()
+    if ltspice_lib:
+        env["LTSPICE_LIB_PATH"] = ltspice_lib
+
     result = subprocess.run(
         renderer_command,
         cwd=str(source.parent),
+        env=env,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -42,6 +43,8 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
     )
     if result.returncode != 0:
         detail = result.stderr.strip() or result.stdout.strip() or "no renderer output"
+        if "Unsupported operating system: Linux" in detail:
+            return _render_with_ltspice_to_svg_package(source, output_path, ltspice_lib)
         raise RuntimeError(f"ltspice_to_svg failed for {source}: {detail}")
 
     produced = source.with_suffix(".svg")
@@ -53,6 +56,57 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
         output_path.write_text(result.stdout)
         return output_path
     raise RuntimeError(f"ltspice_to_svg did not produce an SVG for {source}")
+
+
+def _ltspice_library_path() -> str | None:
+    ltspice_lib = os.environ.get("LTSPICE_LIB_PATH")
+    if ltspice_lib:
+        return ltspice_lib
+
+    docker_ltspice_lib = Path("/opt/ltspice/lib/sym")
+    if docker_ltspice_lib.exists():
+        return str(docker_ltspice_lib)
+    return None
+
+
+def _render_with_ltspice_to_svg_package(source: Path, output_path: Path, ltspice_lib: str | None) -> Path:
+    # ltspice-to-svg 0.2.0's CLI rejects Linux, but its parser/renderer works
+    # when the Docker LTspice symbol path is provided explicitly.
+    try:
+        from src.parsers.schematic_parser import SchematicParser
+        from src.renderers.rendering_config import RenderingConfig
+        from src.renderers.svg_renderer import SVGRenderer
+    except ImportError as exc:
+        raise RuntimeError("ltspice-to-svg package internals are required for Linux schematic rendering") from exc
+
+    previous_ltspice_lib = os.environ.get("LTSPICE_LIB_PATH")
+    if ltspice_lib:
+        os.environ["LTSPICE_LIB_PATH"] = ltspice_lib
+    try:
+        parser = SchematicParser(str(source))
+        data = parser.parse()
+        renderer = SVGRenderer(RenderingConfig())
+        produced = source.with_suffix(".svg")
+
+        renderer.load_schematic(data["schematic"], data["symbols"])
+        renderer.create_drawing(str(produced))
+        renderer.render_wires(1.5)
+        renderer.render_symbols()
+        renderer.render_texts()
+        renderer.render_shapes()
+        renderer.render_flags()
+        renderer.save()
+    finally:
+        if previous_ltspice_lib is None:
+            os.environ.pop("LTSPICE_LIB_PATH", None)
+        else:
+            os.environ["LTSPICE_LIB_PATH"] = previous_ltspice_lib
+
+    if produced.exists():
+        if produced != output_path:
+            output_path.write_bytes(produced.read_bytes())
+        return output_path
+    raise RuntimeError(f"ltspice-to-svg package did not produce an SVG for {source}")
 
 
 def terminal_preview(svg_path: str | Path) -> str:

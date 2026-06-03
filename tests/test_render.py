@@ -45,6 +45,25 @@ class RenderTests(unittest.TestCase):
             self.assertIn("--ltspice-lib", command)
             self.assertIn("/opt/ltspice/lib/sym", command)
 
+    def test_render_uses_package_adapter_for_linux_cli_bug(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "schematic.svg"
+            completed = type(
+                "Completed",
+                (),
+                {"returncode": 1, "stdout": "", "stderr": "OSError: Unsupported operating system: Linux"},
+            )()
+
+            with mock.patch("claw_spice.render.shutil.which", return_value="ltspice_to_svg"):
+                with mock.patch("claw_spice.render.subprocess.run", return_value=completed):
+                    with mock.patch(
+                        "claw_spice.render._render_with_ltspice_to_svg_package", return_value=output
+                    ) as render_package:
+                        result = render_asc_to_svg(EXAMPLE_ASC, output)
+
+            self.assertEqual(result, output)
+            render_package.assert_called_once()
+
     def test_terminal_preview_degrades_without_chafa(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             svg = Path(temp) / "schematic.svg"
