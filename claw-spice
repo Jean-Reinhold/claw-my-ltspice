@@ -46,6 +46,13 @@ case "$1" in
   shell)
     compose run --rm --entrypoint /bin/bash claw-spice
     ;;
+  docs)
+    if [ "${2:-}" = "serve" ]; then
+      compose run --rm --service-ports claw-spice claw-spice "$@"
+    else
+      run_cli "$@"
+    fi
+    ;;
   show)
     terminal=0
     print_only=0

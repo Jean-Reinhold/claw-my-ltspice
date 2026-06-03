@@ -25,8 +25,8 @@ preview tooling, and test dependencies live inside Docker.
 ## Quick Start
 
 ```bash
-git clone git@github.com:Jean-Reinhold/claw-spice.git
-cd claw-spice
+git clone git@github.com:Jean-Reinhold/claw-my-ltspice.git
+cd claw-my-ltspice
 ./claw-spice build
 ./claw-spice doctor
 ./claw-spice examples run

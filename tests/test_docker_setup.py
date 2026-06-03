@@ -30,6 +30,12 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn("platform: linux/amd64", compose)
         self.assertIn(".:/workspace", compose)
         self.assertIn("claw-spice:local", compose)
+        self.assertIn("8000:8000", compose)
+
+    def test_host_wrapper_serves_docs_with_ports(self) -> None:
+        wrapper = Path("claw-spice").read_text()
+
+        self.assertIn("--service-ports", wrapper)
 
 
 if __name__ == "__main__":

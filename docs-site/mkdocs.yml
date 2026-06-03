@@ -1,8 +1,8 @@
 site_name: claw-spice
 site_description: OpenCode-assisted LTspice automation with Docker, code-generated schematics, terminal rendering, transient simulations, and GitHub Actions workflows.
-site_url: https://jean-reinhold.github.io/claw-spice/
-repo_url: https://github.com/Jean-Reinhold/claw-spice
-repo_name: Jean-Reinhold/claw-spice
+site_url: https://jean-reinhold.github.io/claw-my-ltspice/
+repo_url: https://github.com/Jean-Reinhold/claw-my-ltspice
+repo_name: Jean-Reinhold/claw-my-ltspice
 docs_dir: pages
 site_dir: site
 
