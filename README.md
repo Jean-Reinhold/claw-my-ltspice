@@ -33,6 +33,18 @@ cd claw-my-ltspice
 ./claw-spice show examples/transient/rc-step/rc_step.asc
 ```
 
+On Apple Silicon, if the default local LTspice/Wine build hits Wine emulation
+issues, use the prebuilt-base fallback:
+
+```bash
+./claw-spice build-prebuilt
+```
+
+The fallback layers `claw-spice` tooling on top of an existing LTspice/Wine image
+and is provided for convenience. The default `./claw-spice build` path remains
+the preferred licensing-clean local build because it downloads LTspice from
+Analog Devices during the image build.
+
 You can also call Docker Compose directly:
 
 ```bash

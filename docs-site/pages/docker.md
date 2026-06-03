@@ -9,6 +9,18 @@ build inside a Linux container through Wine and Xvfb.
 ./claw-spice build
 ```
 
+## Apple Silicon Fallback
+
+If the local Wine build hits an Apple Silicon emulation issue, use:
+
+```bash
+./claw-spice build-prebuilt
+```
+
+This uses `Dockerfile.prebuilt`, which layers `claw-spice` tooling on top of an
+existing LTspice/Wine image. The default local build remains preferred for a
+cleaner licensing boundary.
+
 ## Direct Compose Usage
 
 ```bash

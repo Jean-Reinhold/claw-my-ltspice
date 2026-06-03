@@ -43,6 +43,9 @@ case "$1" in
   build)
     compose build claw-spice
     ;;
+  build-prebuilt)
+    docker compose -f "$ROOT/docker-compose.yml" -f "$ROOT/docker-compose.prebuilt.yml" build claw-spice
+    ;;
   shell)
     compose run --rm --entrypoint /bin/bash claw-spice
     ;;

@@ -24,6 +24,13 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn("pip install", dockerfile)
         self.assertIn(".[runtime,docs,dev]", dockerfile)
 
+    def test_prebuilt_dockerfile_documents_fallback(self) -> None:
+        dockerfile = Path("Dockerfile.prebuilt").read_text()
+
+        self.assertIn("aanas0sayed/docker-ltspice:macos-latest", dockerfile)
+        self.assertIn(".[runtime,docs,dev]", dockerfile)
+        self.assertIn("claw-spice-entrypoint", dockerfile)
+
     def test_compose_uses_linux_amd64_and_workspace_mount(self) -> None:
         compose = Path("docker-compose.yml").read_text()
 
@@ -36,6 +43,7 @@ class DockerSetupTests(unittest.TestCase):
         wrapper = Path("claw-spice").read_text()
 
         self.assertIn("--service-ports", wrapper)
+        self.assertIn("build-prebuilt", wrapper)
 
 
 if __name__ == "__main__":

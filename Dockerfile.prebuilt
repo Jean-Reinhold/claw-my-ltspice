@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+
+# Optional fast/Apple-Silicon-friendly fallback. This layers claw-spice tooling
+# on top of an existing LTspice/Wine image. The default Dockerfile remains the
+# preferred local-build path because it downloads LTspice from Analog Devices
+# during build instead of relying on a redistributed image.
+FROM aanas0sayed/docker-ltspice:macos-latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        python3-venv \
+        git \
+        chafa \
+        librsvg2-bin \
+        fonts-dejavu-core \
+        fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY pyproject.toml README.md LICENSE NOTICE.md ./
+COPY src ./src
+RUN python3 -m pip install --break-system-packages --no-cache-dir ".[runtime,docs,dev]"
+
+COPY docker/entrypoint.sh /usr/local/bin/claw-spice-entrypoint
+COPY docker/ltspice /usr/local/bin/ltspice
+RUN chmod +x /usr/local/bin/claw-spice-entrypoint /usr/local/bin/ltspice
+
+USER wineuser
+ENTRYPOINT ["/usr/local/bin/claw-spice-entrypoint"]
+CMD ["claw-spice", "doctor"]

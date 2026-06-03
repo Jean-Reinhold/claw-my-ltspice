@@ -1,0 +1,5 @@
+services:
+  claw-spice:
+    build:
+      context: .
+      dockerfile: Dockerfile.prebuilt
