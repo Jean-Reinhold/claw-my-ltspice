@@ -1,0 +1,52 @@
+name: Render Schematics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "examples/**"
+      - "tests/**"
+      - ".github/workflows/render.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "examples/**"
+      - "tests/**"
+      - ".github/workflows/render.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Render example schematics
+        run: PYTHONPATH=src python -m claw_spice.cli examples render
+
+      - name: Write job summary
+        run: |
+          {
+            echo "## claw-spice render"
+            echo ""
+            echo "Generated schematic artifacts:"
+            find runs/latest -type f | sort | sed 's/^/- /'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload render artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: claw-spice-rendered-schematics
+          path: runs/latest/**
+          if-no-files-found: error

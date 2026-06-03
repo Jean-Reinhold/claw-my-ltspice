@@ -1,0 +1,41 @@
+name: Examples
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**"
+      - "src/**"
+      - ".github/workflows/examples.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "examples/**"
+      - "src/**"
+      - ".github/workflows/examples.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  examples-no-ltspice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate and render examples
+        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim
+
+      - name: Upload generated examples
+        uses: actions/upload-artifact@v4
+        with:
+          name: claw-spice-examples-generated
+          path: runs/latest/**
+          if-no-files-found: error

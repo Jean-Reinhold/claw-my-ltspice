@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: LTspice licensing and downloads
+    url: https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html
+    about: Review Analog Devices LTspice information and downloads.

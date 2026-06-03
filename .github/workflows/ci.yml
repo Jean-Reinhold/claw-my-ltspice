@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  source-tests:
+    name: Source tests and fallback rendering
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run unit and integration tests
+        run: PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Generate and render examples without LTspice
+        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim
+
+      - name: Upload generated fallback artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: claw-spice-ci-generated
+          path: runs/latest/**
+          if-no-files-found: warn
+
+  compose-config:
+    name: Docker Compose config check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate compose file
+        run: docker compose config

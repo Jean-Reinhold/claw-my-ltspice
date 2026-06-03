@@ -1,0 +1,29 @@
+name: Simulation help
+description: Ask for help debugging an LTspice simulation or schematic.
+title: "simulation: "
+labels: [simulation]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should the circuit do?
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Commands run
+      value: |
+        ```bash
+        ./claw-spice sim run path/to/circuit.cir
+        ./claw-spice log summary path/to/circuit.log
+        ./claw-spice show path/to/circuit.asc --terminal
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results, logs, and measurements
+      description: Paste log summary and failed measurements. Attach artifacts if needed.

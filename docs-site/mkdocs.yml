@@ -1,0 +1,44 @@
+site_name: claw-spice
+site_description: OpenCode-assisted LTspice automation with Docker, code-generated schematics, terminal rendering, transient simulations, and GitHub Actions workflows.
+site_url: https://jean-reinhold.github.io/claw-spice/
+repo_url: https://github.com/Jean-Reinhold/claw-spice
+repo_name: Jean-Reinhold/claw-spice
+docs_dir: pages
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep orange
+      accent: indigo
+  features:
+    - navigation.sections
+    - navigation.instant
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Quick Start: quick-start.md
+  - Examples: examples.md
+  - Gallery: gallery.md
+  - OpenCode Skills: opencode.md
+  - Docker LTspice: docker.md
+  - Code To Schematic: code-to-schematic.md
+  - GitHub Actions: github-actions.md
+  - Model Policy: model-policy.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_css:
+  - assets/css/extra.css

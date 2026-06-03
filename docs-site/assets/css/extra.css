@@ -1,0 +1,7 @@
+:root {
+  --md-primary-fg-color: #d35400;
+}
+
+.md-typeset img {
+  border-radius: 0.5rem;
+}

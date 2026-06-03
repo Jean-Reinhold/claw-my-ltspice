@@ -1,0 +1,31 @@
+name: Model request
+description: Request support for a SPICE component model or classic part.
+title: "model: "
+labels: [model]
+body:
+  - type: input
+    id: part
+    attributes:
+      label: Part number
+      placeholder: LM741, TL072, LM358, 2N3904
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official model source URL
+      description: Prefer vendor or manufacturer sources.
+    validations:
+      required: false
+  - type: textarea
+    id: license
+    attributes:
+      label: License or redistribution terms
+      description: Do not paste unknown-license model files. Link to terms if possible.
+    validations:
+      required: false
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Intended simulation use case
+      description: What circuit or example should use this model?

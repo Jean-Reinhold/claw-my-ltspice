@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 260" width="920" height="260" role="img" aria-label="claw-spice workflow">
+  <rect width="920" height="260" rx="24" fill="#fff7ed"/>
+  <g font-family="Inter, Arial, sans-serif" fill="#1f2937">
+    <text x="40" y="54" font-size="28" font-weight="700">claw-spice workflow</text>
+    <text x="40" y="84" font-size="15">Code-generated schematics, Docker LTspice simulation, terminal rendering, and CI artifacts.</text>
+  </g>
+  <g transform="translate(40 126)" font-family="Inter, Arial, sans-serif">
+    <g>
+      <rect width="140" height="70" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+      <text x="70" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Code / IR</text>
+      <text x="70" y="52" text-anchor="middle" font-size="12" fill="#6b7280">Python circuit</text>
+    </g>
+    <path d="M150 35h52" stroke="#9ca3af" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(214 0)">
+      <rect width="140" height="70" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+      <text x="70" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">.asc + .cir</text>
+      <text x="70" y="52" text-anchor="middle" font-size="12" fill="#6b7280">LTspice files</text>
+    </g>
+    <path d="M364 35h52" stroke="#9ca3af" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(428 0)">
+      <rect width="140" height="70" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+      <text x="70" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Docker LTspice</text>
+      <text x="70" y="52" text-anchor="middle" font-size="12" fill="#6b7280">Wine + Xvfb</text>
+    </g>
+    <path d="M578 35h52" stroke="#9ca3af" stroke-width="3" marker-end="url(#arrow)"/>
+    <g transform="translate(642 0)">
+      <rect width="140" height="70" rx="14" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+      <text x="70" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Results</text>
+      <text x="70" y="52" text-anchor="middle" font-size="12" fill="#6b7280">raw, log, svg</text>
+    </g>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+</svg>

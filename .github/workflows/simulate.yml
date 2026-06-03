@@ -1,0 +1,69 @@
+name: Manual LTspice Simulation
+
+on:
+  workflow_dispatch:
+    inputs:
+      circuit:
+        description: "Path to .cir, .net, or .asc file"
+        required: true
+        default: "examples/transient/rc-step/rc_step.cir"
+      render_schematic:
+        description: "Render matching .asc schematic if available"
+        required: true
+        default: "true"
+      timeout:
+        description: "Simulation timeout seconds"
+        required: true
+        default: "300"
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build claw-spice LTspice image
+        run: docker compose build claw-spice
+
+      - name: Run selected simulation
+        run: docker compose run --rm claw-spice claw-spice sim run "${{ inputs.circuit }}" --timeout "${{ inputs.timeout }}" --json | tee runs/manual-simulation.json
+
+      - name: Render matching schematic
+        if: ${{ inputs.render_schematic == 'true' }}
+        run: |
+          mkdir -p runs/manual
+          asc="${{ inputs.circuit }}"
+          asc="${asc%.*}.asc"
+          if [ -f "$asc" ]; then
+            docker compose run --rm claw-spice claw-spice render "$asc" --output runs/manual/schematic.svg --terminal-text runs/manual/schematic-terminal.txt
+          else
+            echo "No matching schematic found: $asc" | tee runs/manual/schematic-terminal.txt
+          fi
+
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo "## Manual LTspice Simulation"
+            echo ""
+            echo "Circuit: ${{ inputs.circuit }}"
+            echo ""
+            echo "Artifacts:"
+            find runs -type f | sort | sed 's/^/- /' || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload simulation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claw-spice-manual-simulation
+          path: |
+            runs/**
+            examples/**/*.log
+            examples/**/*.raw
+          if-no-files-found: warn
