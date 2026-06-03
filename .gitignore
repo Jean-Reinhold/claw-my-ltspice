@@ -16,6 +16,7 @@ runs/*
 !runs/.gitkeep
 *.raw
 *.op.raw
+!tests/fixtures/*.raw
 *.log
 !tests/fixtures/*.log
 *.db
