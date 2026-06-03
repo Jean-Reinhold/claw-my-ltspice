@@ -1,0 +1,5 @@
+Circuit: rc_step.cir
+Warning: minor timestep warning example
+vout_max: MAX(v(out))=4.987 FROM 0 TO 0.006
+vout_ss: v(out)=4.966 at 0.005
+tau_rise: v(out)=3.16 AT 0.000999

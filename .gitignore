@@ -17,6 +17,7 @@ runs/*
 *.raw
 *.op.raw
 *.log
+!tests/fixtures/*.log
 *.db
 *.exe.log
 *.net

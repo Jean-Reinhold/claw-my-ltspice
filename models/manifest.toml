@@ -1,0 +1,31 @@
+[[models]]
+name = "2N3904"
+kind = "bjt"
+source = "ltspice-built-in"
+license = "provided-by-ltspice-install"
+redistributable = false
+notes = "Use LTspice installed standard transistor libraries when present."
+
+[[models]]
+name = "LM741"
+kind = "opamp"
+source = "vendor-or-user-installed"
+license = "vendor"
+redistributable = false
+notes = "Classic op-amp target. Do not vendor until redistribution terms are explicit."
+
+[[models]]
+name = "TL072"
+kind = "opamp"
+source = "vendor-or-user-installed"
+license = "vendor"
+redistributable = false
+notes = "Classic JFET op-amp target. Install through manifest workflow later."
+
+[[models]]
+name = "LM358"
+kind = "opamp"
+source = "vendor-or-user-installed"
+license = "vendor"
+redistributable = false
+notes = "Classic single-supply op-amp target. Install through manifest workflow later."

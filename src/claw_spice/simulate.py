@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import os
+import shutil
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+@dataclass(frozen=True)
+class SimulationResult:
+    input_path: Path
+    command: list[str]
+    returncode: int
+    log_path: Path | None
+    raw_path: Path | None
+    stdout: str
+    stderr: str
+
+
+def ltspice_command() -> list[str]:
+    configured = os.environ.get("LTSPICE_CMD")
+    if configured:
+        return configured.split()
+    wrapper = shutil.which("ltspice")
+    if wrapper:
+        return [wrapper]
+    exe = os.environ.get("LTSPICE_EXE")
+    if exe:
+        return ["wine", exe]
+    default_exe = Path(os.environ.get("WINEPREFIX", "/tmp/wine-prefix")) / "drive_c/Program Files/ADI/LTspice/LTspice.exe"
+    return ["wine", str(default_exe)]
+
+
+def wine_path(path: Path) -> str:
+    resolved = path.resolve()
+    return "Z:" + str(resolved).replace("/", "\\")
+
+
+def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResult:
+    source = Path(input_path).resolve()
+    base_command = ltspice_command()
+    command = [*base_command, "-b", "-Run", wine_path(source)]
+    result = subprocess.run(
+        command,
+        cwd=str(source.parent),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=timeout,
+        check=False,
+    )
+    log_path = source.with_suffix(".log") if source.with_suffix(".log").exists() else None
+    raw_path = source.with_suffix(".raw") if source.with_suffix(".raw").exists() else None
+    return SimulationResult(source, command, result.returncode, log_path, raw_path, result.stdout, result.stderr)
+
+
+def create_netlist(asc_path: str | Path, timeout: int = 120) -> Path:
+    source = Path(asc_path).resolve()
+    command = [*ltspice_command(), "-netlist", wine_path(source)]
+    result = subprocess.run(
+        command,
+        cwd=str(source.parent),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        timeout=timeout,
+        check=False,
+    )
+    output = source.with_suffix(".net")
+    if result.returncode != 0 or not output.exists():
+        raise RuntimeError(
+            "LTspice netlist export failed\n"
+            f"command: {' '.join(command)}\n"
+            f"stdout: {result.stdout}\n"
+            f"stderr: {result.stderr}"
+        )
+    return output

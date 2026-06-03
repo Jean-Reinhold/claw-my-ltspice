@@ -1,0 +1,9 @@
+* RC step response
+V1 in 0 PULSE(0 5 0 1n 1n 5m 10m)
+R1 in out 1k
+C1 out 0 1u
+.tran 0 6m 0 10u
+.meas TRAN vout_max MAX V(out)
+.meas TRAN vout_ss FIND V(out) AT=5m
+.meas TRAN tau_rise WHEN V(out)=3.16 RISE=1
+.end
