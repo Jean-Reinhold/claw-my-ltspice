@@ -45,7 +45,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload render artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: claw-spice-rendered-schematics
           path: runs/latest/**
