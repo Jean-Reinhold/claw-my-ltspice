@@ -29,7 +29,7 @@ jobs:
         run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim
 
       - name: Upload generated fallback artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: claw-spice-ci-generated
           path: runs/latest/**
