@@ -1,0 +1,30 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+site/
+
+# LTspice and generated simulation artifacts
+runs/*
+!runs/.gitkeep
+*.raw
+*.op.raw
+*.log
+*.db
+*.exe.log
+*.net
+
+# Keep generated documentation assets opt-in.
+docs-site/site/
+docs-site/assets/generated/*
+!docs-site/assets/generated/.gitkeep
+
+# MCP/runtime sidecars
+.ltspice-mcp/
