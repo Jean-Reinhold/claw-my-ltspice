@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+export HOST_UID="$(id -u)"
+export HOST_GID="$(id -g)"
+
+compose() {
+  docker compose "$@"
+}
+
+open_svg() {
+  local svg="$1"
+  case "$svg" in
+    /workspace/*) svg="$ROOT/${svg#/workspace/}" ;;
+  esac
+  if [ ! -f "$svg" ]; then
+    echo "SVG not found on host: $svg" >&2
+    return 1
+  fi
+  if command -v open >/dev/null 2>&1; then
+    open "$svg"
+  elif command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$svg" >/dev/null 2>&1 &
+  elif command -v cmd.exe >/dev/null 2>&1; then
+    cmd.exe /c start "" "$(wslpath -w "$svg")"
+  else
+    echo "No host SVG opener found. Open manually: $svg" >&2
+    return 1
+  fi
+}
+
+run_cli() {
+  compose run --rm claw-spice claw-spice "$@"
+}
+
+if [ "$#" -eq 0 ]; then
+  run_cli --help
+  exit $?
+fi
+
+case "$1" in
+  build)
+    compose build claw-spice
+    ;;
+  shell)
+    compose run --rm --entrypoint /bin/bash claw-spice
+    ;;
+  show)
+    terminal=0
+    print_only=0
+    for arg in "$@"; do
+      case "$arg" in
+        --terminal) terminal=1 ;;
+        --print-svg-path|--no-open) print_only=1 ;;
+      esac
+    done
+    if [ "$terminal" -eq 1 ] || [ "$print_only" -eq 1 ]; then
+      if [ "$print_only" -eq 1 ]; then
+        filtered=()
+        for arg in "$@"; do
+          [ "$arg" = "--no-open" ] && continue
+          filtered+=("$arg")
+        done
+        run_cli "${filtered[@]}"
+      else
+        run_cli "$@"
+      fi
+    else
+      output="$(run_cli "$@" --print-svg-path)"
+      printf '%s\n' "$output"
+      svg="$(printf '%s\n' "$output" | tail -n 1)"
+      open_svg "$svg"
+    fi
+    ;;
+  *)
+    run_cli "$@"
+    ;;
+esac

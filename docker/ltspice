@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LTSPICE_EXE="${LTSPICE_EXE:-$WINEPREFIX/drive_c/Program Files/ADI/LTspice/LTspice.exe}"
+exec wine "$LTSPICE_EXE" "$@"

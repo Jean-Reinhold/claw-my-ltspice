@@ -21,6 +21,7 @@ runs/*
 *.db
 *.exe.log
 *.net
+examples/**/generated/
 
 # Keep generated documentation assets opt-in.
 docs-site/site/

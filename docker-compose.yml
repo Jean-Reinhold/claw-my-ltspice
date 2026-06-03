@@ -1,0 +1,19 @@
+services:
+  claw-spice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: claw-spice:local
+    platform: linux/amd64
+    working_dir: /workspace
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      CLAW_WORKSPACE: /workspace
+      WINEPREFIX: /tmp/wine-prefix
+      HOME: /tmp/claw-home
+    volumes:
+      - .:/workspace
+      - claw-spice-cache:/tmp/claw-home/.cache
+
+volumes:
+  claw-spice-cache:
