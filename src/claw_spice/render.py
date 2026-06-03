@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -21,8 +22,18 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
             "an environment with the ltspice-to-svg package installed."
         )
 
+    renderer_command = [command]
+    ltspice_lib = os.environ.get("LTSPICE_LIB_PATH")
+    if not ltspice_lib:
+        docker_ltspice_lib = Path("/opt/ltspice/lib/sym")
+        if docker_ltspice_lib.exists():
+            ltspice_lib = str(docker_ltspice_lib)
+    if ltspice_lib:
+        renderer_command.extend(["--ltspice-lib", ltspice_lib])
+    renderer_command.append(str(source))
+
     result = subprocess.run(
-        [command, str(source)],
+        renderer_command,
         cwd=str(source.parent),
         text=True,
         stdout=subprocess.PIPE,

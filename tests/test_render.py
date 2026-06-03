@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -29,6 +30,20 @@ class RenderTests(unittest.TestCase):
 
             self.assertEqual(result, output)
             self.assertEqual(output.read_text(), "<svg>ok</svg>")
+
+    def test_render_passes_explicit_ltspice_library(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "schematic.svg"
+            completed = type("Completed", (), {"returncode": 0, "stdout": "<svg>ok</svg>", "stderr": ""})()
+
+            with mock.patch.dict(os.environ, {"LTSPICE_LIB_PATH": "/opt/ltspice/lib/sym"}):
+                with mock.patch("claw_spice.render.shutil.which", return_value="ltspice_to_svg"):
+                    with mock.patch("claw_spice.render.subprocess.run", return_value=completed) as run:
+                        render_asc_to_svg(EXAMPLE_ASC, output)
+
+            command = run.call_args.args[0]
+            self.assertIn("--ltspice-lib", command)
+            self.assertIn("/opt/ltspice/lib/sym", command)
 
     def test_terminal_preview_degrades_without_chafa(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
