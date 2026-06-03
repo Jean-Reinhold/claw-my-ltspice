@@ -1,0 +1,33 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "README.md",
+    "NOTICE.md",
+    "CONTRIBUTING.md"
+  ],
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "command": {
+    "doctor": {
+      "description": "Check claw-spice Docker/container readiness.",
+      "template": "Run `./claw-spice doctor` and summarize missing host or container requirements."
+    },
+    "examples": {
+      "description": "Generate, render, and smoke-test examples.",
+      "template": "Run `./claw-spice examples run --skip-sim` first. If Docker LTspice is built and available, run `./claw-spice examples run`. Summarize generated artifacts and measurements."
+    },
+    "show-schematic": {
+      "description": "Render and open an LTspice schematic.",
+      "template": "Run `./claw-spice show $ARGUMENTS` to render and open the schematic. If a terminal-only check is more appropriate, run `./claw-spice show $ARGUMENTS --terminal`."
+    },
+    "test": {
+      "description": "Run the automatic test suite.",
+      "template": "Run `PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'` locally, or `./claw-spice test` when the Docker image is built."
+    }
+  },
+  "tool_output": {
+    "max_lines": 500,
+    "max_bytes": 20000
+  }
+}
