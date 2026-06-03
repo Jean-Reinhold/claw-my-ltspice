@@ -1,0 +1,62 @@
+[[runs]]
+id = "rc-step"
+name = "RC step response transient"
+generator = "examples/transient/rc-step/rc_step.py"
+circuit = "examples/transient/rc-step/rc_step.cir"
+schematic = "examples/transient/rc-step/rc_step.asc"
+analysis = "tran"
+expected_measurements = ["vout_max", "vout_ss", "tau_rise"]
+
+[[runs]]
+id = "opamp-voltage-follower"
+name = "Generic op-amp voltage follower transient"
+generator = "examples/transient/opamp-voltage-follower/opamp_voltage_follower.py"
+circuit = "examples/transient/opamp-voltage-follower/opamp_voltage_follower.cir"
+schematic = "examples/transient/opamp-voltage-follower/opamp_voltage_follower.asc"
+analysis = "tran"
+expected_measurements = ["vout_2ms", "tracking_error_max"]
+
+[[runs]]
+id = "opamp-noninverting"
+name = "Generic op-amp non-inverting gain transient"
+generator = "examples/transient/opamp-noninverting/opamp_noninverting.py"
+circuit = "examples/transient/opamp-noninverting/opamp_noninverting.cir"
+schematic = "examples/transient/opamp-noninverting/opamp_noninverting.asc"
+analysis = "tran"
+expected_measurements = ["vout_2ms", "gain_2ms"]
+
+[[runs]]
+id = "opamp-inverting"
+name = "Generic op-amp inverting gain transient"
+generator = "examples/transient/opamp-inverting/opamp_inverting.py"
+circuit = "examples/transient/opamp-inverting/opamp_inverting.cir"
+schematic = "examples/transient/opamp-inverting/opamp_inverting.asc"
+analysis = "tran"
+expected_measurements = ["vout_2ms", "gain_2ms"]
+
+[[runs]]
+id = "opamp-summing"
+name = "Generic op-amp inverting summing amplifier transient"
+generator = "examples/transient/opamp-summing/opamp_summing.py"
+circuit = "examples/transient/opamp-summing/opamp_summing.cir"
+schematic = "examples/transient/opamp-summing/opamp_summing.asc"
+analysis = "tran"
+expected_measurements = ["vout_2ms", "vout_3ms"]
+
+[[runs]]
+id = "opamp-difference"
+name = "Generic op-amp difference amplifier transient"
+generator = "examples/transient/opamp-difference/opamp_difference.py"
+circuit = "examples/transient/opamp-difference/opamp_difference.cir"
+schematic = "examples/transient/opamp-difference/opamp_difference.asc"
+analysis = "tran"
+expected_measurements = ["vout_2ms", "vout_3ms"]
+
+[[runs]]
+id = "opamp-active-lowpass"
+name = "Generic op-amp buffered active low-pass transient"
+generator = "examples/transient/opamp-active-lowpass/opamp_active_lowpass.py"
+circuit = "examples/transient/opamp-active-lowpass/opamp_active_lowpass.cir"
+schematic = "examples/transient/opamp-active-lowpass/opamp_active_lowpass.asc"
+analysis = "tran"
+expected_measurements = ["vout_avg", "vout_max"]

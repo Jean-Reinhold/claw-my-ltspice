@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" role="img">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}</style>
+<text x="86" y="34" class="title">Op-amp voltage follower</text>
+<line x1="86.00" y1="72" x2="86.00" y2="478" class="grid"/>
+<text x="86.00" y="502" text-anchor="middle" class="axis">0</text>
+<line x1="255.20" y1="72" x2="255.20" y2="478" class="grid"/>
+<text x="255.20" y="502" text-anchor="middle" class="axis">0.00084</text>
+<line x1="424.40" y1="72" x2="424.40" y2="478" class="grid"/>
+<text x="424.40" y="502" text-anchor="middle" class="axis">0.00168</text>
+<line x1="593.60" y1="72" x2="593.60" y2="478" class="grid"/>
+<text x="593.60" y="502" text-anchor="middle" class="axis">0.00252</text>
+<line x1="762.80" y1="72" x2="762.80" y2="478" class="grid"/>
+<text x="762.80" y="502" text-anchor="middle" class="axis">0.00336</text>
+<line x1="932.00" y1="72" x2="932.00" y2="478" class="grid"/>
+<text x="932.00" y="502" text-anchor="middle" class="axis">0.0042</text>
+<line x1="86" y1="478.00" x2="932" y2="478.00" class="grid"/>
+<text x="74" y="482.00" text-anchor="end" class="axis">-0.05</text>
+<line x1="86" y1="396.80" x2="932" y2="396.80" class="grid"/>
+<text x="74" y="400.80" text-anchor="end" class="axis">0.17</text>
+<line x1="86" y1="315.60" x2="932" y2="315.60" class="grid"/>
+<text x="74" y="319.60" text-anchor="end" class="axis">0.39</text>
+<line x1="86" y1="234.40" x2="932" y2="234.40" class="grid"/>
+<text x="74" y="238.40" text-anchor="end" class="axis">0.61</text>
+<line x1="86" y1="153.20" x2="932" y2="153.20" class="grid"/>
+<text x="74" y="157.20" text-anchor="end" class="axis">0.83</text>
+<line x1="86" y1="72.00" x2="932" y2="72.00" class="grid"/>
+<text x="74" y="76.00" text-anchor="end" class="axis">1.05</text>
+<rect x="86" y="72" width="846" height="406" class="frame"/>
+<polyline points="86.00,90.45 106.14,90.45 126.29,90.45 146.43,90.45 166.57,90.45 186.71,90.45 206.86,90.45 227.00,90.45 247.14,90.45 267.29,90.45 287.43,90.45 307.57,90.45 327.71,90.45 347.86,90.45 368.00,90.45 388.14,90.45 408.29,90.45 428.43,90.45 448.57,90.45 468.71,90.45 488.86,90.45 509.00,90.45 529.14,90.45 549.29,90.45 569.43,90.45 589.57,90.45 609.71,90.45 629.86,90.45 650.00,90.45 670.14,90.45 690.29,90.45 710.43,90.45 730.57,90.45 750.71,90.45 770.86,90.45 791.00,90.45 811.14,90.45 831.29,90.45 851.43,90.45 871.57,90.45 891.71,90.45" fill="none" stroke="#2563eb" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="86.00,459.55 106.14,196.73 126.29,121.43 146.43,99.86 166.57,93.67 186.71,91.90 206.86,91.40 227.00,91.25 247.14,91.21 267.29,91.20 287.43,91.19 307.57,91.19 327.71,91.19 347.86,91.19 368.00,91.19 388.14,91.19 408.29,91.19 428.43,91.19 448.57,91.19 468.71,91.19 488.86,91.19 509.00,91.19 529.14,91.19 549.29,91.19 569.43,91.19 589.57,91.19 609.71,91.19 629.86,91.19 650.00,91.19 670.14,91.19 690.29,91.19 710.43,91.19 730.57,91.19 750.71,91.19 770.86,91.19 791.00,91.19 811.14,91.19 831.29,91.19 851.43,91.19 871.57,91.19 891.71,91.19" fill="none" stroke="#dc2626" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="86" y1="521" x2="114" y2="521" stroke="#2563eb" stroke-width="3"/>
+<text x="122" y="526" class="legend">V(in)</text>
+<line x1="276" y1="521" x2="304" y2="521" stroke="#dc2626" stroke-width="3"/>
+<text x="312" y="526" class="legend">V(out)</text>
+<text x="509.00" y="546" text-anchor="middle" class="axis">time</text>
+<text x="22" y="275.00" text-anchor="middle" class="axis" transform="rotate(-90 22 275.00)">signal</text>
+</svg>

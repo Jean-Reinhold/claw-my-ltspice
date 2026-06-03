@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" role="img">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}</style>
+<text x="86" y="34" class="title">Op-amp difference amplifier</text>
+<line x1="86.00" y1="72" x2="86.00" y2="478" class="grid"/>
+<text x="86.00" y="502" text-anchor="middle" class="axis">0</text>
+<line x1="255.20" y1="72" x2="255.20" y2="478" class="grid"/>
+<text x="255.20" y="502" text-anchor="middle" class="axis">0.00084</text>
+<line x1="424.40" y1="72" x2="424.40" y2="478" class="grid"/>
+<text x="424.40" y="502" text-anchor="middle" class="axis">0.00168</text>
+<line x1="593.60" y1="72" x2="593.60" y2="478" class="grid"/>
+<text x="593.60" y="502" text-anchor="middle" class="axis">0.00252</text>
+<line x1="762.80" y1="72" x2="762.80" y2="478" class="grid"/>
+<text x="762.80" y="502" text-anchor="middle" class="axis">0.00336</text>
+<line x1="932.00" y1="72" x2="932.00" y2="478" class="grid"/>
+<text x="932.00" y="502" text-anchor="middle" class="axis">0.0042</text>
+<line x1="86" y1="478.00" x2="932" y2="478.00" class="grid"/>
+<text x="74" y="482.00" text-anchor="end" class="axis">-0.08</text>
+<line x1="86" y1="396.80" x2="932" y2="396.80" class="grid"/>
+<text x="74" y="400.80" text-anchor="end" class="axis">0.272</text>
+<line x1="86" y1="315.60" x2="932" y2="315.60" class="grid"/>
+<text x="74" y="319.60" text-anchor="end" class="axis">0.624</text>
+<line x1="86" y1="234.40" x2="932" y2="234.40" class="grid"/>
+<text x="74" y="238.40" text-anchor="end" class="axis">0.976</text>
+<line x1="86" y1="153.20" x2="932" y2="153.20" class="grid"/>
+<text x="74" y="157.20" text-anchor="end" class="axis">1.328</text>
+<line x1="86" y1="72.00" x2="932" y2="72.00" class="grid"/>
+<text x="74" y="76.00" text-anchor="end" class="axis">1.68</text>
+<rect x="86" y="72" width="846" height="406" class="frame"/>
+<polyline points="86.00,275.00 106.14,275.00 126.29,275.00 146.43,275.00 166.57,275.00 186.71,275.00 206.86,275.00 227.00,275.00 247.14,275.00 267.29,275.00 287.43,275.00 307.57,275.00 327.71,275.00 347.86,275.00 368.00,275.00 388.14,275.00 408.29,275.00 428.43,275.00 448.57,275.00 468.71,275.00 488.86,275.00 509.00,275.00 529.14,275.00 549.29,275.00 569.43,275.00 589.57,275.00 609.71,275.00 629.86,275.00 650.00,275.00 670.14,275.00 690.29,275.00 710.43,275.00 730.57,275.00 750.71,275.00 770.86,275.00 791.00,275.00 811.14,275.00 831.29,275.00 851.43,275.00 871.57,275.00 891.71,275.00" fill="none" stroke="#2563eb" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="86.00,459.55 106.14,459.55 126.29,459.55 146.43,459.55 166.57,459.55 186.71,459.55 206.86,459.55 227.00,459.55 247.14,459.55 267.29,459.55 287.43,390.34 307.57,390.34 327.71,390.34 347.86,390.34 368.00,390.34 388.14,390.34 408.29,390.34 428.43,390.34 448.57,390.34 468.71,390.34 488.86,390.34 509.00,390.34 529.14,390.34 549.29,390.34 569.43,390.34 589.57,390.34 609.71,390.34 629.86,390.34 650.00,390.34 670.14,390.34 690.29,390.34 710.43,390.34 730.57,390.34 750.71,390.34 770.86,390.34 791.00,390.34 811.14,390.34 831.29,390.34 851.43,390.34 871.57,390.34 891.71,390.34" fill="none" stroke="#dc2626" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="86.00,90.45 106.14,90.45 126.29,90.45 146.43,90.45 166.57,90.45 186.71,90.45 206.86,90.45 227.00,90.45 247.14,90.45 267.29,90.45 287.43,228.86 307.57,228.86 327.71,228.86 347.86,228.86 368.00,228.86 388.14,228.86 408.29,228.86 428.43,228.86 448.57,228.86 468.71,228.86 488.86,228.86 509.00,228.86 529.14,228.86 549.29,228.86 569.43,228.86 589.57,228.86 609.71,228.86 629.86,228.86 650.00,228.86 670.14,228.86 690.29,228.86 710.43,228.86 730.57,228.86 750.71,228.86 770.86,228.86 791.00,228.86 811.14,228.86 831.29,228.86 851.43,228.86 871.57,228.86 891.71,228.86" fill="none" stroke="#16a34a" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="86" y1="521" x2="114" y2="521" stroke="#2563eb" stroke-width="3"/>
+<text x="122" y="526" class="legend">V(plus)</text>
+<line x1="276" y1="521" x2="304" y2="521" stroke="#dc2626" stroke-width="3"/>
+<text x="312" y="526" class="legend">V(minus)</text>
+<line x1="466" y1="521" x2="494" y2="521" stroke="#16a34a" stroke-width="3"/>
+<text x="502" y="526" class="legend">V(out)</text>
+<text x="509.00" y="546" text-anchor="middle" class="axis">time</text>
+<text x="22" y="275.00" text-anchor="middle" class="axis" transform="rotate(-90 22 275.00)">signal</text>
+</svg>

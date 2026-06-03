@@ -46,6 +46,18 @@ class CircuitIrTests(unittest.TestCase):
             self.assertTrue(cir.exists())
             self.assertTrue(asc.exists())
 
+    def test_opamp_subcircuit_generation(self) -> None:
+        circuit = Circuit("opamp")
+        circuit.include("claw_opamps.lib")
+        circuit.opamp("XU1", "inp", "inn", "vcc", "vee", "out")
+
+        netlist = circuit.to_netlist()
+        asc = circuit.to_asc()
+
+        self.assertIn(".include claw_opamps.lib", netlist)
+        self.assertIn("XU1 inp inn vcc vee out CLAW_IDEAL_OPAMP", netlist)
+        self.assertIn("SYMBOL opamp2", asc)
+
 
 if __name__ == "__main__":
     unittest.main()

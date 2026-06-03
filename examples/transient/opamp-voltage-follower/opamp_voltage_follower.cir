@@ -1,0 +1,11 @@
+* Generic op-amp voltage follower
+.include ../../lib/claw_opamps.lib
+VIN in 0 PULSE(0 1 0 1u 1u 5m 10m)
+VCC vcc 0 5
+VEE vee 0 -5
+XU1 in out vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 4m 0 5u
+.meas TRAN vout_2ms FIND V(out) AT=2m
+.meas TRAN tracking_error_max MAX abs(V(out)-V(in)) FROM=1m TO=4m
+.end

@@ -7,13 +7,16 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 from types import ModuleType
 
 from claw_spice import __version__
+from claw_spice.docs_assets import generate_plot_assets
 from claw_spice.ir import Circuit
 from claw_spice.logs import format_log_summary, parse_log
 from claw_spice.paths import safe_output_path, workspace_paths
+from claw_spice.plot import plot_raw_traces, safe_plot_stem
 from claw_spice.raw import stats as raw_stats
 from claw_spice.raw import trace_names
 from claw_spice.render import render_asc_to_svg, render_png, terminal_preview
@@ -103,6 +106,14 @@ def build_parser() -> argparse.ArgumentParser:
     raw_stats_cmd.add_argument("trace")
     raw_stats_cmd.add_argument("--json", action="store_true", dest="as_json")
     raw_stats_cmd.set_defaults(handler=cmd_raw_stats)
+    raw_plot = raw_sub.add_parser("plot", help="plot one or more traces from an LTspice .raw file")
+    raw_plot.add_argument("input")
+    raw_plot.add_argument("traces", nargs="*", help="trace names to plot; defaults to all non-time traces")
+    raw_plot.add_argument("--x", dest="x_trace", default=None, help="x-axis trace, default: time")
+    raw_plot.add_argument("--output", "-o", default=None)
+    raw_plot.add_argument("--title", default=None)
+    raw_plot.add_argument("--png", action="store_true", help="also convert the SVG plot to PNG when available")
+    raw_plot.set_defaults(handler=cmd_raw_plot)
 
     code = sub.add_parser("code", help="code-to-circuit commands")
     code_sub = code.add_subparsers(dest="code_command", required=True)
@@ -116,9 +127,13 @@ def build_parser() -> argparse.ArgumentParser:
     examples_sub = examples.add_subparsers(dest="examples_command", required=True)
     examples_run = examples_sub.add_parser("run", help="generate/render examples and optionally simulate")
     examples_run.add_argument("--skip-sim", action="store_true")
+    examples_run.add_argument("--skip-render", action="store_true", help="generate examples without rendering schematics")
     examples_run.set_defaults(handler=cmd_examples_run)
     examples_render = examples_sub.add_parser("render", help="render example schematics")
     examples_render.set_defaults(handler=cmd_examples_render)
+    examples_list = examples_sub.add_parser("list", help="list configured sample runs")
+    examples_list.add_argument("--json", action="store_true", dest="as_json")
+    examples_list.set_defaults(handler=cmd_examples_list)
 
     docs = sub.add_parser("docs", help="GitHub Pages documentation commands")
     docs_sub = docs.add_subparsers(dest="docs_command", required=True)
@@ -126,6 +141,9 @@ def build_parser() -> argparse.ArgumentParser:
     docs_build.set_defaults(handler=lambda _args: cmd_docs(["build"]))
     docs_serve = docs_sub.add_parser("serve", help="serve MkDocs site")
     docs_serve.set_defaults(handler=lambda _args: cmd_docs(["serve", "-a", "0.0.0.0:8000"]))
+    docs_assets = docs_sub.add_parser("assets", help="generate docs plot and schematic assets")
+    docs_assets.add_argument("--skip-schematics", action="store_true")
+    docs_assets.set_defaults(handler=cmd_docs_assets)
 
     ci = sub.add_parser("ci", help="local CI parity commands")
     ci_sub = ci.add_subparsers(dest="ci_command", required=True)
@@ -255,6 +273,26 @@ def cmd_raw_stats(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_raw_plot(args: argparse.Namespace) -> int:
+    source = Path(args.input)
+    default = workspace_paths().latest / f"{safe_plot_stem(source, args.traces)}.svg"
+    output = safe_output_path(args.output, default)
+    svg, png = plot_raw_traces(
+        source,
+        args.traces,
+        output,
+        x_trace=args.x_trace,
+        title=args.title,
+        png=args.png,
+    )
+    print(f"SVG plot: {svg}")
+    if png:
+        print(f"PNG plot: {png}")
+    elif args.png:
+        print("PNG plot: not produced; rsvg-convert/resvg not available")
+    return 0
+
+
 def cmd_code_build(args: argparse.Namespace) -> int:
     script = Path(args.input).resolve()
     output_dir = Path(args.output_dir).resolve() if args.output_dir else script.parent / "generated"
@@ -273,25 +311,50 @@ def cmd_code_build(args: argparse.Namespace) -> int:
 
 
 def cmd_examples_run(args: argparse.Namespace) -> int:
-    outputs = _build_rc_example()
-    render_asc_to_svg(outputs["asc"], workspace_paths().latest / "rc_step.svg")
+    output_sets = _build_all_examples()
+    if not args.skip_render:
+        for name, outputs in output_sets.items():
+            if "asc" in outputs:
+                _render_example_assets(name, outputs["asc"])
     skip = args.skip_sim or os.environ.get("CLAW_SPICE_SKIP_SIM") == "1" or not _has_ltspice_runtime()
     if skip:
-        print("Examples generated/rendered. Simulation skipped.")
+        status = "generated/rendered" if not args.skip_render else "generated"
+        print(f"Examples {status}. Simulation skipped.")
         return 0
-    result = run_simulation(outputs["cir"])
-    print(f"Simulation return code: {result.returncode}")
-    return result.returncode
+    failed = 0
+    for name, outputs in output_sets.items():
+        if "cir" not in outputs:
+            continue
+        result = run_simulation(outputs["cir"])
+        print(f"{name}: simulation return code {result.returncode}")
+        failed += 1 if result.returncode != 0 else 0
+    return 1 if failed else 0
 
 
 def cmd_examples_render(_args: argparse.Namespace) -> int:
-    outputs = _build_rc_example()
-    svg = render_asc_to_svg(outputs["asc"], workspace_paths().latest / "rc_step.svg")
-    terminal_path = workspace_paths().latest / "rc_step.terminal.txt"
-    terminal_path.parent.mkdir(parents=True, exist_ok=True)
-    terminal_path.write_text(terminal_preview(svg))
-    print(f"SVG: {svg}")
-    print(f"Terminal preview: {terminal_path}")
+    for name, outputs in _build_all_examples().items():
+        if "asc" not in outputs:
+            continue
+        svg, docs_svg = _render_example_assets(name, outputs["asc"])
+        terminal_path = workspace_paths().latest / f"{name}.terminal.txt"
+        terminal_path.parent.mkdir(parents=True, exist_ok=True)
+        terminal_path.write_text(terminal_preview(svg))
+        print(f"SVG: {svg}")
+        print(f"Docs SVG: {docs_svg}")
+        print(f"Terminal preview: {terminal_path}")
+    return 0
+
+
+def cmd_examples_list(args: argparse.Namespace) -> int:
+    runs = _sample_runs()
+    if args.as_json:
+        print(json.dumps(runs, indent=2))
+        return 0
+    for item in runs:
+        print(f"{item['id']}: {item['name']}")
+        print(f"  generator: {item.get('generator', 'n/a')}")
+        print(f"  circuit:   {item.get('circuit', 'n/a')}")
+        print(f"  schematic: {item.get('schematic', 'n/a')}")
     return 0
 
 
@@ -302,11 +365,26 @@ def cmd_docs(args: list[str]) -> int:
     return subprocess.run([mkdocs, *args, "-f", "docs-site/mkdocs.yml"], check=False).returncode
 
 
+def cmd_docs_assets(args: argparse.Namespace) -> int:
+    plots = generate_plot_assets()
+    for plot in plots:
+        print(f"Plot: {plot}")
+    if args.skip_schematics:
+        print("Schematic assets skipped.")
+        return 0
+    if not _has_schematic_renderer():
+        raise RuntimeError("ltspice_to_svg is required to generate schematic assets")
+    return cmd_examples_render(args)
+
+
 def cmd_ci_smoke(args: argparse.Namespace) -> int:
     test_code = cmd_test(argparse.Namespace(pattern="test_*.py"))
     if test_code != 0:
         return test_code
-    return cmd_examples_render(args)
+    if _has_schematic_renderer():
+        return cmd_examples_render(args)
+    print("Schematic rendering skipped: ltspice_to_svg not found.")
+    return cmd_examples_run(argparse.Namespace(skip_sim=True, skip_render=True))
 
 
 def _load_module(path: Path) -> ModuleType:
@@ -338,8 +416,74 @@ def _build_rc_example() -> dict[str, Path]:
     return _write_circuit_outputs(module.create_circuit(), output_dir, "rc_step")
 
 
+def _build_all_examples() -> dict[str, dict[str, Path]]:
+    root = Path("examples")
+    result: dict[str, dict[str, Path]] = {}
+    sample_ids = _sample_ids_by_generator()
+    for script in sorted(root.glob("**/*.py")):
+        if "generated" in script.parts:
+            continue
+        relative_parent = script.parent.relative_to(root)
+        name = sample_ids.get(script.as_posix()) or "-".join((*relative_parent.parts, script.stem)).replace("_", "-")
+        output_dir = workspace_paths().latest / "examples" / relative_parent
+        module = _load_module(script.resolve())
+        if hasattr(module, "build"):
+            outputs = {key: Path(value) for key, value in module.build(output_dir).items()}
+        elif hasattr(module, "create_circuit"):
+            outputs = _write_circuit_outputs(module.create_circuit(), output_dir, script.stem)
+        else:
+            continue
+        result[name] = outputs
+    return result
+
+
+def _sample_runs() -> list[dict[str, object]]:
+    path = Path("examples/sample-runs.toml")
+    if not path.exists():
+        return []
+    data = tomllib.loads(path.read_text())
+    return list(data.get("runs", []))
+
+
+def _sample_ids_by_generator() -> dict[str, str]:
+    result: dict[str, str] = {}
+    for item in _sample_runs():
+        generator = item.get("generator")
+        sample_id = item.get("id")
+        if isinstance(generator, str) and isinstance(sample_id, str):
+            result[Path(generator).as_posix()] = sample_id
+    return result
+
+
+def _sample_schematics_by_id() -> dict[str, Path]:
+    result: dict[str, Path] = {}
+    for item in _sample_runs():
+        sample_id = item.get("id")
+        schematic = item.get("schematic")
+        if isinstance(sample_id, str) and isinstance(schematic, str):
+            result[sample_id] = Path(schematic)
+    return result
+
+
+def _render_example_assets(name: str, asc: Path) -> tuple[Path, Path]:
+    latest_svg = render_asc_to_svg(asc, workspace_paths().latest / f"{name}.svg")
+    docs_svg = Path("docs-site/pages/assets/generated") / f"{name}.svg"
+    docs_svg.parent.mkdir(parents=True, exist_ok=True)
+    stable_source = _sample_schematics_by_id().get(name)
+    if stable_source and stable_source.exists():
+        render_asc_to_svg(stable_source, docs_svg)
+        render_asc_to_svg(stable_source, stable_source.with_name("preview.svg"))
+    else:
+        docs_svg.write_bytes(latest_svg.read_bytes())
+    return latest_svg, docs_svg
+
+
 def _has_ltspice_runtime() -> bool:
     return bool(shutil.which("ltspice") or shutil.which("wine") or os.environ.get("LTSPICE_CMD"))
+
+
+def _has_schematic_renderer() -> bool:
+    return bool(shutil.which("ltspice_to_svg") or shutil.which("ltspice-to-svg"))
 
 
 if __name__ == "__main__":

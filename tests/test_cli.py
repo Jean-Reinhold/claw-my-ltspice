@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -68,15 +69,40 @@ class CliTests(unittest.TestCase):
                 "--print-svg-path",
             )
 
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertTrue(output.exists())
-            self.assertEqual(result.stdout.strip(), str(output))
+            if shutil.which("ltspice_to_svg") or shutil.which("ltspice-to-svg"):
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertTrue(output.exists())
+                self.assertEqual(result.stdout.strip(), str(output))
+            else:
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("ltspice_to_svg is required", result.stderr)
 
     def test_examples_run_skip_sim(self) -> None:
-        result = self.run_cli("examples", "run", "--skip-sim")
+        result = self.run_cli("examples", "run", "--skip-sim", "--skip-render")
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Simulation skipped", result.stdout)
+
+    def test_raw_plot_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "plot.svg"
+            result = self.run_cli("raw", "plot", "tests/fixtures/ascii.raw", "V(out)", "--output", str(output))
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("SVG plot:", result.stdout)
+            self.assertIn("<svg", output.read_text())
+
+    def test_examples_list_json(self) -> None:
+        result = self.run_cli("examples", "list", "--json")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        ids = {item["id"] for item in payload}
+        self.assertGreaterEqual(len(payload), 7)
+        self.assertIn("opamp-voltage-follower", ids)
+        self.assertIn("opamp-summing", ids)
+        self.assertIn("opamp-difference", ids)
+        self.assertIn("opamp-active-lowpass", ids)
 
 
 if __name__ == "__main__":

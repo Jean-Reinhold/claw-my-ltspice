@@ -1,0 +1,13 @@
+* Generic op-amp buffered active low-pass
+.include ../../lib/claw_opamps.lib
+VIN in 0 PULSE(0 1 0 1u 1u 500u 1m)
+VCC vcc 0 5
+VEE vee 0 -5
+RIN in filt 10k
+CF filt 0 47n
+XU1 filt out vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 4m 0 2u
+.meas TRAN vout_avg AVG V(out) FROM=2m TO=4m
+.meas TRAN vout_max MAX V(out) FROM=2m TO=4m
+.end

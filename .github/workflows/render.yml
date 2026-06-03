@@ -27,13 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
+      - name: Build Docker image
+        run: docker compose build claw-spice
 
-      - name: Render example schematics
-        run: PYTHONPATH=src python -m claw_spice.cli examples render
+      - name: Render docs assets
+        run: docker compose run --rm claw-spice claw-spice docs assets
 
       - name: Write job summary
         run: |

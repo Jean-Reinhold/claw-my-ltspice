@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   source-tests:
-    name: Source tests and fallback rendering
+    name: Source tests and example generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,10 +25,10 @@ jobs:
       - name: Run unit and integration tests
         run: PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py'
 
-      - name: Generate and render examples without LTspice
-        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim
+      - name: Generate examples without LTspice or renderer
+        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim --skip-render
 
-      - name: Upload generated fallback artifacts
+      - name: Upload generated source artifacts
         uses: actions/upload-artifact@v7
         with:
           name: claw-spice-ci-generated

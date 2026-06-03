@@ -1,0 +1,15 @@
+* Generic op-amp inverting summing amplifier
+.include ../../lib/claw_opamps.lib
+VIN1 in1 0 PULSE(0 0.5 0 1u 1u 5m 10m)
+VIN2 in2 0 PULSE(0 0.25 1m 1u 1u 5m 10m)
+VCC vcc 0 5
+VEE vee 0 -5
+R1 in1 sum 10k
+R2 in2 sum 20k
+RF out sum 20k
+XU1 0 sum vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 4m 0 5u
+.meas TRAN vout_2ms FIND V(out) AT=2m
+.meas TRAN vout_3ms FIND V(out) AT=3m
+.end

@@ -36,8 +36,8 @@ jobs:
       - name: Build Docker image
         run: docker compose build claw-spice
 
-      - name: Generate docs gallery artifacts
-        run: docker compose run --rm claw-spice claw-spice examples render
+      - name: Generate docs assets
+        run: docker compose run --rm claw-spice claw-spice docs assets
 
       - name: Build MkDocs site
         run: docker compose run --rm claw-spice claw-spice docs build

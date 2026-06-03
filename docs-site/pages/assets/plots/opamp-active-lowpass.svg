@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" role="img">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}</style>
+<text x="86" y="34" class="title">Buffered active low-pass response</text>
+<line x1="86.00" y1="72" x2="86.00" y2="478" class="grid"/>
+<text x="86.00" y="502" text-anchor="middle" class="axis">0</text>
+<line x1="255.20" y1="72" x2="255.20" y2="478" class="grid"/>
+<text x="255.20" y="502" text-anchor="middle" class="axis">0.00168</text>
+<line x1="424.40" y1="72" x2="424.40" y2="478" class="grid"/>
+<text x="424.40" y="502" text-anchor="middle" class="axis">0.00336</text>
+<line x1="593.60" y1="72" x2="593.60" y2="478" class="grid"/>
+<text x="593.60" y="502" text-anchor="middle" class="axis">0.00504</text>
+<line x1="762.80" y1="72" x2="762.80" y2="478" class="grid"/>
+<text x="762.80" y="502" text-anchor="middle" class="axis">0.00672</text>
+<line x1="932.00" y1="72" x2="932.00" y2="478" class="grid"/>
+<text x="932.00" y="502" text-anchor="middle" class="axis">0.0084</text>
+<line x1="86" y1="478.00" x2="932" y2="478.00" class="grid"/>
+<text x="74" y="482.00" text-anchor="end" class="axis">-0.05</text>
+<line x1="86" y1="396.80" x2="932" y2="396.80" class="grid"/>
+<text x="74" y="400.80" text-anchor="end" class="axis">0.17</text>
+<line x1="86" y1="315.60" x2="932" y2="315.60" class="grid"/>
+<text x="74" y="319.60" text-anchor="end" class="axis">0.39</text>
+<line x1="86" y1="234.40" x2="932" y2="234.40" class="grid"/>
+<text x="74" y="238.40" text-anchor="end" class="axis">0.61</text>
+<line x1="86" y1="153.20" x2="932" y2="153.20" class="grid"/>
+<text x="74" y="157.20" text-anchor="end" class="axis">0.83</text>
+<line x1="86" y1="72.00" x2="932" y2="72.00" class="grid"/>
+<text x="74" y="76.00" text-anchor="end" class="axis">1.05</text>
+<rect x="86" y="72" width="846" height="406" class="frame"/>
+<polyline points="86.00,90.45 102.11,90.45 118.23,90.45 134.34,90.45 150.46,90.45 166.57,90.45 182.69,90.45 198.80,459.55 214.91,459.55 231.03,459.55 247.14,459.55 263.26,459.55 279.37,459.55 295.49,90.45 311.60,90.45 327.71,90.45 343.83,90.45 359.94,90.45 376.06,90.45 392.17,459.55 408.29,459.55 424.40,459.55 440.51,459.55 456.63,459.55 472.74,459.55 488.86,90.45 504.97,90.45 521.09,90.45 537.20,90.45 553.31,90.45 569.43,90.45 585.54,90.45 601.66,459.55 617.77,459.55 633.89,459.55 650.00,459.55 666.11,459.55 682.23,459.55 698.34,90.45 714.46,90.45 730.57,90.45 746.69,90.45 762.80,90.45 778.91,90.45 795.03,459.55 811.14,459.55 827.26,459.55 843.37,459.55 859.49,459.55 875.60,459.55 891.71,90.45" fill="none" stroke="#2563eb" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="86.00,349.11 102.11,271.71 118.23,217.48 134.34,179.47 150.46,152.84 166.57,134.17 182.69,121.09 198.80,222.36 214.91,293.33 231.03,343.06 247.14,377.92 263.26,402.34 279.37,419.46 295.49,321.02 311.60,252.03 327.71,203.68 343.83,169.80 359.94,146.06 376.06,129.42 392.17,228.20 408.29,297.42 424.40,345.93 440.51,379.93 456.63,403.75 472.74,420.45 488.86,321.71 504.97,252.51 521.09,204.02 537.20,170.04 553.31,146.23 569.43,129.54 585.54,117.84 601.66,220.09 617.77,291.74 633.89,341.95 650.00,377.13 666.11,401.79 682.23,419.07 698.34,320.75 714.46,251.84 730.57,203.55 746.69,169.71 762.80,146.00 778.91,129.38 795.03,228.17 811.14,297.40 827.26,345.92 843.37,379.92 859.49,403.74 875.60,420.44 891.71,321.70" fill="none" stroke="#dc2626" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="86" y1="521" x2="114" y2="521" stroke="#2563eb" stroke-width="3"/>
+<text x="122" y="526" class="legend">V(in)</text>
+<line x1="276" y1="521" x2="304" y2="521" stroke="#dc2626" stroke-width="3"/>
+<text x="312" y="526" class="legend">V(out)</text>
+<text x="509.00" y="546" text-anchor="middle" class="axis">time</text>
+<text x="22" y="275.00" text-anchor="middle" class="axis" transform="rotate(-90 22 275.00)">signal</text>
+</svg>

@@ -78,6 +78,17 @@ class Circuit:
     def voltage(self, ref: str, node_p: str, node_n: str, value: str, **layout: object) -> Component:
         return self.add(ref, "voltage", (node_p, node_n), value, **layout)
 
+    def behavioral_voltage(
+        self,
+        ref: str,
+        node_p: str,
+        node_n: str,
+        expression: str,
+        **layout: object,
+    ) -> Component:
+        value = expression if expression.strip().upper().startswith("V=") else f"V={expression}"
+        return self.add(ref, "bv", (node_p, node_n), value, **layout)
+
     def current(self, ref: str, node_p: str, node_n: str, value: str, **layout: object) -> Component:
         return self.add(ref, "current", (node_p, node_n), value, **layout)
 
@@ -107,6 +118,35 @@ class Circuit:
         **layout: object,
     ) -> Component:
         return self.add(ref, "nmos", (drain, gate, source, bulk), "", model=model, **layout)
+
+    def subcircuit(
+        self,
+        ref: str,
+        kind: str,
+        nodes: tuple[str, ...],
+        name: str,
+        **layout: object,
+    ) -> Component:
+        return self.add(ref, kind, nodes, name, **layout)
+
+    def opamp(
+        self,
+        ref: str,
+        non_inverting: str,
+        inverting: str,
+        vcc: str,
+        vee: str,
+        output: str,
+        subckt: str = "CLAW_IDEAL_OPAMP",
+        **layout: object,
+    ) -> Component:
+        return self.subcircuit(
+            ref,
+            "opamp",
+            (non_inverting, inverting, vcc, vee, output),
+            subckt,
+            **layout,
+        )
 
     def include(self, path: str) -> None:
         self.includes.append(path)
@@ -160,11 +200,13 @@ class AscExporter:
         "cap": "cap",
         "ind": "ind",
         "voltage": "voltage",
+        "bv": "bv",
         "current": "current",
         "diode": "diode",
         "npn": "npn",
         "bjt": "npn",
         "nmos": "nmos",
+        "opamp": "opamp2",
     }
 
     def __init__(self, circuit: Circuit) -> None:
@@ -218,6 +260,8 @@ def _node_offsets(kind: str, count: int) -> list[tuple[int, int]]:
         return [(48, 0), (0, 32), (48, 96)]
     if kind == "nmos":
         return [(48, 0), (0, 80), (48, 96), (80, 96)]
+    if kind == "opamp":
+        return [(0, 32), (0, 96), (48, 0), (48, 128), (96, 64)]
     return [(index * 48, 0) for index in range(count)]
 
 

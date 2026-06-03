@@ -30,8 +30,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Generate and render examples
-        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim
+      - name: Generate examples
+        run: PYTHONPATH=src python -m claw_spice.cli examples run --skip-sim --skip-render
 
       - name: Upload generated examples
         uses: actions/upload-artifact@v7

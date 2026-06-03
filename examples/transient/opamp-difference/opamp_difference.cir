@@ -1,0 +1,16 @@
+* Generic op-amp difference amplifier
+.include ../../lib/claw_opamps.lib
+VPLUS plus 0 PULSE(0 0.8 0 1u 1u 5m 10m)
+VMINUS minus 0 PULSE(0 0.3 1m 1u 1u 5m 10m)
+VCC vcc 0 5
+VEE vee 0 -5
+RINM minus inv 10k
+RFM out inv 20k
+RINP plus noninv 10k
+RGP noninv 0 20k
+XU1 noninv inv vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 4m 0 5u
+.meas TRAN vout_2ms FIND V(out) AT=2m
+.meas TRAN vout_3ms FIND V(out) AT=3m
+.end

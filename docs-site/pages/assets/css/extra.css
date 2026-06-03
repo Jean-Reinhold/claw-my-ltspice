@@ -1,0 +1,13 @@
+:root {
+  --md-primary-fg-color: #d35400;
+}
+
+.md-typeset img {
+  border: 1px solid #f3e2d2;
+  border-radius: 0.5rem;
+  background: #fbfaf7;
+}
+
+.md-typeset table img {
+  max-width: 280px;
+}

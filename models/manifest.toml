@@ -1,4 +1,13 @@
 [[models]]
+name = "CLAW_IDEAL_OPAMP"
+kind = "opamp"
+source = "repo-owned"
+path = "examples/lib/claw_opamps.lib"
+license = "MIT"
+redistributable = true
+notes = "Educational generic macromodel for topology and workflow validation; not vendor accurate."
+
+[[models]]
 name = "2N3904"
 kind = "bjt"
 source = "ltspice-built-in"

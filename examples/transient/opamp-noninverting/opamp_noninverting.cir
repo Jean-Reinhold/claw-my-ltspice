@@ -1,0 +1,13 @@
+* Generic op-amp non-inverting amplifier
+.include ../../lib/claw_opamps.lib
+VIN in 0 PULSE(0 1 0 1u 1u 5m 10m)
+VCC vcc 0 5
+VEE vee 0 -5
+XU1 in fb vcc vee out CLAW_IDEAL_OPAMP
+RG fb 0 10k
+RF out fb 20k
+RL out 0 10k
+.tran 0 4m 0 5u
+.meas TRAN vout_2ms FIND V(out) AT=2m
+.meas TRAN gain_2ms PARAM vout_2ms/1
+.end
