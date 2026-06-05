@@ -1,0 +1,12 @@
+* Diode clipper harmonic spectrum
+VIN in 0 SINE(0 3 1k)
+RSRC in clip 1k
+RLOAD clip 0 10k
+DCLIP clip 0 DCLAW
+.model DCLAW D(Is=2n Rs=0.25 N=1.8 Cjo=2p M=0.33 Eg=1.11)
+.options plotwinsize=0
+.tran 0 8m 0 1u
+.meas TRAN clip_max MAX V(clip) FROM=2m TO=8m
+.meas TRAN clip_min MIN V(clip) FROM=2m TO=8m
+.meas TRAN clip_avg AVG V(clip) FROM=2m TO=8m
+.end

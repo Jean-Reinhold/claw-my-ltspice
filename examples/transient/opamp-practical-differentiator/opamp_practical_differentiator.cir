@@ -1,0 +1,16 @@
+* Practical inverting op-amp differentiator
+.include ../../lib/claw_opamps.lib
+VIN in 0 PULSE(-0.05 0.05 0 500u 500u 2m 5m)
+VCC vcc 0 5
+VEE vee 0 -5
+CIN in ncin 100n
+RIN ncin sum 1k
+RF out sum 100k
+CF out sum 1n
+XU1 0 sum vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 15m 0 5u
+.meas TRAN vout_max MAX V(out) FROM=5m TO=15m
+.meas TRAN vout_min MIN V(out) FROM=5m TO=15m
+.meas TRAN vout_rms RMS V(out) FROM=5m TO=15m
+.end

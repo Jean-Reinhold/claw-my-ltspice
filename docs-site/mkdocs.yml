@@ -20,16 +20,26 @@ theme:
     - search.suggest
 
 nav:
-  - Home: index.md
+  - Overview: index.md
   - Quick Start: quick-start.md
-  - Examples: examples.md
+  - Engineering Workflow: engineering-workflow.md
+  - Runtime Architecture: docker.md
+  - CLI Reference: command-reference.md
+  - Code-Generated Schematics: code-to-schematic.md
+  - Schematic Rendering: schematic-rendering.md
+  - Simulation And Analysis: simulation-analysis.md
+  - Circuit Examples: examples.md
+  - Theory To Examples: theory-to-examples.md
+  - RC Step Walkthrough: example-rc-step.md
+  - Op-Amp Walkthroughs: example-opamps.md
+  - Precision Rectifier Walkthrough: example-precision-rectifier.md
+  - Sallen-Key Walkthrough: example-sallen-key-lowpass.md
   - Gallery: gallery.md
-  - Signal Plots: signal-plots.md
-  - OpenCode Skills: opencode.md
-  - Docker LTspice: docker.md
-  - Code To Schematic: code-to-schematic.md
+  - Plots And FFT Gallery: signal-plots.md
+  - AI Workflow: opencode.md
+  - Full AI Instructions: ai-instructions.md
   - GitHub Actions: github-actions.md
-  - Model Policy: model-policy.md
+  - Models And Licensing: model-policy.md
   - Troubleshooting: troubleshooting.md
 
 markdown_extensions:

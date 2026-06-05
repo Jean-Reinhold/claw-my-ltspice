@@ -8,6 +8,15 @@ redistributable = true
 notes = "Educational generic macromodel for topology and workflow validation; not vendor accurate."
 
 [[models]]
+name = "DCLAW"
+kind = "diode"
+source = "repo-owned"
+path = "examples/transient/precision-rectifier/precision_rectifier.cir"
+license = "MIT"
+redistributable = true
+notes = "Small educational diode model embedded in the precision rectifier example; not vendor accurate."
+
+[[models]]
 name = "2N3904"
 kind = "bjt"
 source = "ltspice-built-in"

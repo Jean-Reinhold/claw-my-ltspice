@@ -5,7 +5,7 @@ import math
 import re
 from pathlib import Path
 
-from claw_spice.raw import WaveformData, waveform_data
+from claw_spice.raw import WaveformData, WaveformSeries, waveform_data
 from claw_spice.render import render_png
 
 
@@ -29,6 +29,18 @@ def plot_raw_traces(
     return output_path, png_path
 
 
+def plot_raw_fft(
+    raw_path: str | Path,
+    trace: str,
+    output: str | Path,
+    *,
+    title: str | None = None,
+    png: bool = False,
+) -> tuple[Path, Path | None]:
+    source = waveform_data(raw_path, [trace])
+    return plot_fft_waveform_data(source, output, title=title or f"FFT of {trace}", png=png)
+
+
 def plot_waveform_data(
     data: WaveformData,
     output: str | Path,
@@ -43,9 +55,59 @@ def plot_waveform_data(
     return output_path, png_path
 
 
+def plot_fft_waveform_data(
+    data: WaveformData,
+    output: str | Path,
+    *,
+    title: str,
+    png: bool = False,
+) -> tuple[Path, Path | None]:
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(_plot_svg(fft_waveform_data(data), title))
+    png_path = render_png(output_path) if png else None
+    return output_path, png_path
+
+
+def fft_waveform_data(data: WaveformData) -> WaveformData:
+    if len(data.series) != 1:
+        raise ValueError("FFT plots require exactly one selected signal trace")
+    if len(data.x_values) < 4:
+        raise ValueError("FFT plots require at least four samples")
+    sample_step = _sample_step(data.x_values)
+    values = data.series[0].values
+    sample_count = min(len(data.x_values), len(values), 2048)
+    sample_count = _largest_power_of_two(sample_count)
+    if sample_count < 4:
+        raise ValueError("FFT plots require at least four usable samples")
+    sampled = values[:sample_count]
+    mean = sum(sampled) / sample_count
+    centered = [value - mean for value in sampled]
+    window = _hann_window(sample_count)
+    window_sum = sum(window) or 1.0
+    frequencies: list[float] = []
+    magnitudes: list[float] = []
+    for bin_index in range(sample_count // 2 + 1):
+        real = 0.0
+        imag = 0.0
+        for sample_index, value in enumerate(centered):
+            angle = -2.0 * math.pi * bin_index * sample_index / sample_count
+            weighted = value * window[sample_index]
+            real += weighted * math.cos(angle)
+            imag += weighted * math.sin(angle)
+        scale = 1.0 / window_sum if bin_index in {0, sample_count // 2} else 2.0 / window_sum
+        frequencies.append(bin_index / (sample_count * sample_step))
+        magnitudes.append(math.hypot(real, imag) * scale)
+    return WaveformData("frequency (Hz)", frequencies, [WaveformSeries(f"FFT {data.series[0].trace}", magnitudes)])
+
+
 def safe_plot_stem(raw_path: str | Path, traces: list[str] | tuple[str, ...]) -> str:
     trace_suffix = "_".join(_safe_token(trace) for trace in traces) if traces else "signals"
     return f"{Path(raw_path).stem}_{trace_suffix}"
+
+
+def safe_fft_stem(raw_path: str | Path, trace: str) -> str:
+    return f"{Path(raw_path).stem}_fft_{_safe_token(trace)}"
 
 
 def _plot_svg(data: WaveformData, title: str) -> str:
@@ -136,6 +198,29 @@ def _format_number(value: float) -> str:
     if absolute >= 1000 or absolute < 0.001:
         return f"{value:.3g}"
     return f"{value:.4g}"
+
+
+def _sample_step(values: list[float]) -> float:
+    deltas = [b - a for a, b in zip(values, values[1:], strict=False) if b > a]
+    if not deltas:
+        raise ValueError("FFT x-axis must be monotonically increasing")
+    average = sum(deltas) / len(deltas)
+    if average <= 0:
+        raise ValueError("FFT sample step must be positive")
+    return average
+
+
+def _largest_power_of_two(value: int) -> int:
+    result = 1
+    while result * 2 <= value:
+        result *= 2
+    return result
+
+
+def _hann_window(count: int) -> list[float]:
+    if count == 1:
+        return [1.0]
+    return [0.5 - 0.5 * math.cos(2.0 * math.pi * index / (count - 1)) for index in range(count)]
 
 
 def _safe_token(value: str) -> str:

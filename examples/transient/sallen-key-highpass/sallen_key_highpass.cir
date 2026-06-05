@@ -1,0 +1,16 @@
+* Unity-gain Sallen-Key high-pass filter
+.include ../../lib/claw_opamps.lib
+VIN in 0 PULSE(0 0.5 0 20u 20u 500u 1m)
+VCC vcc 0 5
+VEE vee 0 -5
+C1 in n1 10n
+C2 n1 filt 10n
+R1 n1 out 10k
+R2 filt 0 10k
+XU1 filt out vcc vee out CLAW_IDEAL_OPAMP
+RL out 0 10k
+.tran 0 5m 0 1u
+.meas TRAN vout_max MAX V(out) FROM=1m TO=5m
+.meas TRAN vout_min MIN V(out) FROM=1m TO=5m
+.meas TRAN vout_avg AVG V(out) FROM=1m TO=5m
+.end

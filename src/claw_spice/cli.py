@@ -12,11 +12,11 @@ from pathlib import Path
 from types import ModuleType
 
 from claw_spice import __version__
-from claw_spice.docs_assets import generate_plot_assets
+from claw_spice.docs_assets import generate_opencode_reference, generate_plot_assets
 from claw_spice.ir import Circuit
 from claw_spice.logs import format_log_summary, parse_log
 from claw_spice.paths import safe_output_path, workspace_paths
-from claw_spice.plot import plot_raw_traces, safe_plot_stem
+from claw_spice.plot import plot_raw_fft, plot_raw_traces, safe_fft_stem, safe_plot_stem
 from claw_spice.raw import stats as raw_stats
 from claw_spice.raw import trace_names
 from claw_spice.render import render_asc_to_svg, render_png, terminal_preview
@@ -114,6 +114,13 @@ def build_parser() -> argparse.ArgumentParser:
     raw_plot.add_argument("--title", default=None)
     raw_plot.add_argument("--png", action="store_true", help="also convert the SVG plot to PNG when available")
     raw_plot.set_defaults(handler=cmd_raw_plot)
+    raw_fft = raw_sub.add_parser("fft", help="plot a single-sided FFT magnitude spectrum from an LTspice .raw trace")
+    raw_fft.add_argument("input")
+    raw_fft.add_argument("trace", help="trace name to transform")
+    raw_fft.add_argument("--output", "-o", default=None)
+    raw_fft.add_argument("--title", default=None)
+    raw_fft.add_argument("--png", action="store_true", help="also convert the SVG plot to PNG when available")
+    raw_fft.set_defaults(handler=cmd_raw_fft)
 
     code = sub.add_parser("code", help="code-to-circuit commands")
     code_sub = code.add_subparsers(dest="code_command", required=True)
@@ -293,6 +300,19 @@ def cmd_raw_plot(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_raw_fft(args: argparse.Namespace) -> int:
+    source = Path(args.input)
+    default = workspace_paths().latest / f"{safe_fft_stem(source, args.trace)}.svg"
+    output = safe_output_path(args.output, default)
+    svg, png = plot_raw_fft(source, args.trace, output, title=args.title, png=args.png)
+    print(f"SVG FFT plot: {svg}")
+    if png:
+        print(f"PNG FFT plot: {png}")
+    elif args.png:
+        print("PNG FFT plot: not produced; rsvg-convert/resvg not available")
+    return 0
+
+
 def cmd_code_build(args: argparse.Namespace) -> int:
     script = Path(args.input).resolve()
     output_dir = Path(args.output_dir).resolve() if args.output_dir else script.parent / "generated"
@@ -369,6 +389,8 @@ def cmd_docs_assets(args: argparse.Namespace) -> int:
     plots = generate_plot_assets()
     for plot in plots:
         print(f"Plot: {plot}")
+    opencode_reference = generate_opencode_reference()
+    print(f"AI instructions: {opencode_reference}")
     if args.skip_schematics:
         print("Schematic assets skipped.")
         return 0

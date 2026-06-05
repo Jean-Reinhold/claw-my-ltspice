@@ -1,0 +1,13 @@
+* Passive RC spectrum split
+VLOW mid 0 SINE(0 1 250)
+VHIGH in mid SINE(0 0.6 4k)
+RLP in low 3.3k
+CLP low 0 47n
+CHP in high 47n
+RHP high 0 3.3k
+.options plotwinsize=0
+.tran 0 20m 0 5u
+.meas TRAN vin_rms RMS V(in) FROM=4m TO=20m
+.meas TRAN low_rms RMS V(low) FROM=4m TO=20m
+.meas TRAN high_rms RMS V(high) FROM=4m TO=20m
+.end

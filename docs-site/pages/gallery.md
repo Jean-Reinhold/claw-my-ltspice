@@ -1,56 +1,72 @@
 # Gallery
 
-Rendered gallery artifacts are produced by GitHub Actions and the Dockerized
-toolchain. The Pages workflow runs `claw-spice docs assets` before building
-MkDocs, which refreshes schematic previews under `assets/generated/` with the
-real `ltspice_to_svg` renderer and plot previews under `assets/plots/`.
+The gallery is the fastest way to inspect the generated visual artifacts. GitHub
+Actions and `./claw-spice docs assets` regenerate these files from committed
+examples using the Dockerized toolchain.
 
-## RC Step Response
+## Schematics
 
+<div class="schematic-frame" markdown>
 ![Rendered RC step response schematic](assets/generated/rc-step.svg)
+</div>
 
-## Op-Amp Voltage Follower
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp voltage follower schematic](assets/generated/opamp-voltage-follower.svg)
+</div>
 
-## Op-Amp Non-Inverting Gain
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp non-inverting schematic](assets/generated/opamp-noninverting.svg)
+</div>
 
-## Op-Amp Inverting Gain
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp inverting schematic](assets/generated/opamp-inverting.svg)
+</div>
 
-## Op-Amp Inverting Summing Amplifier
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp summing schematic](assets/generated/opamp-summing.svg)
+</div>
 
-## Op-Amp Difference Amplifier
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp difference schematic](assets/generated/opamp-difference.svg)
+</div>
 
-## Op-Amp Buffered Active Low-Pass
-
+<div class="schematic-frame" markdown>
 ![Rendered op-amp active low-pass schematic](assets/generated/opamp-active-lowpass.svg)
+</div>
 
-## Render Command
+<div class="schematic-frame" markdown>
+![Rendered precision rectifier schematic](assets/generated/precision-rectifier.svg)
+</div>
 
-```bash
-./claw-spice examples render
-```
+<div class="schematic-frame" markdown>
+![Rendered Sallen-Key low-pass schematic](assets/generated/sallen-key-lowpass.svg)
+</div>
 
-Artifacts are generated under `runs/latest/` during CI and copied into the Pages
-asset directory for publication.
+<div class="schematic-frame" markdown>
+![Rendered diode clipper schematic](assets/generated/diode-clipper-spectrum.svg)
+</div>
+
+<div class="schematic-frame" markdown>
+![Rendered RLC step ringing schematic](assets/generated/rlc-step-ringing.svg)
+</div>
+
+<div class="schematic-frame" markdown>
+![Rendered passive RC spectrum split schematic](assets/generated/passive-rc-spectrum-split.svg)
+</div>
+
+<div class="schematic-frame" markdown>
+![Rendered practical op-amp integrator schematic](assets/generated/opamp-practical-integrator.svg)
+</div>
+
+<div class="schematic-frame" markdown>
+![Rendered practical op-amp differentiator schematic](assets/generated/opamp-practical-differentiator.svg)
+</div>
+
+<div class="schematic-frame" markdown>
+![Rendered Sallen-Key high-pass schematic](assets/generated/sallen-key-highpass.svg)
+</div>
 
 ## Signal Plots
-
-Waveform plots are generated on demand from LTspice `.raw` files:
-
-```bash
-./claw-spice raw plot runs/latest/rc_step.raw V(out) --output runs/latest/rc_step_vout.svg
-```
-
-The documentation also includes expected signal-shape plots for each example:
 
 ![RC step output plot](assets/plots/rc-step-vout.svg)
 
@@ -66,18 +82,40 @@ The documentation also includes expected signal-shape plots for each example:
 
 ![Buffered active low-pass plot](assets/plots/opamp-active-lowpass.svg)
 
-## Terminal Preview
+![Precision rectifier response plot](assets/plots/precision-rectifier.svg)
 
-`claw-spice` can render a schematic in the terminal:
+![Sallen-Key low-pass response plot](assets/plots/sallen-key-lowpass.svg)
+
+![Sallen-Key low-pass FFT plot](assets/plots/sallen-key-lowpass-fft.svg)
+
+![Diode clipper response plot](assets/plots/diode-clipper-spectrum.svg)
+
+![Diode clipper FFT plot](assets/plots/diode-clipper-spectrum-fft.svg)
+
+![RLC step ringing response plot](assets/plots/rlc-step-ringing.svg)
+
+![Passive RC spectrum split plot](assets/plots/passive-rc-spectrum-split.svg)
+
+![Passive RC low-pass FFT plot](assets/plots/passive-rc-spectrum-low-fft.svg)
+
+![Passive RC high-pass FFT plot](assets/plots/passive-rc-spectrum-high-fft.svg)
+
+![Practical op-amp integrator plot](assets/plots/opamp-practical-integrator.svg)
+
+![Practical op-amp differentiator plot](assets/plots/opamp-practical-differentiator.svg)
+
+![Sallen-Key high-pass response plot](assets/plots/sallen-key-highpass.svg)
+
+![Sallen-Key high-pass FFT plot](assets/plots/sallen-key-highpass-fft.svg)
+
+## Regenerate Locally
 
 ```bash
-./claw-spice show examples/transient/rc-step/rc_step.asc --terminal
+./claw-spice examples render
+./claw-spice docs assets
+./claw-spice docs build
 ```
 
-## Visual Preview
-
-`claw-spice` can render SVG inside Docker and open it on the host:
-
-```bash
-./claw-spice show examples/transient/rc-step/rc_step.asc
-```
+Generated SVGs are intentionally ignored in the working tree except for stable
+plot assets. Recreate them when needed rather than manually editing rendered
+output.

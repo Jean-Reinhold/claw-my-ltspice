@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from claw_spice.docs_assets import generate_plot_assets
+from claw_spice.docs_assets import EXPECTED_PLOT_ASSETS, generate_opencode_reference, generate_plot_assets
 
 
 class DocsAssetTests(unittest.TestCase):
@@ -12,21 +12,27 @@ class DocsAssetTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             plots = generate_plot_assets(temp)
 
-            self.assertEqual(len(plots), 7)
+            self.assertEqual({plot.name for plot in plots}, set(EXPECTED_PLOT_ASSETS))
             for plot in plots:
                 self.assertTrue(plot.exists())
                 self.assertIn("<svg", plot.read_text())
 
+    def test_generate_opencode_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "ai-instructions.md"
+            page = generate_opencode_reference(output)
+
+            text = page.read_text()
+            self.assertIn("# Full AI Instructions", text)
+            for path in Path(".opencode/agent").glob("*.md"):
+                self.assertIn(f"Source: `{path.as_posix()}`", text)
+                self.assertIn(path.read_text().strip(), text)
+            for path in Path(".opencode/skills").glob("*/SKILL.md"):
+                self.assertIn(f"Source: `{path.as_posix()}`", text)
+                self.assertIn(path.read_text().strip(), text)
+
     def test_committed_plot_assets_exist_for_pages(self) -> None:
-        expected = {
-            "rc-step-vout.svg",
-            "opamp-voltage-follower.svg",
-            "opamp-noninverting.svg",
-            "opamp-inverting.svg",
-            "opamp-summing.svg",
-            "opamp-difference.svg",
-            "opamp-active-lowpass.svg",
-        }
+        expected = set(EXPECTED_PLOT_ASSETS)
         actual = {path.name for path in Path("docs-site/pages/assets/plots").glob("*.svg")}
 
         self.assertTrue(expected.issubset(actual))

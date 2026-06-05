@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import tomllib
 import unittest
 from pathlib import Path
+
+from claw_spice.docs_assets import EXPECTED_PLOT_ASSETS
 
 
 class GitHubAssetTests(unittest.TestCase):
@@ -48,37 +51,56 @@ class GitHubAssetTests(unittest.TestCase):
 
     def test_mkdocs_site_metadata(self) -> None:
         mkdocs = Path("docs-site/mkdocs.yml").read_text()
+        expected_nav = {
+            "Overview: index.md",
+            "Quick Start: quick-start.md",
+            "Engineering Workflow: engineering-workflow.md",
+            "Runtime Architecture: docker.md",
+            "CLI Reference: command-reference.md",
+            "Code-Generated Schematics: code-to-schematic.md",
+            "Schematic Rendering: schematic-rendering.md",
+            "Simulation And Analysis: simulation-analysis.md",
+            "Circuit Examples: examples.md",
+            "Theory To Examples: theory-to-examples.md",
+            "RC Step Walkthrough: example-rc-step.md",
+            "Op-Amp Walkthroughs: example-opamps.md",
+            "Precision Rectifier Walkthrough: example-precision-rectifier.md",
+            "Sallen-Key Walkthrough: example-sallen-key-lowpass.md",
+            "Gallery: gallery.md",
+            "Plots And FFT Gallery: signal-plots.md",
+            "AI Workflow: opencode.md",
+            "Full AI Instructions: ai-instructions.md",
+            "GitHub Actions: github-actions.md",
+            "Models And Licensing: model-policy.md",
+            "Troubleshooting: troubleshooting.md",
+        }
 
         self.assertIn("site_name: claw-spice", mkdocs)
         self.assertIn("site_description:", mkdocs)
         self.assertIn("repo_url:", mkdocs)
         self.assertIn("theme:", mkdocs)
-        self.assertIn("Home: index.md", mkdocs)
+        for nav_entry in expected_nav:
+            with self.subTest(nav_entry=nav_entry):
+                self.assertIn(nav_entry, mkdocs)
+                self.assertTrue((Path("docs-site/pages") / nav_entry.rsplit(": ", 1)[1]).exists())
 
     def test_pages_content_mentions_core_features(self) -> None:
         home = Path("docs-site/pages/index.md").read_text()
 
         for phrase in (
-            "OpenCode-assisted LTspice automation",
+            "Docker-first LTspice automation",
             "Docker",
             "code-generated schematics",
-            "GitHub Actions",
+            "OpenCode",
         ):
             self.assertIn(phrase, home)
 
     def test_pages_reference_rendered_example_images(self) -> None:
         examples = Path("docs-site/pages/examples.md").read_text()
         gallery = Path("docs-site/pages/gallery.md").read_text()
+        run_ids = {item["id"] for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]}
 
-        for image in (
-            "assets/generated/rc-step.svg",
-            "assets/generated/opamp-voltage-follower.svg",
-            "assets/generated/opamp-noninverting.svg",
-            "assets/generated/opamp-inverting.svg",
-            "assets/generated/opamp-summing.svg",
-            "assets/generated/opamp-difference.svg",
-            "assets/generated/opamp-active-lowpass.svg",
-        ):
+        for image in (f"assets/generated/{run_id}.svg" for run_id in run_ids):
             self.assertIn(image, examples + gallery)
 
     def test_pages_reference_signal_plot_images(self) -> None:
@@ -86,17 +108,36 @@ class GitHubAssetTests(unittest.TestCase):
         examples = Path("docs-site/pages/examples.md").read_text()
         gallery = Path("docs-site/pages/gallery.md").read_text()
 
-        for image in (
-            "assets/plots/rc-step-vout.svg",
-            "assets/plots/opamp-voltage-follower.svg",
-            "assets/plots/opamp-noninverting.svg",
-            "assets/plots/opamp-inverting.svg",
-            "assets/plots/opamp-summing.svg",
-            "assets/plots/opamp-difference.svg",
-            "assets/plots/opamp-active-lowpass.svg",
-        ):
+        for name in EXPECTED_PLOT_ASSETS:
+            image = f"assets/plots/{name}"
             self.assertIn(image, signal_plots + examples + gallery)
             self.assertTrue((Path("docs-site/pages") / image).exists())
+
+    def test_theory_and_opencode_pages_are_linked(self) -> None:
+        home = Path("docs-site/pages/index.md").read_text()
+        theory = Path("docs-site/pages/theory-to-examples.md").read_text()
+        opencode = Path("docs-site/pages/opencode.md").read_text()
+
+        self.assertIn("theory-to-examples.md", home)
+        self.assertIn("engineering-workflow.md", home)
+        self.assertIn("schematic-rendering.md", home)
+        self.assertIn("simulation-analysis.md", home)
+        self.assertIn("material_teorico", theory)
+        self.assertIn("ai-instructions.md", opencode)
+        self.assertIn("./claw-spice docs assets", opencode)
+
+    def test_operational_reference_pages_cover_quality_gates(self) -> None:
+        workflow = Path("docs-site/pages/engineering-workflow.md").read_text()
+        rendering = Path("docs-site/pages/schematic-rendering.md").read_text()
+        simulation = Path("docs-site/pages/simulation-analysis.md").read_text()
+        command_reference = Path("docs-site/pages/command-reference.md").read_text()
+
+        self.assertIn("Definition Of Done", workflow)
+        self.assertIn("./claw-spice raw fft", workflow)
+        self.assertIn("fake fallback", rendering)
+        self.assertIn("component groups", rendering)
+        self.assertIn("Hann window", simulation)
+        self.assertIn("raw fft", command_reference)
 
     def test_render_workflow_uses_docker_renderer_path(self) -> None:
         render = Path(".github/workflows/render.yml").read_text()

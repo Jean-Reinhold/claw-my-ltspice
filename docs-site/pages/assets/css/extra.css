@@ -6,8 +6,45 @@
   border: 1px solid #f3e2d2;
   border-radius: 0.5rem;
   background: #fbfaf7;
+  display: block;
+  height: auto;
+  margin: 1rem 0 1.5rem;
+  max-width: 100%;
 }
 
 .md-typeset table img {
-  max-width: 280px;
+  max-width: 340px;
+}
+
+.md-typeset .claw-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin: 1rem 0 1.5rem;
+}
+
+.md-typeset .claw-card {
+  border: 1px solid #f3e2d2;
+  border-radius: 0.75rem;
+  background: #fffaf4;
+  padding: 1rem;
+}
+
+.md-typeset .claw-card h3 {
+  margin-top: 0;
+}
+
+.md-typeset .schematic-frame {
+  overflow-x: auto;
+  padding: 0.25rem;
+}
+
+.md-typeset .schematic-frame img {
+  min-width: 520px;
+}
+
+@media screen and (max-width: 700px) {
+  .md-typeset .schematic-frame img {
+    min-width: 420px;
+  }
 }

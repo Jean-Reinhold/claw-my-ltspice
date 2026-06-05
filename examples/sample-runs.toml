@@ -60,3 +60,75 @@ circuit = "examples/transient/opamp-active-lowpass/opamp_active_lowpass.cir"
 schematic = "examples/transient/opamp-active-lowpass/opamp_active_lowpass.asc"
 analysis = "tran"
 expected_measurements = ["vout_avg", "vout_max"]
+
+[[runs]]
+id = "precision-rectifier"
+name = "Generic op-amp precision half-wave rectifier transient"
+generator = "examples/transient/precision-rectifier/precision_rectifier.py"
+circuit = "examples/transient/precision-rectifier/precision_rectifier.cir"
+schematic = "examples/transient/precision-rectifier/precision_rectifier.asc"
+analysis = "tran"
+expected_measurements = ["vrect_max", "vrect_min", "vrect_avg"]
+
+[[runs]]
+id = "sallen-key-lowpass"
+name = "Generic op-amp Sallen-Key low-pass transient"
+generator = "examples/transient/sallen-key-lowpass/sallen_key_lowpass.py"
+circuit = "examples/transient/sallen-key-lowpass/sallen_key_lowpass.cir"
+schematic = "examples/transient/sallen-key-lowpass/sallen_key_lowpass.asc"
+analysis = "tran"
+expected_measurements = ["vout_peak", "vout_min", "filt_peak"]
+
+[[runs]]
+id = "diode-clipper-spectrum"
+name = "Passive diode clipper harmonic spectrum transient"
+generator = "examples/transient/diode-clipper-spectrum/diode_clipper_spectrum.py"
+circuit = "examples/transient/diode-clipper-spectrum/diode_clipper_spectrum.cir"
+schematic = "examples/transient/diode-clipper-spectrum/diode_clipper_spectrum.asc"
+analysis = "tran"
+expected_measurements = ["clip_max", "clip_min", "clip_avg"]
+
+[[runs]]
+id = "rlc-step-ringing"
+name = "Passive RLC step ringing transient"
+generator = "examples/transient/rlc-step-ringing/rlc_step_ringing.py"
+circuit = "examples/transient/rlc-step-ringing/rlc_step_ringing.cir"
+schematic = "examples/transient/rlc-step-ringing/rlc_step_ringing.asc"
+analysis = "tran"
+expected_measurements = ["ring_peak", "ring_min", "vout_3ms"]
+
+[[runs]]
+id = "passive-rc-spectrum-split"
+name = "Passive RC spectrum split transient"
+generator = "examples/transient/passive-rc-spectrum-split/passive_rc_spectrum_split.py"
+circuit = "examples/transient/passive-rc-spectrum-split/passive_rc_spectrum_split.cir"
+schematic = "examples/transient/passive-rc-spectrum-split/passive_rc_spectrum_split.asc"
+analysis = "tran"
+expected_measurements = ["vin_rms", "low_rms", "high_rms"]
+
+[[runs]]
+id = "opamp-practical-integrator"
+name = "Practical op-amp inverting integrator transient"
+generator = "examples/transient/opamp-practical-integrator/opamp_practical_integrator.py"
+circuit = "examples/transient/opamp-practical-integrator/opamp_practical_integrator.cir"
+schematic = "examples/transient/opamp-practical-integrator/opamp_practical_integrator.asc"
+analysis = "tran"
+expected_measurements = ["vout_max", "vout_min", "vout_avg"]
+
+[[runs]]
+id = "opamp-practical-differentiator"
+name = "Practical op-amp inverting differentiator transient"
+generator = "examples/transient/opamp-practical-differentiator/opamp_practical_differentiator.py"
+circuit = "examples/transient/opamp-practical-differentiator/opamp_practical_differentiator.cir"
+schematic = "examples/transient/opamp-practical-differentiator/opamp_practical_differentiator.asc"
+analysis = "tran"
+expected_measurements = ["vout_max", "vout_min", "vout_rms"]
+
+[[runs]]
+id = "sallen-key-highpass"
+name = "Generic op-amp Sallen-Key high-pass transient"
+generator = "examples/transient/sallen-key-highpass/sallen_key_highpass.py"
+circuit = "examples/transient/sallen-key-highpass/sallen_key_highpass.cir"
+schematic = "examples/transient/sallen-key-highpass/sallen_key_highpass.asc"
+analysis = "tran"
+expected_measurements = ["vout_max", "vout_min", "vout_avg"]

@@ -1,0 +1,11 @@
+* Passive RLC step ringing
+VSTEP in 0 PULSE(0 5 0 1u 1u 10m 20m)
+RS in n1 47
+L1 n1 out 10m
+C1 out 0 100n
+RLOAD out 0 10k
+.tran 0 4m 0 1u
+.meas TRAN ring_peak MAX V(out) FROM=0 TO=2m
+.meas TRAN ring_min MIN V(out) FROM=0 TO=2m
+.meas TRAN vout_3ms FIND V(out) AT=3m
+.end

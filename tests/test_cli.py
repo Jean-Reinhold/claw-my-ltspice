@@ -9,6 +9,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from test_examples import EXPECTED_SAMPLE_IDS
+
 
 class CliTests(unittest.TestCase):
     def run_cli(self, *args: str) -> subprocess.CompletedProcess[str]:
@@ -98,11 +100,48 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         ids = {item["id"] for item in payload}
-        self.assertGreaterEqual(len(payload), 7)
-        self.assertIn("opamp-voltage-follower", ids)
-        self.assertIn("opamp-summing", ids)
-        self.assertIn("opamp-difference", ids)
-        self.assertIn("opamp-active-lowpass", ids)
+        self.assertEqual(ids, EXPECTED_SAMPLE_IDS)
+
+    def test_raw_fft_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            raw = Path(temp) / "wave.raw"
+            raw.write_text(
+                "\n".join(
+                    [
+                        "Title: FFT fixture",
+                        "Plotname: Transient Analysis",
+                        "Flags: real forward",
+                        "No. Variables: 2",
+                        "No. Points: 8",
+                        "Variables:",
+                        "        0       time    time",
+                        "        1       V(out)  voltage",
+                        "Values:",
+                        "0       0",
+                        "        0",
+                        "1       0.001",
+                        "        1",
+                        "2       0.002",
+                        "        0",
+                        "3       0.003",
+                        "        -1",
+                        "4       0.004",
+                        "        0",
+                        "5       0.005",
+                        "        1",
+                        "6       0.006",
+                        "        0",
+                        "7       0.007",
+                        "        -1",
+                    ]
+                )
+            )
+            output = Path(temp) / "fft.svg"
+            result = self.run_cli("raw", "fft", str(raw), "V(out)", "--output", str(output))
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("SVG FFT plot:", result.stdout)
+            self.assertIn("<svg", output.read_text())
 
 
 if __name__ == "__main__":

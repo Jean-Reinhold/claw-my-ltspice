@@ -1,0 +1,14 @@
+* Precision half-wave rectifier
+.include ../../lib/claw_opamps.lib
+VIN in 0 SINE(0 0.75 1k)
+VCC vcc 0 5
+VEE vee 0 -5
+XU1 in rect vcc vee drive CLAW_IDEAL_OPAMP
+D1 drive rect DCLAW
+RLOAD rect 0 10k
+.model DCLAW D(Is=2n Rs=0.2 N=1.8 Cjo=2p)
+.tran 0 5m 0 1u
+.meas TRAN vrect_max MAX V(rect) FROM=1m TO=5m
+.meas TRAN vrect_min MIN V(rect) FROM=1m TO=5m
+.meas TRAN vrect_avg AVG V(rect) FROM=1m TO=5m
+.end

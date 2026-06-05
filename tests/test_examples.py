@@ -5,22 +5,31 @@ import unittest
 from pathlib import Path
 
 
+EXPECTED_SAMPLE_IDS = {
+    "rc-step",
+    "opamp-voltage-follower",
+    "opamp-noninverting",
+    "opamp-inverting",
+    "opamp-summing",
+    "opamp-difference",
+    "opamp-active-lowpass",
+    "precision-rectifier",
+    "sallen-key-lowpass",
+    "diode-clipper-spectrum",
+    "rlc-step-ringing",
+    "passive-rc-spectrum-split",
+    "opamp-practical-integrator",
+    "opamp-practical-differentiator",
+    "sallen-key-highpass",
+}
+
+
 class ExampleAssetTests(unittest.TestCase):
     def test_sample_runs_have_existing_assets_and_previews(self) -> None:
         runs = tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]
         ids = {item["id"] for item in runs}
 
-        self.assertTrue(
-            {
-                "rc-step",
-                "opamp-voltage-follower",
-                "opamp-noninverting",
-                "opamp-inverting",
-                "opamp-summing",
-                "opamp-difference",
-                "opamp-active-lowpass",
-            }.issubset(ids)
-        )
+        self.assertEqual(ids, EXPECTED_SAMPLE_IDS)
 
         for item in runs:
             with self.subTest(sample=item["id"]):
@@ -41,6 +50,17 @@ class ExampleAssetTests(unittest.TestCase):
         self.assertIn("CLAW_IDEAL_OPAMP", models)
         self.assertEqual(models["CLAW_IDEAL_OPAMP"]["source"], "repo-owned")
         self.assertTrue(models["CLAW_IDEAL_OPAMP"]["redistributable"])
+        self.assertIn("DCLAW", models)
+        self.assertEqual(models["DCLAW"]["source"], "repo-owned")
+        self.assertTrue(models["DCLAW"]["redistributable"])
+
+    def test_example_docs_cover_all_sample_runs(self) -> None:
+        examples = Path("docs-site/pages/examples.md").read_text()
+        gallery = Path("docs-site/pages/gallery.md").read_text()
+
+        for sample_id in EXPECTED_SAMPLE_IDS:
+            with self.subTest(sample=sample_id):
+                self.assertIn(sample_id, examples + gallery)
 
     def test_example_readmes_embed_preview_images(self) -> None:
         for readme in Path("examples").glob("transient/*/README.md"):
