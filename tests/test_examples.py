@@ -49,6 +49,25 @@ class ExampleAssetTests(unittest.TestCase):
                 self.assertIn("preview.svg", text)
                 self.assertIn("ltspice_to_svg", text)
 
+    def test_committed_schematics_have_explicit_wires(self) -> None:
+        for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]:
+            schematic = Path(item["schematic"])
+
+            with self.subTest(schematic=schematic):
+                wire_count = sum(1 for line in schematic.read_text().splitlines() if line.startswith("WIRE "))
+                self.assertGreaterEqual(wire_count, 3)
+
+    def test_bundled_renderer_symbols_cover_examples(self) -> None:
+        symbol_dir = Path("src/claw_spice/symbols")
+        emitted_symbols: set[str] = set()
+        for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]:
+            for line in Path(item["schematic"]).read_text().splitlines():
+                if line.startswith("SYMBOL "):
+                    emitted_symbols.add(line.split()[1])
+
+        missing = {symbol for symbol in emitted_symbols if not (symbol_dir / f"{symbol}.asy").exists()}
+        self.assertFalse(missing)
+
 
 if __name__ == "__main__":
     unittest.main()

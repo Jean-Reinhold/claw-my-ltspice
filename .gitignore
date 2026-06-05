@@ -26,6 +26,9 @@ examples/**/generated/
 
 # Keep generated documentation assets opt-in.
 docs-site/site/
+docs-site/pages/assets/generated/*
+!docs-site/pages/assets/generated/.gitkeep
+examples/transient/*/*.svg
 
 # MCP/runtime sidecars
 .ltspice-mcp/

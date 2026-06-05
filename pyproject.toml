@@ -43,6 +43,9 @@ claw-spice = "claw_spice.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+claw_spice = ["symbols/*.asy"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

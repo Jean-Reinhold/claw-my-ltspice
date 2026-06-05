@@ -21,5 +21,9 @@ Always check for:
 - Explicit objective measurements.
 - Model source and pin-order assumptions.
 - Rendered schematic readability.
+- Missing rendered component symbols or `Symbol definition not found` warnings.
+- `.asc` files for non-trivial circuits that have few or no `WIRE` entries.
+- Floating labels, rotated labels, disconnected grounds, and directives that
+  overlap the circuit drawing.
 
 Return findings first, ordered by severity, with file references when possible.

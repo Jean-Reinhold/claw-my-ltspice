@@ -12,6 +12,22 @@ class Layout:
 
 
 @dataclass
+class Wire:
+    x1: int
+    y1: int
+    x2: int
+    y2: int
+
+
+@dataclass
+class Flag:
+    x: int
+    y: int
+    label: str
+    direction: str | None = None
+
+
+@dataclass
 class Component:
     ref: str
     kind: str
@@ -39,6 +55,8 @@ class Circuit:
     def __init__(self, title: str) -> None:
         self.title = title
         self.components: list[Component] = []
+        self.wires: list[Wire] = []
+        self.flags: list[Flag] = []
         self.directives: list[str] = []
         self.includes: list[str] = []
 
@@ -151,6 +169,15 @@ class Circuit:
     def include(self, path: str) -> None:
         self.includes.append(path)
 
+    def wire(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        self.wires.append(Wire(x1, y1, x2, y2))
+
+    def flag(self, x: int, y: int, label: str) -> None:
+        self.flags.append(Flag(x, y, label))
+
+    def iopin(self, x: int, y: int, label: str, direction: str) -> None:
+        self.flags.append(Flag(x, y, label, direction))
+
     def directive(self, text: str) -> None:
         self.directives.append(text if text.startswith(".") else f".{text}")
 
@@ -214,14 +241,16 @@ class AscExporter:
 
     def render(self) -> str:
         lines = ["Version 4", "SHEET 1 1200 800"]
+        for wire in self.circuit.wires:
+            lines.append(f"WIRE {wire.x1} {wire.y1} {wire.x2} {wire.y2}")
+
+        explicit_flags = bool(self.circuit.flags)
         y = 96
         for index, component in enumerate(self.circuit.components):
             x = component.layout.x if component.layout.x is not None else 128 + index * 176
             cy = component.layout.y if component.layout.y is not None else y
             symbol = self.SYMBOLS.get(component.kind, "res")
             rotation = component.layout.rotation
-            if component.kind in {"res", "ind"} and component.layout.rotation == "R0":
-                rotation = "R90"
             lines.append(f"SYMBOL {symbol} {x} {cy} {rotation}")
             lines.append(f"SYMATTR InstName {component.ref}")
             value = component.model or component.value
@@ -229,31 +258,45 @@ class AscExporter:
                 lines.append(f"SYMATTR Value {value}")
             if component.model and component.value:
                 lines.append(f"SYMATTR SpiceLine {component.value}")
-            self._append_node_labels(lines, component, x, cy)
+            if not explicit_flags:
+                self._append_node_labels(lines, component, x, cy)
 
-        text_y = 320
+        for flag in self.circuit.flags:
+            lines.append(f"FLAG {flag.x} {flag.y} {flag.label}")
+            if flag.direction:
+                lines.append(f"IOPIN {flag.x} {flag.y} {flag.direction}")
+
+        text_y = self._directive_y()
         for directive in [*self.circuit.includes_as_directives(), *self.circuit.directives]:
-            lines.append(f"TEXT 64 {text_y} Left 2 !{directive}")
+            lines.append(f"TEXT 64 {text_y} Left 1 !{directive}")
             text_y += 32
         return "\n".join(lines) + "\n"
+
+    def _directive_y(self) -> int:
+        ys: list[int] = []
+        ys.extend(y for wire in self.circuit.wires for y in (wire.y1, wire.y2))
+        ys.extend(flag.y for flag in self.circuit.flags)
+        ys.extend(component.layout.y for component in self.circuit.components if component.layout.y is not None)
+        return max(ys, default=224) + 112
 
     def _append_node_labels(self, lines: list[str], component: Component, x: int, y: int) -> None:
         # These pin label coordinates are intentionally conservative and used for
         # generated schematic readability. LTspice-compatible routing can be
         # refined through layout hints as the generator matures.
-        offsets = _node_offsets(component.kind, len(component.nodes))
+        offsets = _node_offsets(component.kind, len(component.nodes), component.layout.rotation)
         for node, (dx, dy) in zip(component.nodes, offsets, strict=False):
             label = "0" if node in {"0", "GND", "gnd"} else node
             lines.append(f"FLAG {x + dx} {y + dy} {label}")
 
 
-def _node_offsets(kind: str, count: int) -> list[tuple[int, int]]:
+def _node_offsets(kind: str, count: int, rotation: str = "R0") -> list[tuple[int, int]]:
+    vertical = rotation in {"R90", "M90", "R270", "M270"}
     if kind in {"res", "ind"}:
-        return [(0, 0), (64, 0)]
+        return [(0, 0), (0, 96)] if vertical else [(0, 0), (96, 0)]
     if kind == "cap":
-        return [(16, 0), (16, 64)]
+        return [(0, 0), (96, 0)] if vertical else [(0, 0), (0, 96)]
     if kind in {"voltage", "current"}:
-        return [(0, 16), (0, 96)]
+        return [(0, 0), (0, 96)]
     if kind == "diode":
         return [(0, 0), (64, 0)]
     if kind in {"npn", "bjt"}:
@@ -261,7 +304,7 @@ def _node_offsets(kind: str, count: int) -> list[tuple[int, int]]:
     if kind == "nmos":
         return [(48, 0), (0, 80), (48, 96), (80, 96)]
     if kind == "opamp":
-        return [(0, 32), (0, 96), (48, 0), (48, 128), (96, 64)]
+        return [(0, 32), (0, 96), (48, 0), (48, 128), (144, 64)]
     return [(index * 48, 0) for index in range(count)]
 
 

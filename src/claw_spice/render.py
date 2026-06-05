@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
 
 
 def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) -> Path:
-    source = Path(asc_path)
+    source = Path(asc_path).resolve()
     if output is None:
         output_path = source.with_suffix(".svg")
     else:
@@ -22,8 +23,22 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
             "an environment with the ltspice-to-svg package installed."
         )
 
+    errors: list[str] = []
+    for ltspice_lib in _ltspice_library_paths():
+        try:
+            return _run_renderer_command(command, source, output_path, ltspice_lib)
+        except RuntimeError as exc:
+            detail = str(exc)
+            errors.append(detail)
+            if not _is_symbol_resolution_error(detail):
+                raise
+    raise RuntimeError(errors[-1] if errors else f"ltspice_to_svg did not run for {source}")
+
+
+def _run_renderer_command(
+    command: str, source: Path, output_path: Path, ltspice_lib: str | None
+) -> Path:
     renderer_command = [command]
-    ltspice_lib = _ltspice_library_path()
     if ltspice_lib:
         renderer_command.extend(["--ltspice-lib", ltspice_lib])
     renderer_command.append(str(source))
@@ -32,6 +47,8 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
     if ltspice_lib:
         env["LTSPICE_LIB_PATH"] = ltspice_lib
 
+    produced = source.with_suffix(".svg")
+    previous_mtime = produced.stat().st_mtime_ns if produced.exists() else None
     result = subprocess.run(
         renderer_command,
         cwd=str(source.parent),
@@ -47,31 +64,44 @@ def render_asc_to_svg(asc_path: str | Path, output: str | Path | None = None) ->
             return _render_with_ltspice_to_svg_package(source, output_path, ltspice_lib)
         raise RuntimeError(f"ltspice_to_svg failed for {source}: {detail}")
 
-    produced = source.with_suffix(".svg")
-    if produced.exists():
-        if produced != output_path:
-            output_path.write_bytes(produced.read_bytes())
-        return output_path
     if result.stdout.lstrip().startswith("<svg"):
         output_path.write_text(result.stdout)
-        return output_path
+        return _finalize_svg(output_path, output_path, source)
+    if produced.exists():
+        if previous_mtime == produced.stat().st_mtime_ns:
+            raise RuntimeError(f"ltspice_to_svg did not produce a fresh SVG for {source}")
+        return _finalize_svg(produced, output_path, source)
     raise RuntimeError(f"ltspice_to_svg did not produce an SVG for {source}")
 
 
-def _ltspice_library_path() -> str | None:
+def _ltspice_library_paths() -> list[str | None]:
+    paths: list[str | None] = []
+
+    def append(path: str | None) -> None:
+        if path and path not in paths:
+            paths.append(path)
+
     ltspice_lib = os.environ.get("LTSPICE_LIB_PATH")
-    if ltspice_lib:
-        return ltspice_lib
+    append(ltspice_lib)
+
+    bundled_symbols = Path(__file__).resolve().parent / "symbols"
+    if bundled_symbols.exists():
+        append(str(bundled_symbols))
 
     docker_ltspice_lib = Path("/opt/ltspice/lib/sym")
     if docker_ltspice_lib.exists():
-        return str(docker_ltspice_lib)
-    return None
+        append(str(docker_ltspice_lib))
+    paths.append(None)
+    return paths
+
+
+def _is_symbol_resolution_error(detail: str) -> bool:
+    return "could not resolve symbol definitions" in detail or "Symbol definition not found" in detail
 
 
 def _render_with_ltspice_to_svg_package(source: Path, output_path: Path, ltspice_lib: str | None) -> Path:
     # ltspice-to-svg 0.2.0's CLI rejects Linux, but its parser/renderer works
-    # when the Docker LTspice symbol path is provided explicitly.
+    # when a symbol library path is provided explicitly.
     try:
         from src.parsers.schematic_parser import SchematicParser
         from src.renderers.rendering_config import RenderingConfig
@@ -83,8 +113,19 @@ def _render_with_ltspice_to_svg_package(source: Path, output_path: Path, ltspice
     if ltspice_lib:
         os.environ["LTSPICE_LIB_PATH"] = ltspice_lib
     try:
-        parser = SchematicParser(str(source))
+        parser = SchematicParser(str(source), lib_path=ltspice_lib)
         data = parser.parse()
+        missing_symbols = sorted(
+            {
+                symbol["symbol_name"]
+                for symbol in data["schematic"].get("symbols", [])
+                if symbol["symbol_name"] not in data["symbols"]
+            }
+        )
+        if missing_symbols:
+            raise RuntimeError(
+                f"ltspice-to-svg could not resolve symbol definitions: {', '.join(missing_symbols)}"
+            )
         renderer = SVGRenderer(RenderingConfig())
         produced = source.with_suffix(".svg")
 
@@ -103,10 +144,56 @@ def _render_with_ltspice_to_svg_package(source: Path, output_path: Path, ltspice
             os.environ["LTSPICE_LIB_PATH"] = previous_ltspice_lib
 
     if produced.exists():
-        if produced != output_path:
-            output_path.write_bytes(produced.read_bytes())
-        return output_path
+        return _finalize_svg(produced, output_path, source)
     raise RuntimeError(f"ltspice-to-svg package did not produce an SVG for {source}")
+
+
+def _finalize_svg(produced: Path, output_path: Path, source: Path) -> Path:
+    if produced != output_path:
+        output_path.write_bytes(produced.read_bytes())
+    _pad_svg_viewbox(output_path)
+    _validate_rendered_svg(source, output_path)
+    return output_path
+
+
+def _validate_rendered_svg(source: Path, svg_path: Path) -> None:
+    asc = source.read_text()
+    svg = svg_path.read_text()
+    symbol_count = sum(1 for line in asc.splitlines() if line.startswith("SYMBOL "))
+    wire_count = sum(1 for line in asc.splitlines() if line.startswith("WIRE "))
+    rendered_symbols = svg.count("s:type=")
+    rendered_wires = svg.count("<line ")
+
+    if symbol_count and rendered_symbols == 0:
+        raise RuntimeError(
+            f"ltspice_to_svg rendered no component symbols for {source}; "
+            "check symbol library resolution instead of publishing a flag-only schematic."
+        )
+    if wire_count and rendered_wires < wire_count:
+        raise RuntimeError(
+            f"ltspice_to_svg rendered too few schematic wires for {source}: "
+            f"expected at least {wire_count}, saw {rendered_wires}."
+        )
+
+
+def _pad_svg_viewbox(svg_path: Path, padding: float = 192.0) -> None:
+    text = svg_path.read_text()
+    match = re.search(r'viewBox="([-0-9.]+) ([-0-9.]+) ([-0-9.]+) ([-0-9.]+)"', text)
+    if not match:
+        return
+
+    x, y, width, height = (float(value) for value in match.groups())
+    padded = (x - padding, y - padding, width + padding * 2, height + padding * 2)
+    viewbox = f'viewBox="{padded[0]:.1f} {padded[1]:.1f} {padded[2]:.1f} {padded[3]:.1f}"'
+    text = text[: match.start()] + viewbox + text[match.end() :]
+
+    if "data-claw-background" not in text:
+        background = (
+            f'  <rect data-claw-background="true" fill="white" height="{padded[3]:.1f}" '
+            f'width="{padded[2]:.1f}" x="{padded[0]:.1f}" y="{padded[1]:.1f}"/>\n'
+        )
+        text = text.replace("  <defs/>\n", "  <defs/>\n" + background, 1)
+    svg_path.write_text(text)
 
 
 def terminal_preview(svg_path: str | Path) -> str:

@@ -26,3 +26,9 @@ If the user asks to see it visually, run:
 
 Schematics should use left-to-right signal flow, top supply rails, bottom ground
 or negative rails, orthogonal wiring, local ground flags, and readable net labels.
+
+Do not accept an SVG that contains mostly floating labels or ground symbols. If
+component bodies are missing, treat renderer messages such as `Symbol definition
+not found` as failures and fix the `.asy` symbol path or bundled symbol files.
+If wires are missing, fix the IR or `.asc` source so non-trivial examples include
+explicit `WIRE` entries.

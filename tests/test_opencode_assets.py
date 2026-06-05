@@ -34,6 +34,16 @@ class OpenCodeAssetTests(unittest.TestCase):
             self.assertIn("mode: subagent", text, agent_file)
             self.assertIn("permission:", text, agent_file)
 
+    def test_schematic_quality_gate_is_documented(self) -> None:
+        agents = Path("AGENTS.md").read_text()
+        layout_skill = Path(".opencode/skills/schematic-layout-rendering/SKILL.md").read_text()
+        code_skill = Path(".opencode/skills/code-to-schematic/SKILL.md").read_text()
+
+        for text in (agents, layout_skill, code_skill):
+            self.assertIn("Symbol definition not found", text)
+            self.assertIn("WIRE", text)
+            self.assertIn("floating", text)
+
 
 if __name__ == "__main__":
     unittest.main()

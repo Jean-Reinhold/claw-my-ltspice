@@ -14,7 +14,7 @@ of truth. It should emit both a simulation netlist and an LTspice schematic.
 
 1. Define components and readable net names.
 2. Add directives and `.meas` checks.
-3. Add layout hints for non-trivial circuits.
+3. Add layout hints, explicit wires, and flags for non-trivial circuits.
 4. Export `.cir`.
 5. Export `.asc`.
 6. Render `.asc`.
@@ -33,8 +33,23 @@ of truth. It should emit both a simulation netlist and an LTspice schematic.
 - Use stable refs such as `R1`, `C1`, `V1`, `Q1`, `M1`.
 - Use readable nets such as `in`, `out`, `bias`, `vdd`, `vss`.
 - Keep generated output deterministic.
-- Prefer net labels over complex auto-routing for early versions.
+- Use `Circuit.wire(...)`, `Circuit.flag(...)`, and `Circuit.iopin(...)` for
+  readable generated `.asc` output with explicit `WIRE`, `FLAG`, and `IOPIN`
+  records.
+- Prefer net labels only for long nets; do not use labels as a substitute for
+  every visible connection.
 - Do not hand-write large `.asc` files when the IR can generate them.
+- Ensure every symbol name emitted by the IR has a resolvable `.asy` definition
+  in the bundled symbol library or the LTspice symbol path.
+- Treat `Symbol definition not found` as a generation failure to fix in symbol
+  lookup or source layout, not as an acceptable rendered schematic.
+
+## Render Quality Gate
+
+Rendered SVGs are only acceptable when they show component bodies, orthogonal
+wires, attached labels, and clear supply/ground references. A generated SVG made
+mostly of floating text labels and ground flags is a failed schematic generation
+pass, not a successful render.
 
 ## OpenCode Rule
 

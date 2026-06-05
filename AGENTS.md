@@ -35,6 +35,24 @@ For circuit work, do not stop after writing a file. Follow this loop:
 7. Render the schematic in terminal and visually if requested.
 8. Report evidence, failures, and residual risks.
 
+## Schematic Quality Gate
+
+Rendered schematics must look like real readable circuit schematics, not loose
+labels, floating ground symbols, or decorative diagrams. Treat bad SVG output as
+a bug in the `.asc`/IR/source layout, not as an acceptable render.
+
+Before accepting schematic work:
+
+1. Confirm the `.asc` contains explicit `WIRE` routing for non-trivial circuits.
+2. Confirm all rendered components have symbol shapes; `Symbol definition not found`
+   from `ltspice-to-svg` is a failure.
+3. Confirm labels are attached to wires or pins and are readable, not rotated or
+   scattered across blank space.
+4. Confirm directives are grouped away from components and do not overlap labels.
+5. Fix source layout, component coordinates, wires, flags, or bundled `.asy`
+   symbols when the rendered SVG is ugly. Do not solve this by adding fake
+   fallback schematic art.
+
 ## Dependency Policy
 
 Do not run host `pip`, `uv`, `brew`, `apt`, or `npm` for project dependencies.

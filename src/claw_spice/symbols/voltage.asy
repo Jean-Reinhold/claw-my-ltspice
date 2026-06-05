@@ -1,0 +1,10 @@
+Version 4
+SymbolType CELL
+LINE Normal 0 0 0 24
+CIRCLE Normal -24 24 24 72
+LINE Normal 0 72 0 96
+LINE Normal -10 40 10 40
+LINE Normal 0 30 0 50
+LINE Normal -10 56 10 56
+WINDOW 0 32 16 Left 0
+WINDOW 3 32 64 Left 0
