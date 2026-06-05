@@ -23,8 +23,8 @@ and humans use during the engineering loop.
 ### Rendered Schematics
 
 <p>
-  <img src="examples/transient/opamp-summing/preview.svg" alt="Rendered op-amp summing amplifier schematic" width="49%">
-  <img src="examples/transient/sallen-key-lowpass/preview.svg" alt="Rendered Sallen-Key low-pass schematic" width="49%">
+  <img src="docs-site/pages/assets/generated/opamp-summing.svg" alt="Rendered op-amp summing amplifier schematic" width="49%">
+  <img src="docs-site/pages/assets/generated/sallen-key-lowpass.svg" alt="Rendered Sallen-Key low-pass schematic" width="49%">
 </p>
 
 ### Simulation Plots

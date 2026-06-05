@@ -28,6 +28,8 @@ examples/**/generated/
 docs-site/site/
 docs-site/pages/assets/generated/*
 !docs-site/pages/assets/generated/.gitkeep
+!docs-site/pages/assets/generated/opamp-summing.svg
+!docs-site/pages/assets/generated/sallen-key-lowpass.svg
 examples/transient/*/*.svg
 
 # MCP/runtime sidecars
