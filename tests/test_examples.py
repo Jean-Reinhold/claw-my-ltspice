@@ -4,6 +4,8 @@ import tomllib
 import unittest
 from pathlib import Path
 
+from claw_spice.schematic_model import component_collisions
+
 
 EXPECTED_SAMPLE_IDS = {
     "rc-step",
@@ -87,6 +89,42 @@ class ExampleAssetTests(unittest.TestCase):
 
         missing = {symbol for symbol in emitted_symbols if not (symbol_dir / f"{symbol}.asy").exists()}
         self.assertFalse(missing)
+
+    def test_committed_schematics_have_orthogonal_wires(self) -> None:
+        for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]:
+            schematic = Path(item["schematic"])
+
+            with self.subTest(schematic=schematic):
+                diagonals = []
+                for line in schematic.read_text().splitlines():
+                    if line.startswith("WIRE "):
+                        _wire, x1, y1, x2, y2 = line.split()
+                        if x1 != x2 and y1 != y2:
+                            diagonals.append(line)
+                self.assertEqual(diagonals, [])
+
+    def test_committed_schematics_have_no_modeled_component_collisions(self) -> None:
+        for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]:
+            schematic = Path(item["schematic"])
+
+            with self.subTest(schematic=schematic):
+                collisions = component_collisions(schematic.read_text(), clearance=8)
+                formatted = [
+                    f"{collision.first.reference}/{collision.second.reference}"
+                    for collision in collisions
+                ]
+                self.assertEqual(formatted, [])
+
+    def test_committed_schematics_use_orientation_specific_symbols(self) -> None:
+        rotated_component_symbols = []
+        for item in tomllib.loads(Path("examples/sample-runs.toml").read_text())["runs"]:
+            schematic = Path(item["schematic"])
+            for line in schematic.read_text().splitlines():
+                if line.startswith(("SYMBOL res ", "SYMBOL cap ", "SYMBOL diode ", "SYMBOL ind ")):
+                    if line.endswith(" R90"):
+                        rotated_component_symbols.append(f"{schematic}: {line}")
+
+        self.assertEqual(rotated_component_symbols, [])
 
 
 if __name__ == "__main__":

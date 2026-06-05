@@ -5,7 +5,7 @@ VCC vcc 0 5
 VEE vee 0 -5
 XU1 in fb vcc vee out CLAW_IDEAL_OPAMP
 RG fb 0 10k
-RF out fb 20k
+RF fb out 20k
 RL out 0 10k
 .tran 0 4m 0 5u
 .meas TRAN vout_2ms FIND V(out) AT=2m

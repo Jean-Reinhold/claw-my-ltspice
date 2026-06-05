@@ -1,6 +1,6 @@
 * Passive RC spectrum split
-VLOW mid 0 SINE(0 1 250)
 VHIGH in mid SINE(0 0.6 4k)
+VLOW mid 0 SINE(0 1 250)
 RLP in low 3.3k
 CLP low 0 47n
 CHP in high 47n

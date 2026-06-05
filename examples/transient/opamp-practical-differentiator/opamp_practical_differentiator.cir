@@ -5,8 +5,8 @@ VCC vcc 0 5
 VEE vee 0 -5
 CIN in ncin 100n
 RIN ncin sum 1k
-RF out sum 100k
-CF out sum 1n
+RF sum out 100k
+CF sum out 1n
 XU1 0 sum vcc vee out CLAW_IDEAL_OPAMP
 RL out 0 10k
 .tran 0 15m 0 5u

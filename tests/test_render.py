@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from claw_spice.render import _render_with_ltspice_to_svg_package, render_asc_to_svg, terminal_preview
+from claw_spice.render import _normalize_power_flag_text, _render_with_ltspice_to_svg_package, render_asc_to_svg, terminal_preview
 
 
 EXAMPLE_ASC = Path("examples/transient/rc-step/rc_step.asc")
@@ -160,6 +160,20 @@ class RenderTests(unittest.TestCase):
 
             self.assertIsInstance(text, str)
             self.assertTrue(text)
+
+    def test_power_flag_text_is_normalized(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            svg = Path(temp) / "schematic.svg"
+            svg.write_text(
+                '<svg><text font-family="Arial" font-size="24.0px">vcc</text>'
+                '<text font-family="Arial" font-size="24.0px">out</text></svg>'
+            )
+
+            _normalize_power_flag_text(svg)
+
+            text = svg.read_text()
+            self.assertIn('font-size="12.0px">VCC</text>', text)
+            self.assertIn('font-size="24.0px">out</text>', text)
 
 
 if __name__ == "__main__":

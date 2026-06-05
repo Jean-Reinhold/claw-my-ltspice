@@ -58,6 +58,31 @@ class CircuitIrTests(unittest.TestCase):
         self.assertIn("XU1 inp inn vcc vee out CLAW_IDEAL_OPAMP", netlist)
         self.assertIn("SYMBOL opamp2", asc)
 
+    def test_render_symbol_override_does_not_change_netlist(self) -> None:
+        circuit = Circuit("render symbols")
+        circuit.resistor("R1", "out", "0", "10k", symbol="res_v", at=(128, 128))
+        circuit.capacitor("C1", "in", "out", "1u", symbol="cap_h", at=(256, 128))
+
+        netlist = circuit.to_netlist()
+        asc = circuit.to_asc()
+
+        self.assertIn("R1 out 0 10k", netlist)
+        self.assertIn("C1 in out 1u", netlist)
+        self.assertIn("SYMBOL res_v 128 128 R0", asc)
+        self.assertIn("SYMBOL cap_h 256 128 R0", asc)
+
+    def test_opamp_supply_flags_use_clear_stubs(self) -> None:
+        circuit = Circuit("opamp supplies")
+        circuit.opamp("XU1", "inp", "inn", "vcc", "vee", "out", at=(320, 160))
+        circuit.opamp_supply_flags(320, 160, stub=48)
+
+        asc = circuit.to_asc()
+
+        self.assertIn("WIRE 368 160 368 112", asc)
+        self.assertIn("WIRE 368 288 368 336", asc)
+        self.assertIn("FLAG 368 112 vcc", asc)
+        self.assertIn("FLAG 368 336 vee", asc)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,6 +6,9 @@ ARC Normal 32 -16 64 16 32 0 48 0
 ARC Normal 48 -16 80 16 48 0 64 0
 ARC Normal 64 -16 96 16 64 0 80 0
 LINE Normal 80 0 96 0
+WINDOW 0 48 -42 Center 0
+WINDOW 3 48 32 Center 0
+SYMATTR Prefix L
 PIN 0 0 NONE 0
 PINATTR PinName 1
 PINATTR SpiceOrder 1

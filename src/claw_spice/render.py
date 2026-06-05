@@ -151,9 +151,26 @@ def _render_with_ltspice_to_svg_package(source: Path, output_path: Path, ltspice
 def _finalize_svg(produced: Path, output_path: Path, source: Path) -> Path:
     if produced != output_path:
         output_path.write_bytes(produced.read_bytes())
+    _normalize_power_flag_text(output_path)
     _pad_svg_viewbox(output_path)
     _validate_rendered_svg(source, output_path)
     return output_path
+
+
+def _normalize_power_flag_text(svg_path: Path) -> None:
+    text = svg_path.read_text()
+
+    def replace(match: re.Match[str]) -> str:
+        label = match.group(3).upper()
+        return f'{match.group(1)}12.0px{match.group(2)}{label}{match.group(4)}'
+
+    text = re.sub(
+        r'(<text\b(?=[^>]*font-size="24\.0px")[^>]*font-size=")24\.0px("[^>]*>)(vcc|vee)(</text>)',
+        replace,
+        text,
+        flags=re.IGNORECASE,
+    )
+    svg_path.write_text(text)
 
 
 def _validate_rendered_svg(source: Path, svg_path: Path) -> None:
