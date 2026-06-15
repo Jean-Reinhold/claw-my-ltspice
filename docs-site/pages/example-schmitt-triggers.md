@@ -42,6 +42,13 @@ below that lower threshold before the output returns high.
 Key measurements: `upper_trip`, `lower_trip`, `hysteresis_width`,
 `expected_trip`, and `expected_hysteresis`.
 
+| Measurement | Default expectation |
+| --- | --- |
+| `upper_trip` | near `+0.8 V` |
+| `lower_trip` | near `-0.8 V` |
+| `hysteresis_width` | near `1.6 V` |
+| `expected_hysteresis` | near `1.6 V` |
+
 ## Temperature Switch Use Case
 
 The practical example models a temperature-controlled fan-enable signal. The raw
@@ -75,8 +82,15 @@ about `460 mV`.
 ![Temperature switch Schmitt trigger plot](assets/plots/schmitt-trigger-temperature-switch.svg)
 
 Key measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
-`expected_upper`, `expected_lower`, `fan_on_time`, `raw_ripple_pp`, and
+`expected_upper`, `expected_lower`, `fan_on_time`, `raw_ripple_pp`,
 `filtered_ripple_pp`, and `ripple_reduction`.
+
+| Measurement | Default expectation |
+| --- | --- |
+| `turn_on_sensor` | near `2.73 V` |
+| `turn_off_sensor` | near `2.27 V` |
+| `hysteresis_width` | near `0.46 V` |
+| `ripple_reduction` | greater than `1` |
 
 ## Design Tuning
 
