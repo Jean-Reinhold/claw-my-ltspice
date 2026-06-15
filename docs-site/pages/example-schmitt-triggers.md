@@ -10,6 +10,10 @@ be reviewed without adding vendor model licensing questions.
 | `schmitt-trigger-simple` | Inverting Schmitt comparator | `+/-5 V` | Hysteresis width follows a simple feedback-divider ratio. |
 | `schmitt-trigger-temperature-switch` | Non-inverting sensor conditioner | `0 V` to `5 V` | Filtering plus hysteresis turns a noisy sensor into a stable `fan_en` signal. |
 
+Use the simple trigger first when validating threshold equations or schematic
+routing. Use the temperature switch when you want a realistic single-supply
+signal-conditioning problem with a noisy sensor and a load-control output.
+
 ## Simple Configurable Trigger
 
 The simple example is an inverting Schmitt comparator. The input drives the
