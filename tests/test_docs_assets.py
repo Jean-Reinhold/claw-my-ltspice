@@ -37,6 +37,13 @@ class DocsAssetTests(unittest.TestCase):
 
         self.assertTrue(expected.issubset(actual))
 
+    def test_signal_plots_page_references_expected_assets(self) -> None:
+        page = Path("docs-site/pages/signal-plots.md").read_text()
+
+        for asset in EXPECTED_PLOT_ASSETS:
+            with self.subTest(asset=asset):
+                self.assertIn(f"assets/plots/{asset}", page)
+
     def test_schmitt_plots_include_threshold_markers(self) -> None:
         simple = Path("docs-site/pages/assets/plots/schmitt-trigger-simple.svg").read_text()
         practical = Path("docs-site/pages/assets/plots/schmitt-trigger-temperature-switch.svg").read_text()
