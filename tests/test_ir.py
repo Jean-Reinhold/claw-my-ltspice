@@ -83,6 +83,14 @@ class CircuitIrTests(unittest.TestCase):
         self.assertIn("FLAG 368 112 vcc", asc)
         self.assertIn("FLAG 368 336 vee", asc)
 
+    def test_schematic_text_annotations_do_not_change_netlist(self) -> None:
+        circuit = Circuit("annotated")
+        circuit.resistor("R1", "in", "out", "1k", at=(128, 128))
+        circuit.text(64, 64, "Layer 1 weighted sums")
+
+        self.assertIn("TEXT 64 64 Left 2 Layer 1 weighted sums", circuit.to_asc())
+        self.assertNotIn("Layer 1 weighted sums", circuit.to_netlist())
+
 
 if __name__ == "__main__":
     unittest.main()

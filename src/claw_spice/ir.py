@@ -30,6 +30,14 @@ class Flag:
 
 
 @dataclass
+class SchematicText:
+    x: int
+    y: int
+    text: str
+    size: int = 2
+
+
+@dataclass
 class Component:
     ref: str
     kind: str
@@ -60,6 +68,7 @@ class Circuit:
         self.components: list[Component] = []
         self.wires: list[Wire] = []
         self.flags: list[Flag] = []
+        self.texts: list[SchematicText] = []
         self.directives: list[str] = []
         self.includes: list[str] = []
 
@@ -201,6 +210,9 @@ class Circuit:
     def iopin(self, x: int, y: int, label: str, direction: str) -> None:
         self.flags.append(Flag(x, y, label, direction))
 
+    def text(self, x: int, y: int, text: str, *, size: int = 2) -> None:
+        self.texts.append(SchematicText(x, y, text, size))
+
     def directive(self, text: str) -> None:
         self.directives.append(text if text.startswith(".") else f".{text}")
 
@@ -289,6 +301,9 @@ class AscExporter:
             if flag.direction:
                 lines.append(f"IOPIN {flag.x} {flag.y} {flag.direction}")
 
+        for text in self.circuit.texts:
+            lines.append(f"TEXT {text.x} {text.y} Left {text.size} {text.text}")
+
         text_y = self._directive_y()
         for directive in [*self.circuit.includes_as_directives(), *self.circuit.directives]:
             lines.append(f"TEXT 64 {text_y} Left 1 !{directive}")
@@ -317,12 +332,15 @@ class AscExporter:
                 lines.append(f"SYMATTR Value {value}")
         for flag in self.circuit.flags:
             lines.append(f"FLAG {flag.x} {flag.y} {flag.label}")
+        for text in self.circuit.texts:
+            lines.append(f"TEXT {text.x} {text.y} Left {text.size} {text.text}")
         return "\n".join(lines)
 
     def _directive_y(self) -> int:
         ys: list[int] = []
         ys.extend(y for wire in self.circuit.wires for y in (wire.y1, wire.y2))
         ys.extend(flag.y for flag in self.circuit.flags)
+        ys.extend(text.y for text in self.circuit.texts)
         ys.extend(component.layout.y for component in self.circuit.components if component.layout.y is not None)
         return max(ys, default=224) + 112
 

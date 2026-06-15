@@ -218,7 +218,7 @@ def terminal_preview(svg_path: str | Path) -> str:
     chafa = shutil.which("chafa")
     if chafa:
         result = subprocess.run(
-            [chafa, "--symbols", "block", str(source)],
+            [chafa, "--symbols", "block", "--size", "120x40", str(source)],
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

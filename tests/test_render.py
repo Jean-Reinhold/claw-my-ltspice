@@ -161,6 +161,17 @@ class RenderTests(unittest.TestCase):
             self.assertIsInstance(text, str)
             self.assertTrue(text)
 
+    def test_terminal_preview_uses_readable_fixed_size(self) -> None:
+        completed = type("Completed", (), {"returncode": 0, "stdout": "preview", "stderr": ""})()
+
+        with mock.patch("claw_spice.render.shutil.which", return_value="chafa"):
+            with mock.patch("claw_spice.render.subprocess.run", return_value=completed) as run:
+                self.assertEqual(terminal_preview("example.svg"), "preview")
+
+        command = run.call_args.args[0]
+        self.assertIn("--size", command)
+        self.assertIn("120x40", command)
+
     def test_power_flag_text_is_normalized(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             svg = Path(temp) / "schematic.svg"
