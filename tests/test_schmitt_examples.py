@@ -90,6 +90,17 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("Expected measurement ranges", simple)
         self.assertIn("Expected measurement ranges", practical)
 
+    def test_schmitt_readmes_include_terminal_preview_commands(self) -> None:
+        readmes = [
+            Path("examples/transient/schmitt-trigger-simple/README.md"),
+            Path("examples/transient/schmitt-trigger-temperature-switch/README.md"),
+        ]
+
+        for readme in readmes:
+            with self.subTest(readme=readme):
+                self.assertIn("./claw-spice show", readme.read_text())
+                self.assertIn("--terminal", readme.read_text())
+
     def test_schmitt_walkthrough_covers_both_examples(self) -> None:
         page = Path("docs-site/pages/example-schmitt-triggers.md").read_text()
 
