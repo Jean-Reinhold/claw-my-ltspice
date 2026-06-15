@@ -5,6 +5,11 @@ noisy analog signal must become a clean digital decision. Both examples use the
 repo-owned `CLAW_IDEAL_OPAMP` model so the topology, measurements, and layout can
 be reviewed without adding vendor model licensing questions.
 
+| Example | Topology | Supply | Main lesson |
+| --- | --- | --- | --- |
+| `schmitt-trigger-simple` | Inverting Schmitt comparator | `+/-5 V` | Hysteresis width follows a simple feedback-divider ratio. |
+| `schmitt-trigger-temperature-switch` | Non-inverting sensor conditioner | `0 V` to `5 V` | Filtering plus hysteresis turns a noisy sensor into a stable `fan_en` signal. |
+
 ## Simple Configurable Trigger
 
 The simple example is an inverting Schmitt comparator. The input drives the
