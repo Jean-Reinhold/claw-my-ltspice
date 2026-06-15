@@ -334,6 +334,8 @@ positive feedback. A slow triangle-like input crosses the two thresholds, while
 
 Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`.
 
+![Simple Schmitt trigger hysteresis plot](assets/plots/schmitt-trigger-simple.svg)
+
 ## Noisy Temperature Switch Schmitt Trigger
 
 <div class="schematic-frame" markdown>
@@ -354,6 +356,8 @@ setpoint.
 
 Measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
 `fan_on_time`.
+
+![Temperature switch Schmitt trigger plot](assets/plots/schmitt-trigger-temperature-switch.svg)
 
 ## Sallen-Key High-Pass Filter
 

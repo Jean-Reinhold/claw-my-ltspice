@@ -26,6 +26,8 @@ EXPECTED_PLOT_ASSETS = (
     "passive-rc-spectrum-high-fft.svg",
     "opamp-practical-integrator.svg",
     "opamp-practical-differentiator.svg",
+    "schmitt-trigger-simple.svg",
+    "schmitt-trigger-temperature-switch.svg",
     "sallen-key-highpass.svg",
     "sallen-key-highpass-fft.svg",
 )
@@ -53,6 +55,8 @@ def generate_plot_assets(output_dir: str | Path = "docs-site/pages/assets/plots"
         _passive_rc_spectrum_high_fft(output / "passive-rc-spectrum-high-fft.svg"),
         _practical_integrator(output / "opamp-practical-integrator.svg"),
         _practical_differentiator(output / "opamp-practical-differentiator.svg"),
+        _schmitt_trigger_simple(output / "schmitt-trigger-simple.svg"),
+        _schmitt_temperature_switch(output / "schmitt-trigger-temperature-switch.svg"),
         _sallen_key_highpass(output / "sallen-key-highpass.svg"),
         _sallen_key_highpass_fft(output / "sallen-key-highpass-fft.svg"),
     ]
@@ -305,6 +309,66 @@ def _practical_differentiator(path: Path) -> Path:
     )
 
 
+def _schmitt_trigger_simple(path: Path) -> Path:
+    times = _times(stop=0.008, step=0.00004)
+    vin_points = [(0.0, -2.0), (0.002, 2.0), (0.004, -2.0), (0.006, 2.0), (0.008, -2.0)]
+    vin = [_triangle_points(time, vin_points) for time in times]
+    ratio = 20_000.0 / (100_000.0 + 20_000.0)
+    upper_trip = 4.8 * ratio
+    lower_trip = -4.8 * ratio
+    output: list[float] = []
+    trip: list[float] = []
+    state = 4.8
+    for sample in vin:
+        if state > 0.0 and sample >= upper_trip:
+            state = -4.8
+        elif state < 0.0 and sample <= lower_trip:
+            state = 4.8
+        output.append(state)
+        trip.append(state * ratio)
+    return _plot(
+        path,
+        "Configurable Schmitt trigger hysteresis",
+        times,
+        [
+            WaveformSeries("V(in)", vin),
+            WaveformSeries("V(trip)", trip),
+            WaveformSeries("V(out)", output),
+        ],
+    )
+
+
+def _schmitt_temperature_switch(path: Path) -> Path:
+    times = _times(stop=0.2, step=0.0005)
+    base_points = [(0.0, 2.0), (0.05, 3.1), (0.1, 2.0), (0.15, 3.1), (0.2, 2.0)]
+    base = [_triangle_points(time, base_points) for time in times]
+    raw = [
+        value + 0.08 * math.sin(2.0 * math.pi * 600.0 * time)
+        for time, value in zip(times, base, strict=False)
+    ]
+    sense = _lowpass_response(times, raw, cutoff_hz=1.0 / (2.0 * math.pi * 0.0047))
+    fan_en: list[float] = []
+    state = 0.2
+    upper_trip = 2.73
+    lower_trip = 2.27
+    for sample in sense:
+        if state < 2.5 and sample >= upper_trip:
+            state = 4.8
+        elif state > 2.5 and sample <= lower_trip:
+            state = 0.2
+        fan_en.append(state)
+    return _plot(
+        path,
+        "Noisy temperature switch with hysteresis",
+        times,
+        [
+            WaveformSeries("V(sensor_raw)", raw),
+            WaveformSeries("V(sense)", sense),
+            WaveformSeries("V(fan_en)", fan_en),
+        ],
+    )
+
+
 def _sallen_key_highpass(path: Path) -> Path:
     times = _times(stop=0.006, step=0.00004)
     vin = [_mixed_signal(time) for time in times]
@@ -330,6 +394,16 @@ def _sallen_key_highpass_fft(path: Path) -> Path:
 
 def _mixed_signal(time: float) -> float:
     return math.sin(2.0 * math.pi * 500.0 * time) + 0.35 * math.sin(2.0 * math.pi * 8000.0 * time)
+
+
+def _triangle_points(time: float, points: list[tuple[float, float]]) -> float:
+    if time <= points[0][0]:
+        return points[0][1]
+    for (time_a, value_a), (time_b, value_b) in zip(points, points[1:], strict=False):
+        if time <= time_b:
+            fraction = (time - time_a) / (time_b - time_a)
+            return value_a + (value_b - value_a) * fraction
+    return points[-1][1]
 
 
 def _clip_positive(value: float) -> float:
