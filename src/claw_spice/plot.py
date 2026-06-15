@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import math
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from claw_spice.raw import WaveformData, WaveformSeries, waveform_data
@@ -10,6 +11,13 @@ from claw_spice.render import render_png
 
 
 COLORS = ("#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c", "#0891b2")
+
+
+@dataclass(frozen=True)
+class ReferenceLine:
+    value: float
+    label: str
+    color: str = "#6b7280"
 
 
 def plot_raw_traces(
@@ -46,11 +54,12 @@ def plot_waveform_data(
     output: str | Path,
     *,
     title: str,
+    reference_lines: tuple[ReferenceLine, ...] = (),
     png: bool = False,
 ) -> tuple[Path, Path | None]:
     output_path = Path(output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(_plot_svg(data, title))
+    output_path.write_text(_plot_svg(data, title, reference_lines=reference_lines))
     png_path = render_png(output_path) if png else None
     return output_path, png_path
 
@@ -110,7 +119,12 @@ def safe_fft_stem(raw_path: str | Path, trace: str) -> str:
     return f"{Path(raw_path).stem}_fft_{_safe_token(trace)}"
 
 
-def _plot_svg(data: WaveformData, title: str) -> str:
+def _plot_svg(
+    data: WaveformData,
+    title: str,
+    *,
+    reference_lines: tuple[ReferenceLine, ...] = (),
+) -> str:
     width = 960
     height = 560
     left = 86
@@ -123,6 +137,7 @@ def _plot_svg(data: WaveformData, title: str) -> str:
     if data.x_values and min(data.x_values) >= 0:
         x_min = 0.0
     y_values = [value for series in data.series for value in series.values]
+    y_values.extend(line.value for line in reference_lines)
     y_min, y_max = _range(y_values)
 
     def sx(value: float) -> float:
@@ -134,7 +149,7 @@ def _plot_svg(data: WaveformData, title: str) -> str:
     body = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" role="img">',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
-        '<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}</style>',
+        '<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}.reference{stroke-dasharray:7 5;stroke-width:1.7}.reference-label{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}</style>',
         f'<text x="{left}" y="34" class="title">{html.escape(title)}</text>',
     ]
 
@@ -148,6 +163,17 @@ def _plot_svg(data: WaveformData, title: str) -> str:
         body.append(f'<text x="{left - 12}" y="{y + 4:.2f}" text-anchor="end" class="axis">{_format_number(tick)}</text>')
 
     body.append(f'<rect x="{left}" y="{top}" width="{plot_width}" height="{plot_height}" class="frame"/>')
+
+    for line in reference_lines:
+        y = sy(line.value)
+        body.append(
+            f'<line x1="{left}" y1="{y:.2f}" x2="{left + plot_width}" y2="{y:.2f}" '
+            f'class="reference" stroke="{html.escape(line.color)}"/>'
+        )
+        body.append(
+            f'<text x="{left + plot_width - 8}" y="{y - 7:.2f}" text-anchor="end" '
+            f'class="reference-label">{html.escape(line.label)}</text>'
+        )
 
     for index, series in enumerate(data.series):
         color = COLORS[index % len(COLORS)]

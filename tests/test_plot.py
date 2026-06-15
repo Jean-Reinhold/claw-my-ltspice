@@ -4,7 +4,15 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from claw_spice.plot import plot_raw_fft, plot_raw_traces, safe_fft_stem, safe_plot_stem
+from claw_spice.plot import (
+    ReferenceLine,
+    plot_raw_fft,
+    plot_raw_traces,
+    plot_waveform_data,
+    safe_fft_stem,
+    safe_plot_stem,
+)
+from claw_spice.raw import WaveformData, WaveformSeries
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -70,6 +78,20 @@ class PlotTests(unittest.TestCase):
             self.assertIn("<svg", text)
             self.assertIn("FFT output", text)
             self.assertIn("frequency (Hz)", text)
+
+    def test_plot_waveform_data_writes_reference_lines(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "plot.svg"
+            svg, _png = plot_waveform_data(
+                WaveformData("time", [0.0, 1.0], [WaveformSeries("V(out)", [0.0, 1.0])]),
+                output,
+                title="Threshold plot",
+                reference_lines=(ReferenceLine(0.5, "trip"),),
+            )
+
+            text = svg.read_text()
+            self.assertIn("reference", text)
+            self.assertIn("trip", text)
 
 
 if __name__ == "__main__":
