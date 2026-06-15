@@ -67,7 +67,7 @@ about `460 mV`.
 
 Key measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
 `expected_upper`, `expected_lower`, `fan_on_time`, `raw_ripple_pp`, and
-`filtered_ripple_pp`.
+`filtered_ripple_pp`, and `ripple_reduction`.
 
 ## Design Tuning
 

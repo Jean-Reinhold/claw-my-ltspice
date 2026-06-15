@@ -43,6 +43,7 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("WHEN V(fan_en)=2.5 RISE=1", netlist)
         self.assertIn("WHEN V(fan_en)=2.5 FALL=1", netlist)
         self.assertIn("TRIG V(fan_en) VAL=2.5 RISE=1", netlist)
+        self.assertIn(".meas TRAN ripple_reduction PARAM raw_ripple_pp/filtered_ripple_pp", netlist)
 
     def test_schmitt_readmes_document_expected_measurements(self) -> None:
         simple = Path("examples/transient/schmitt-trigger-simple/README.md").read_text()
@@ -60,6 +61,7 @@ class SchmittExampleTests(unittest.TestCase):
             "fan_on_time",
             "raw_ripple_pp",
             "filtered_ripple_pp",
+            "ripple_reduction",
         ):
             with self.subTest(readme="temperature-switch", measurement=measurement):
                 self.assertIn(f"`{measurement}`", practical)

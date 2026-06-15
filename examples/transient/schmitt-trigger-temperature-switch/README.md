@@ -38,7 +38,7 @@ Commands:
 
 The `.meas` directives report `turn_on_sensor`, `turn_off_sensor`,
 `hysteresis_width`, `expected_upper`, `expected_lower`, `fan_on_time`,
-`raw_ripple_pp`, and `filtered_ripple_pp`.
+`raw_ripple_pp`, `filtered_ripple_pp`, and `ripple_reduction`.
 
 Expected measurement ranges with the default parameters:
 
@@ -52,6 +52,7 @@ Expected measurement ranges with the default parameters:
 | `fan_on_time` | `35 ms` to `65 ms` | Approximate on-duration during one slow sensor cycle. |
 | `raw_ripple_pp` | above `100 mV` | Ripple present before the input RC filter. |
 | `filtered_ripple_pp` | below `raw_ripple_pp` | Ripple attenuation at the comparator input. |
+| `ripple_reduction` | above `1` | Ratio showing the RC filter reduced ripple. |
 
 For a noisier sensor or a mechanical load that should not cycle often, decrease
 `RHYS` to widen the hysteresis band. For tighter temperature control, increase
