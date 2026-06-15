@@ -22,6 +22,7 @@ EXPECTED_SAMPLE_IDS = {
     "passive-rc-spectrum-split",
     "opamp-practical-integrator",
     "opamp-practical-differentiator",
+    "opamp-mlp-forward-pass",
     "schmitt-trigger-simple",
     "schmitt-trigger-temperature-switch",
     "sallen-key-highpass",

@@ -1,0 +1,62 @@
+* Three-layer op-amp MLP forward pass
+.include ../../lib/claw_opamps.lib
+VX1 x1 0 PWL(0 0 2m 0 2.01m 0.8 4m 0.8 4.01m 0.1 6m 0.1 6.01m 0.6 8m 0.6)
+VX2 x2 0 PWL(0 0 2m 0 2.01m 0.1 4m 0.1 4.01m 0.9 6m 0.9 6.01m 0.5 8m 0.5)
+VBP bp 0 1
+VBN bn 0 -1
+VCC vcc 0 5
+VEE vee 0 -5
+BNX1 nx1 0 V=-V(x1)
+BNX2 nx2 0 V=-V(x2)
+XL1A 0 sum1a vcc vee z1a CLAW_IDEAL_OPAMP
+RFL1A z1a sum1a 100k
+RL1AX1 nx1 sum1a 142.857k
+RL1AX2 nx2 sum1a 333.333k
+RL1AB bn sum1a 1Meg
+XL1B 0 sum1b vcc vee z1b CLAW_IDEAL_OPAMP
+RFL1B z1b sum1b 100k
+RL1BX1 nx1 sum1b 500k
+RL1BX2 nx2 sum1b 125k
+RL1BB bp sum1b 500k
+BA1A a1a 0 V=limit(V(z1a),0,4.8)
+BA1B a1b 0 V=limit(V(z1b),0,4.8)
+BNA1A na1a 0 V=-V(a1a)
+BNA1B na1b 0 V=-V(a1b)
+XL2A 0 sum2a vcc vee z2a CLAW_IDEAL_OPAMP
+RFL2A z2a sum2a 100k
+RL2AA na1a sum2a 166.667k
+RL2AB na1b sum2a 250k
+RL2ABI bn sum2a 2Meg
+XL2B 0 sum2b vcc vee z2b CLAW_IDEAL_OPAMP
+RFL2B z2b sum2b 100k
+RL2BA na1a sum2b 333.333k
+RL2BB na1b sum2b 142.857k
+BA2A a2a 0 V=limit(V(z2a),0,4.8)
+BA2B a2b 0 V=limit(V(z2b),0,4.8)
+BNA2A na2a 0 V=-V(a2a)
+BNA2B na2b 0 V=-V(a2b)
+XL3Y 0 sum3y vcc vee yout CLAW_IDEAL_OPAMP
+RFL3Y yout sum3y 100k
+RL3YA na2a sum3y 200k
+RL3YB na2b sum3y 200k
+RL3YBI bn sum3y 1Meg
+RLOAD yout 0 10k
+.options plotwinsize=0
+.tran 0 8m 0 10u
+.meas TRAN y_vec1 FIND V(yout) AT=0.001
+.meas TRAN expected_y_vec1 PARAM 0.17
+.meas TRAN err_vec1 PARAM y_vec1-expected_y_vec1
+.meas TRAN z1b_vec1 FIND V(z1b) AT=0.001
+.meas TRAN a1b_vec1 FIND V(a1b) AT=0.001
+.meas TRAN expected_z1b_vec1 PARAM -0.2
+.meas TRAN expected_a1b_vec1 PARAM 0
+.meas TRAN y_vec2 FIND V(yout) AT=0.003
+.meas TRAN expected_y_vec2 PARAM 0.4575
+.meas TRAN err_vec2 PARAM y_vec2-expected_y_vec2
+.meas TRAN y_vec3 FIND V(yout) AT=0.005
+.meas TRAN expected_y_vec3 PARAM 0.62
+.meas TRAN err_vec3 PARAM y_vec3-expected_y_vec3
+.meas TRAN y_vec4 FIND V(yout) AT=0.007
+.meas TRAN expected_y_vec4 PARAM 0.6025
+.meas TRAN err_vec4 PARAM y_vec4-expected_y_vec4
+.end

@@ -125,6 +125,15 @@ analysis = "tran"
 expected_measurements = ["vout_max", "vout_min", "vout_rms"]
 
 [[runs]]
+id = "opamp-mlp-forward-pass"
+name = "Three-layer op-amp MLP forward-pass transient"
+generator = "examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.py"
+circuit = "examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.cir"
+schematic = "examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.asc"
+analysis = "tran"
+expected_measurements = ["y_vec1", "y_vec2", "y_vec3", "y_vec4", "a1b_vec1"]
+
+[[runs]]
 id = "schmitt-trigger-simple"
 name = "Configurable inverting Schmitt trigger transient"
 generator = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py"

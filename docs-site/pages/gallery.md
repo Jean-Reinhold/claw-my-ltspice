@@ -63,6 +63,10 @@ examples using the Dockerized toolchain.
 </div>
 
 <div class="schematic-frame" markdown>
+![Rendered op-amp MLP forward-pass schematic](assets/generated/opamp-mlp-forward-pass.svg)
+</div>
+
+<div class="schematic-frame" markdown>
 ![Rendered simple Schmitt trigger schematic](assets/generated/schmitt-trigger-simple.svg)
 </div>
 

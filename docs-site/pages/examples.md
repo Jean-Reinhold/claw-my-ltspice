@@ -319,6 +319,26 @@ Measurements: `vout_max`, `vout_min`, `vout_rms`.
 
 ![Practical op-amp differentiator plot](assets/plots/opamp-practical-differentiator.svg)
 
+## Op-Amp MLP Forward Pass
+
+<div class="schematic-frame" markdown>
+![Rendered op-amp MLP forward-pass schematic](assets/generated/opamp-mlp-forward-pass.svg)
+</div>
+
+The `opamp-mlp-forward-pass` example implements a three-layer multilayer
+perceptron with op-amp weighted-sum neurons. Behavioral clamp sources model ReLU
+activations so the transient run can step through multiple input vectors and
+measure the expected forward-pass output for each vector.
+
+```bash
+./claw-spice code build examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.py
+./claw-spice sim run examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.cir
+./claw-spice raw plot examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.raw V(x1) V(x2) V(yout) --output runs/latest/opamp_mlp_forward_pass.svg
+./claw-spice show examples/transient/opamp-mlp-forward-pass/opamp_mlp_forward_pass.asc --terminal
+```
+
+Measurements: `y_vec1`, `y_vec2`, `y_vec3`, `y_vec4`, and `a1b_vec1`.
+
 ## Simple Configurable Schmitt Trigger
 
 <div class="schematic-frame" markdown>
