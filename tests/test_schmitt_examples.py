@@ -90,6 +90,13 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("Expected measurement ranges", simple)
         self.assertIn("Expected measurement ranges", practical)
 
+    def test_schmitt_walkthrough_covers_both_examples(self) -> None:
+        page = Path("docs-site/pages/example-schmitt-triggers.md").read_text()
+
+        self.assertIn("schmitt-trigger-simple", page)
+        self.assertIn("schmitt-trigger-temperature-switch", page)
+        self.assertIn("fan_en", page)
+
 
 if __name__ == "__main__":
     unittest.main()
