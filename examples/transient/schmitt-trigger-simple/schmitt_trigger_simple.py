@@ -12,6 +12,7 @@ def create_circuit(include_path: str = "../../lib/claw_opamps.lib") -> Circuit:
     circuit.directive(".param RHYS=100k")
     circuit.directive(".param RREF=20k")
     circuit.directive(".param VTRIP=4.8*RREF/(RHYS+RREF)")
+    circuit.directive(".options plotwinsize=0")
     circuit.voltage("VIN", "in", "0", "PWL(0 -2 2m 2 4m -2 6m 2 8m -2)", at=(96, 336))
     circuit.voltage("VCC", "vcc", "0", "5", at=(528, 64))
     circuit.voltage("VEE", "vee", "0", "-5", at=(528, 560))

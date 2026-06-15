@@ -10,6 +10,7 @@ RL out 0 10k
 .param RHYS=100k
 .param RREF=20k
 .param VTRIP=4.8*RREF/(RHYS+RREF)
+.options plotwinsize=0
 .tran 0 8m 0 2u
 .meas TRAN upper_trip FIND V(in) WHEN V(out)=0 FALL=1
 .meas TRAN lower_trip FIND V(in) WHEN V(out)=0 RISE=1
