@@ -120,6 +120,7 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("Quick tuning recipes", page)
         self.assertIn("RFLT * CFILT", page)
         self.assertIn("conditioned voltage proportional to temperature", page)
+        self.assertIn("./claw-spice examples list", page)
 
 
 if __name__ == "__main__":
