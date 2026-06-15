@@ -17,6 +17,21 @@ def _load_example(path: str) -> ModuleType:
 
 
 class SchmittExampleTests(unittest.TestCase):
+    def test_committed_schmitt_outputs_match_generators(self) -> None:
+        examples = [
+            Path("examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py"),
+            Path(
+                "examples/transient/schmitt-trigger-temperature-switch/"
+                "schmitt_trigger_temperature_switch.py"
+            ),
+        ]
+
+        for source in examples:
+            with self.subTest(source=source):
+                circuit = _load_example(source.as_posix()).create_circuit()
+                self.assertEqual(source.with_suffix(".cir").read_text(), circuit.to_netlist())
+                self.assertEqual(source.with_suffix(".asc").read_text(), circuit.to_asc())
+
     def test_simple_schmitt_exposes_configurable_hysteresis(self) -> None:
         module = _load_example("examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py")
         netlist = module.create_circuit().to_netlist()
