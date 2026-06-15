@@ -88,6 +88,10 @@ should be regenerated from each run's `.raw` output.
 
 ![Practical op-amp differentiator plot](assets/plots/opamp-practical-differentiator.svg)
 
+![Simple Schmitt trigger hysteresis plot](assets/plots/schmitt-trigger-simple.svg)
+
+![Temperature switch Schmitt trigger plot](assets/plots/schmitt-trigger-temperature-switch.svg)
+
 ![Sallen-Key high-pass response plot](assets/plots/sallen-key-highpass.svg)
 
 ![Sallen-Key high-pass FFT plot](assets/plots/sallen-key-highpass-fft.svg)
