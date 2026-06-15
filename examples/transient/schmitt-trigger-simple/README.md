@@ -7,6 +7,10 @@ repo-owned `CLAW_IDEAL_OPAMP` macromodel. A slow triangle-like `PWL` input drive
 the inverting input. The non-inverting input receives positive feedback from the
 output through `RHYS` and a reference leg `RREF` to ground.
 
+This is intentionally a dual-supply teaching circuit. It keeps the threshold
+math symmetric around ground so `RHYS` and `RREF` are easy to tune and verify
+before moving to the practical single-supply temperature-switch example.
+
 Expected behavior:
 
 - The output toggles hard between the op-amp rail limits instead of following the
