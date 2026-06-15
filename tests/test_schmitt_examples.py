@@ -107,6 +107,8 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("schmitt-trigger-simple", page)
         self.assertIn("schmitt-trigger-temperature-switch", page)
         self.assertIn("fan_en", page)
+        self.assertIn("near `+0.8 V`", page)
+        self.assertIn("near `2.73 V`", page)
 
 
 if __name__ == "__main__":
