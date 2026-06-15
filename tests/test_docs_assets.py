@@ -37,6 +37,15 @@ class DocsAssetTests(unittest.TestCase):
 
         self.assertTrue(expected.issubset(actual))
 
+    def test_schmitt_plots_include_threshold_markers(self) -> None:
+        simple = Path("docs-site/pages/assets/plots/schmitt-trigger-simple.svg").read_text()
+        practical = Path("docs-site/pages/assets/plots/schmitt-trigger-temperature-switch.svg").read_text()
+
+        self.assertIn("upper trip", simple)
+        self.assertIn("lower trip", simple)
+        self.assertIn("fan on", practical)
+        self.assertIn("fan off", practical)
+
 
 if __name__ == "__main__":
     unittest.main()
