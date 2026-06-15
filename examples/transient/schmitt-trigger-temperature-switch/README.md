@@ -7,6 +7,12 @@ sensor is represented as a slow conditioned voltage with `600 Hz`, `80 mV`
 ripple riding on it, similar to a long cable or noisy supply coupling into an
 analog temperature signal.
 
+Without hysteresis, a fan controller near the setpoint can chatter: noise pushes
+the comparator above and below the threshold repeatedly, causing rapid on/off
+commands. The RC filter reduces high-frequency ripple, but the Schmitt feedback
+is what gives the controller memory and forces a meaningful temperature change
+before the output changes state again.
+
 The circuit adds three practical pieces around the comparator:
 
 - `RFLT` and `CFILT` low-pass the raw sensor voltage before it reaches the
