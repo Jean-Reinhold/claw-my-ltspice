@@ -37,6 +37,13 @@ class DocsAssetTests(unittest.TestCase):
 
         self.assertTrue(expected.issubset(actual))
 
+    def test_committed_plot_assets_have_accessible_metadata(self) -> None:
+        for asset in EXPECTED_PLOT_ASSETS:
+            with self.subTest(asset=asset):
+                text = (Path("docs-site/pages/assets/plots") / asset).read_text()
+                self.assertIn("<title>", text)
+                self.assertIn("<desc>", text)
+
     def test_signal_plots_page_references_expected_assets(self) -> None:
         page = Path("docs-site/pages/signal-plots.md").read_text()
 
