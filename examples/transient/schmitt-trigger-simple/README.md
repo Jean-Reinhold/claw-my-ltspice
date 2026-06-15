@@ -27,6 +27,7 @@ Commands:
 ./claw-spice code build examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py
 ./claw-spice sim run examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.cir
 ./claw-spice raw plot runs/latest/schmitt_trigger_simple.raw V(in) V(trip) V(out) --output runs/latest/schmitt_trigger_simple.svg
+./claw-spice show examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.asc --terminal
 ./claw-spice show examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.asc
 ```
 
