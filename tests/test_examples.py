@@ -66,6 +66,13 @@ class ExampleAssetTests(unittest.TestCase):
             with self.subTest(sample=sample_id):
                 self.assertIn(sample_id, examples + gallery)
 
+    def test_readme_links_schmitt_walkthrough(self) -> None:
+        readme = Path("README.md").read_text()
+
+        self.assertIn("docs-site/pages/example-schmitt-triggers.md", readme)
+        self.assertIn("schmitt-trigger-simple", readme)
+        self.assertIn("schmitt-trigger-temperature-switch", readme)
+
     def test_example_readmes_embed_preview_images(self) -> None:
         for readme in Path("examples").glob("transient/*/README.md"):
             with self.subTest(readme=readme):
