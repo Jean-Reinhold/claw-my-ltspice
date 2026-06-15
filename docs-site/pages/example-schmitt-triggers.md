@@ -55,6 +55,10 @@ The practical example models a temperature-controlled fan-enable signal. The raw
 sensor voltage includes high-frequency ripple to represent cable pickup or supply
 noise. The circuit then adds three practical blocks before producing `fan_en`:
 
+The sensor source is a conditioned voltage proportional to temperature, not a raw
+thermistor macromodel. This keeps the example focused on comparator hysteresis,
+input filtering, and stable load-control behavior.
+
 - `RFLT` and `CFILT` attenuate ripple before the comparator input.
 - `RTOP`, `RBOT`, and `CREF` make a quiet mid-supply reference.
 - `RHYS` feeds back a small part of the output state, creating separate turn-on
