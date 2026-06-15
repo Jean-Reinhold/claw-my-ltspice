@@ -73,6 +73,13 @@ class ExampleAssetTests(unittest.TestCase):
         self.assertIn("schmitt-trigger-simple", readme)
         self.assertIn("schmitt-trigger-temperature-switch", readme)
 
+    def test_examples_page_introduces_paired_schmitt_examples(self) -> None:
+        examples = Path("docs-site/pages/examples.md").read_text()
+
+        self.assertIn("Schmitt trigger examples are included as a pair", examples)
+        self.assertIn("hysteresis math", examples)
+        self.assertIn("temperature-switch", examples)
+
     def test_example_readmes_embed_preview_images(self) -> None:
         for readme in Path("examples").glob("transient/*/README.md"):
             with self.subTest(readme=readme):
