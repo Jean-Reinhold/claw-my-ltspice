@@ -7,6 +7,11 @@ sensor is represented as a slow conditioned voltage with `600 Hz`, `80 mV`
 ripple riding on it, similar to a long cable or noisy supply coupling into an
 analog temperature signal.
 
+The source is intentionally a conditioned sensor voltage rather than a raw
+thermistor model. That keeps the example focused on the Schmitt trigger problem:
+how to make a stable decision once a sensor front end has already produced a
+voltage proportional to temperature.
+
 Without hysteresis, a fan controller near the setpoint can chatter: noise pushes
 the comparator above and below the threshold repeatedly, causing rapid on/off
 commands. The RC filter reduces high-frequency ripple, but the Schmitt feedback
