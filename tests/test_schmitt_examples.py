@@ -91,6 +91,10 @@ class SchmittExampleTests(unittest.TestCase):
                 self.assertIn(f"`{measurement}`", practical)
         self.assertIn("Expected measurement ranges", simple)
         self.assertIn("Expected measurement ranges", practical)
+        self.assertIn("dashed", simple)
+        self.assertIn("dashed", practical)
+        self.assertIn("fan on", practical)
+        self.assertIn("fan off", practical)
 
     def test_schmitt_readmes_include_terminal_preview_commands(self) -> None:
         readmes = [
