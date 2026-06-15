@@ -22,6 +22,7 @@ EXPECTED_SAMPLE_IDS = {
     "passive-rc-spectrum-split",
     "opamp-practical-integrator",
     "opamp-practical-differentiator",
+    "schmitt-trigger-simple",
     "sallen-key-highpass",
 }
 

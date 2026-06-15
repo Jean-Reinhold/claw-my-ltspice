@@ -125,6 +125,15 @@ analysis = "tran"
 expected_measurements = ["vout_max", "vout_min", "vout_rms"]
 
 [[runs]]
+id = "schmitt-trigger-simple"
+name = "Configurable inverting Schmitt trigger transient"
+generator = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py"
+circuit = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.cir"
+schematic = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.asc"
+analysis = "tran"
+expected_measurements = ["upper_trip", "lower_trip", "hysteresis_width", "expected_trip"]
+
+[[runs]]
 id = "sallen-key-highpass"
 name = "Generic op-amp Sallen-Key high-pass transient"
 generator = "examples/transient/sallen-key-highpass/sallen_key_highpass.py"

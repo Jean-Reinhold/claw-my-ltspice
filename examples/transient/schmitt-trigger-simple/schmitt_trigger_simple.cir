@@ -1,0 +1,20 @@
+* Configurable inverting Schmitt trigger
+.include ../../lib/claw_opamps.lib
+VIN in 0 PWL(0 -2 2m 2 4m -2 6m 2 8m -2)
+VCC vcc 0 5
+VEE vee 0 -5
+XU1 trip in vcc vee out CLAW_IDEAL_OPAMP
+RHYS out trip {RHYS}
+RREF trip 0 {RREF}
+RL out 0 10k
+.param RHYS=100k
+.param RREF=20k
+.param VTRIP=4.8*RREF/(RHYS+RREF)
+.tran 0 8m 0 2u
+.meas TRAN upper_trip FIND V(in) WHEN V(out)=0 FALL=1
+.meas TRAN lower_trip FIND V(in) WHEN V(out)=0 RISE=1
+.meas TRAN hysteresis_width PARAM upper_trip-lower_trip
+.meas TRAN expected_trip PARAM VTRIP
+.meas TRAN vout_max MAX V(out) FROM=1m TO=8m
+.meas TRAN vout_min MIN V(out) FROM=1m TO=8m
+.end

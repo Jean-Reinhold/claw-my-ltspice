@@ -63,6 +63,10 @@ examples using the Dockerized toolchain.
 </div>
 
 <div class="schematic-frame" markdown>
+![Rendered simple Schmitt trigger schematic](assets/generated/schmitt-trigger-simple.svg)
+</div>
+
+<div class="schematic-frame" markdown>
 ![Rendered Sallen-Key high-pass schematic](assets/generated/sallen-key-highpass.svg)
 </div>
 

@@ -315,6 +315,25 @@ Measurements: `vout_max`, `vout_min`, `vout_rms`.
 
 ![Practical op-amp differentiator plot](assets/plots/opamp-practical-differentiator.svg)
 
+## Simple Configurable Schmitt Trigger
+
+<div class="schematic-frame" markdown>
+![Rendered simple Schmitt trigger schematic](assets/generated/schmitt-trigger-simple.svg)
+</div>
+
+The `schmitt-trigger-simple` example is a compact inverting comparator with
+positive feedback. A slow triangle-like input crosses the two thresholds, while
+`RHYS` and `RREF` set the hysteresis band through
+`VTRIP = 4.8 * RREF / (RHYS + RREF)`.
+
+```bash
+./claw-spice code build examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py
+./claw-spice sim run examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.cir
+./claw-spice raw plot examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.raw V(in) V(trip) V(out) --output runs/latest/schmitt_trigger_simple.svg
+```
+
+Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`.
+
 ## Sallen-Key High-Pass Filter
 
 <div class="schematic-frame" markdown>
