@@ -60,6 +60,12 @@ class DocsAssetTests(unittest.TestCase):
         self.assertIn("fan on", practical)
         self.assertIn("fan off", practical)
 
+    def test_mlp_plot_shows_forward_pass_output(self) -> None:
+        plot = Path("docs-site/pages/assets/plots/opamp-mlp-forward-pass.svg").read_text()
+
+        self.assertIn("Op-amp MLP forward-pass response", plot)
+        self.assertIn("V(yout)", plot)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -339,6 +339,8 @@ measure the expected forward-pass output for each vector.
 
 Measurements: `y_vec1`, `y_vec2`, `y_vec3`, `y_vec4`, and `a1b_vec1`.
 
+![Op-amp MLP forward-pass plot](assets/plots/opamp-mlp-forward-pass.svg)
+
 ## Simple Configurable Schmitt Trigger
 
 <div class="schematic-frame" markdown>

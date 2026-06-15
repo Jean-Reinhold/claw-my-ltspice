@@ -26,6 +26,7 @@ EXPECTED_PLOT_ASSETS = (
     "passive-rc-spectrum-high-fft.svg",
     "opamp-practical-integrator.svg",
     "opamp-practical-differentiator.svg",
+    "opamp-mlp-forward-pass.svg",
     "schmitt-trigger-simple.svg",
     "schmitt-trigger-temperature-switch.svg",
     "sallen-key-highpass.svg",
@@ -55,6 +56,7 @@ def generate_plot_assets(output_dir: str | Path = "docs-site/pages/assets/plots"
         _passive_rc_spectrum_high_fft(output / "passive-rc-spectrum-high-fft.svg"),
         _practical_integrator(output / "opamp-practical-integrator.svg"),
         _practical_differentiator(output / "opamp-practical-differentiator.svg"),
+        _opamp_mlp_forward_pass(output / "opamp-mlp-forward-pass.svg"),
         _schmitt_trigger_simple(output / "schmitt-trigger-simple.svg"),
         _schmitt_temperature_switch(output / "schmitt-trigger-temperature-switch.svg"),
         _sallen_key_highpass(output / "sallen-key-highpass.svg"),
@@ -321,6 +323,31 @@ def _practical_differentiator(path: Path) -> Path:
     )
 
 
+def _opamp_mlp_forward_pass(path: Path) -> Path:
+    times = _times(stop=0.008, step=0.00004)
+    vectors = [
+        (0.0, 0.0),
+        (0.8, 0.1),
+        (0.1, 0.9),
+        (0.6, 0.5),
+    ]
+    x1: list[float] = []
+    x2: list[float] = []
+    yout: list[float] = []
+    for time in times:
+        index = min(int(time / 0.002), len(vectors) - 1)
+        sample_x1, sample_x2 = vectors[index]
+        x1.append(sample_x1)
+        x2.append(sample_x2)
+        yout.append(_mlp_forward_y(sample_x1, sample_x2))
+    return _plot(
+        path,
+        "Op-amp MLP forward-pass response",
+        times,
+        [WaveformSeries("V(x1)", x1), WaveformSeries("V(x2)", x2), WaveformSeries("V(yout)", yout)],
+    )
+
+
 def _schmitt_trigger_simple(path: Path) -> Path:
     times = _times(stop=0.008, step=0.00004)
     vin_points = [(0.0, -2.0), (0.002, 2.0), (0.004, -2.0), (0.006, 2.0), (0.008, -2.0)]
@@ -428,6 +455,16 @@ def _triangle_points(time: float, points: list[tuple[float, float]]) -> float:
 
 def _clip_positive(value: float) -> float:
     return min(value, 0.72 + max(value - 0.72, 0.0) * 0.06)
+
+
+def _mlp_forward_y(x1: float, x2: float) -> float:
+    z1a = 0.7 * x1 + 0.3 * x2 + 0.1
+    z1b = 0.2 * x1 + 0.8 * x2 - 0.2
+    a1a = max(z1a, 0.0)
+    a1b = max(z1b, 0.0)
+    a2a = max(0.6 * a1a + 0.4 * a1b + 0.05, 0.0)
+    a2b = max(0.3 * a1a + 0.7 * a1b, 0.0)
+    return 0.5 * a2a + 0.5 * a2b + 0.1
 
 
 def _passive_rc_spectrum_data(
