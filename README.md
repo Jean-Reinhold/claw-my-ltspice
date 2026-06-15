@@ -180,6 +180,9 @@ Refresh generated example outputs and docs assets through Docker:
 ./claw-spice docs assets
 ```
 
+For hysteresis-specific design notes, see the Schmitt trigger walkthrough at
+`docs-site/pages/example-schmitt-triggers.md`.
+
 ## AI Agent Contract
 
 This repository includes OpenCode instructions under `.opencode/`. They define
