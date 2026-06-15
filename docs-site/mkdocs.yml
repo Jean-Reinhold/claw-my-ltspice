@@ -34,6 +34,7 @@ nav:
   - Op-Amp Walkthroughs: example-opamps.md
   - Precision Rectifier Walkthrough: example-precision-rectifier.md
   - Sallen-Key Walkthrough: example-sallen-key-lowpass.md
+  - Schmitt Trigger Walkthrough: example-schmitt-triggers.md
   - Gallery: gallery.md
   - Plots And FFT Gallery: signal-plots.md
   - AI Workflow: opencode.md
