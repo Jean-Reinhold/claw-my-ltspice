@@ -83,3 +83,14 @@ tolerate more switching and needs tighter regulation.
 For the simple inverting trigger, increase `RREF` or decrease `RHYS` to widen the
 band. For the practical non-inverting trigger, decrease `RHYS` relative to `RIN`
 to widen the band.
+
+## Verification Checklist
+
+Before accepting changes to either Schmitt example, collect these artifacts:
+
+- Generated `.cir` and `.asc` files from the Python source.
+- LTspice `.log` summary showing all Schmitt `.meas` statements succeeded.
+- Raw trace list confirming the plotted nodes are present.
+- Waveform plot showing input, threshold or filtered sensor, and output state.
+- Rendered schematic preview with explicit wires, readable labels, and no missing
+  symbols.
