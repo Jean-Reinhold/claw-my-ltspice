@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
-from claw_spice.plot import plot_fft_waveform_data, plot_waveform_data
+from claw_spice.plot import ReferenceLine, plot_fft_waveform_data, plot_waveform_data
 from claw_spice.raw import WaveformData, WaveformSeries
 
 
@@ -113,8 +113,20 @@ def _settled_step(times: list[float], level: float, tau: float, delay: float = 0
     return values
 
 
-def _plot(path: Path, title: str, x_values: list[float], series: list[WaveformSeries]) -> Path:
-    svg, _png = plot_waveform_data(WaveformData("time", x_values, series), path, title=title)
+def _plot(
+    path: Path,
+    title: str,
+    x_values: list[float],
+    series: list[WaveformSeries],
+    *,
+    reference_lines: tuple[ReferenceLine, ...] = (),
+) -> Path:
+    svg, _png = plot_waveform_data(
+        WaveformData("time", x_values, series),
+        path,
+        title=title,
+        reference_lines=reference_lines,
+    )
     return svg
 
 
@@ -335,6 +347,10 @@ def _schmitt_trigger_simple(path: Path) -> Path:
             WaveformSeries("V(trip)", trip),
             WaveformSeries("V(out)", output),
         ],
+        reference_lines=(
+            ReferenceLine(upper_trip, "upper trip", "#7c3aed"),
+            ReferenceLine(lower_trip, "lower trip", "#7c3aed"),
+        ),
     )
 
 
@@ -366,6 +382,10 @@ def _schmitt_temperature_switch(path: Path) -> Path:
             WaveformSeries("V(sense)", sense),
             WaveformSeries("V(fan_en)", fan_en),
         ],
+        reference_lines=(
+            ReferenceLine(upper_trip, "fan on", "#7c3aed"),
+            ReferenceLine(lower_trip, "fan off", "#7c3aed"),
+        ),
     )
 
 
