@@ -102,6 +102,14 @@ For the simple inverting trigger, increase `RREF` or decrease `RHYS` to widen th
 band. For the practical non-inverting trigger, decrease `RHYS` relative to `RIN`
 to widen the band.
 
+Quick tuning recipes:
+
+| Goal | Simple trigger change | Temperature switch change |
+| --- | --- | --- |
+| Wider hysteresis | Increase `RREF` or decrease `RHYS` | Decrease `RHYS` relative to `RIN` |
+| Narrower hysteresis | Decrease `RREF` or increase `RHYS` | Increase `RHYS` relative to `RIN` |
+| Less sensor ripple at comparator | Not applicable | Increase `RFLT * CFILT` after checking response time |
+
 ## Verification Checklist
 
 Before accepting changes to either Schmitt example, collect these artifacts:
