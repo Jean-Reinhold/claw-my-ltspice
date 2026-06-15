@@ -148,6 +148,8 @@ def _plot_svg(
 
     body = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" role="img">',
+        f'<title>{html.escape(title)}</title>',
+        f'<desc>Waveform plot with {len(data.series)} signal trace(s).</desc>',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
         '<style>.title{font:700 20px system-ui,sans-serif;fill:#111827}.axis{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}.legend{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.frame{stroke:#374151;stroke-width:1.5;fill:none}.reference{stroke-dasharray:7 5;stroke-width:1.7}.reference-label{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#374151}</style>',
         f'<text x="{left}" y="34" class="title">{html.escape(title)}</text>',

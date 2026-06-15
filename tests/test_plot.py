@@ -32,6 +32,8 @@ class PlotTests(unittest.TestCase):
             self.assertEqual(svg, output)
             self.assertIsNone(png)
             self.assertIn("<svg", text)
+            self.assertIn("<title>RC output</title>", text)
+            self.assertIn("<desc>Waveform plot", text)
             self.assertIn("RC output", text)
             self.assertIn("V(out)", text)
 
