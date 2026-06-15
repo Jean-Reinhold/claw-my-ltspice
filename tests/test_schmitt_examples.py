@@ -44,6 +44,28 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("WHEN V(fan_en)=2.5 FALL=1", netlist)
         self.assertIn("TRIG V(fan_en) VAL=2.5 RISE=1", netlist)
 
+    def test_schmitt_readmes_document_expected_measurements(self) -> None:
+        simple = Path("examples/transient/schmitt-trigger-simple/README.md").read_text()
+        practical = Path("examples/transient/schmitt-trigger-temperature-switch/README.md").read_text()
+
+        for measurement in ("upper_trip", "lower_trip", "hysteresis_width", "expected_trip"):
+            with self.subTest(readme="simple", measurement=measurement):
+                self.assertIn(f"`{measurement}`", simple)
+        for measurement in (
+            "turn_on_sensor",
+            "turn_off_sensor",
+            "hysteresis_width",
+            "expected_upper",
+            "expected_lower",
+            "fan_on_time",
+            "raw_ripple_pp",
+            "filtered_ripple_pp",
+        ):
+            with self.subTest(readme="temperature-switch", measurement=measurement):
+                self.assertIn(f"`{measurement}`", practical)
+        self.assertIn("Expected measurement ranges", simple)
+        self.assertIn("Expected measurement ranges", practical)
+
 
 if __name__ == "__main__":
     unittest.main()
