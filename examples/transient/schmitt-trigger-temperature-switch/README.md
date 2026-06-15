@@ -39,6 +39,7 @@ Commands:
 ./claw-spice code build examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.py
 ./claw-spice sim run examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.cir
 ./claw-spice raw plot runs/latest/schmitt_trigger_temperature_switch.raw V(sensor_raw) V(sense) V(fan_en) --output runs/latest/schmitt_trigger_temperature_switch.svg
+./claw-spice show examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.asc --terminal
 ./claw-spice show examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.asc
 ```
 
