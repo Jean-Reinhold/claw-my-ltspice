@@ -27,6 +27,7 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn(".meas TRAN upper_trip FIND V(in) WHEN V(out)=0 FALL=1", netlist)
         self.assertIn(".meas TRAN lower_trip FIND V(in) WHEN V(out)=0 RISE=1", netlist)
         self.assertIn(".meas TRAN hysteresis_width PARAM upper_trip-lower_trip", netlist)
+        self.assertIn(".meas TRAN expected_hysteresis PARAM 2*VTRIP", netlist)
 
     def test_temperature_switch_uses_real_fan_enable_node(self) -> None:
         module = _load_example(
@@ -49,7 +50,13 @@ class SchmittExampleTests(unittest.TestCase):
         simple = Path("examples/transient/schmitt-trigger-simple/README.md").read_text()
         practical = Path("examples/transient/schmitt-trigger-temperature-switch/README.md").read_text()
 
-        for measurement in ("upper_trip", "lower_trip", "hysteresis_width", "expected_trip"):
+        for measurement in (
+            "upper_trip",
+            "lower_trip",
+            "hysteresis_width",
+            "expected_trip",
+            "expected_hysteresis",
+        ):
             with self.subTest(readme="simple", measurement=measurement):
                 self.assertIn(f"`{measurement}`", simple)
         for measurement in (

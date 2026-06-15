@@ -332,7 +332,8 @@ positive feedback. A slow triangle-like input crosses the two thresholds, while
 ./claw-spice raw plot examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.raw V(in) V(trip) V(out) --output runs/latest/schmitt_trigger_simple.svg
 ```
 
-Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`.
+Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`,
+`expected_hysteresis`.
 
 ![Simple Schmitt trigger hysteresis plot](assets/plots/schmitt-trigger-simple.svg)
 

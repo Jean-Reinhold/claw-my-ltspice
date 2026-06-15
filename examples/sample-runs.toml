@@ -131,7 +131,7 @@ generator = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py
 circuit = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.cir"
 schematic = "examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.asc"
 analysis = "tran"
-expected_measurements = ["upper_trip", "lower_trip", "hysteresis_width", "expected_trip"]
+expected_measurements = ["upper_trip", "lower_trip", "hysteresis_width", "expected_trip", "expected_hysteresis"]
 
 [[runs]]
 id = "schmitt-trigger-temperature-switch"

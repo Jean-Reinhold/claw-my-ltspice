@@ -30,8 +30,8 @@ below that lower threshold before the output returns high.
 
 ![Simple Schmitt trigger hysteresis plot](assets/plots/schmitt-trigger-simple.svg)
 
-Key measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, and
-`expected_trip`.
+Key measurements: `upper_trip`, `lower_trip`, `hysteresis_width`,
+`expected_trip`, and `expected_hysteresis`.
 
 ## Temperature Switch Use Case
 

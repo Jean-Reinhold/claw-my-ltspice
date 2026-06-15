@@ -27,7 +27,8 @@ Commands:
 ```
 
 The `.meas` directives report `upper_trip`, `lower_trip`,
-`hysteresis_width`, `expected_trip`, `vout_max`, and `vout_min`.
+`hysteresis_width`, `expected_trip`, `expected_hysteresis`, `vout_max`, and
+`vout_min`.
 
 Expected measurement ranges with the default parameters:
 
@@ -37,6 +38,7 @@ Expected measurement ranges with the default parameters:
 | `lower_trip` | `-0.9 V` to `-0.7 V` | Falling-input threshold before the output returns high. |
 | `hysteresis_width` | `1.4 V` to `1.8 V` | Separation between the upper and lower thresholds. |
 | `expected_trip` | `0.75 V` to `0.85 V` | Parameter-derived threshold magnitude. |
+| `expected_hysteresis` | `1.5 V` to `1.7 V` | Parameter-derived hysteresis width. |
 | `vout_max` | above `4.5 V` | High output saturation from the ideal op-amp model. |
 | `vout_min` | below `-4.5 V` | Low output saturation from the ideal op-amp model. |
 

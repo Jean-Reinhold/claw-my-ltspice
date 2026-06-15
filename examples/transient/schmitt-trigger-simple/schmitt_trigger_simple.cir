@@ -15,6 +15,7 @@ RL out 0 10k
 .meas TRAN lower_trip FIND V(in) WHEN V(out)=0 RISE=1
 .meas TRAN hysteresis_width PARAM upper_trip-lower_trip
 .meas TRAN expected_trip PARAM VTRIP
+.meas TRAN expected_hysteresis PARAM 2*VTRIP
 .meas TRAN vout_max MAX V(out) FROM=1m TO=8m
 .meas TRAN vout_min MIN V(out) FROM=1m TO=8m
 .end

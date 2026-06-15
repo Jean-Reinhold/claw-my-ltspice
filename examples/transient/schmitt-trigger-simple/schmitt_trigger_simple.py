@@ -45,6 +45,7 @@ def create_circuit(include_path: str = "../../lib/claw_opamps.lib") -> Circuit:
     circuit.meas("TRAN", "lower_trip", "FIND V(in) WHEN V(out)=0 RISE=1")
     circuit.meas("TRAN", "hysteresis_width", "PARAM upper_trip-lower_trip")
     circuit.meas("TRAN", "expected_trip", "PARAM VTRIP")
+    circuit.meas("TRAN", "expected_hysteresis", "PARAM 2*VTRIP")
     circuit.meas("TRAN", "vout_max", "MAX V(out) FROM=1m TO=8m")
     circuit.meas("TRAN", "vout_min", "MIN V(out) FROM=1m TO=8m")
     return circuit
