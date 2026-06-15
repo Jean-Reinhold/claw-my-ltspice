@@ -330,6 +330,7 @@ positive feedback. A slow triangle-like input crosses the two thresholds, while
 ./claw-spice code build examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.py
 ./claw-spice sim run examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.cir
 ./claw-spice raw plot examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.raw V(in) V(trip) V(out) --output runs/latest/schmitt_trigger_simple.svg
+./claw-spice show examples/transient/schmitt-trigger-simple/schmitt_trigger_simple.asc --terminal
 ```
 
 Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`,
@@ -353,6 +354,7 @@ setpoint.
 ./claw-spice code build examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.py
 ./claw-spice sim run examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.cir
 ./claw-spice raw plot examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.raw V(sensor_raw) V(sense) V(fan_en) --output runs/latest/schmitt_trigger_temperature_switch.svg
+./claw-spice show examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.asc --terminal
 ```
 
 Measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
