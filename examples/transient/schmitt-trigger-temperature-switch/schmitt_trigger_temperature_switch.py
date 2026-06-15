@@ -71,6 +71,7 @@ def create_circuit(include_path: str = "../../lib/claw_opamps.lib") -> Circuit:
     circuit.meas("TRAN", "expected_upper", "PARAM UPPER_TRIP")
     circuit.meas("TRAN", "expected_lower", "PARAM LOWER_TRIP")
     circuit.meas("TRAN", "fan_on_time", "TRIG V(fan_en) VAL=2.5 RISE=1 TARG V(fan_en) VAL=2.5 FALL=1")
+    circuit.meas("TRAN", "fan_en_avg", "AVG V(fan_en) FROM=0 TO=200m")
     circuit.meas("TRAN", "raw_ripple_pp", "PP V(sensor_raw) FROM=20m TO=25m")
     circuit.meas("TRAN", "filtered_ripple_pp", "PP V(sense) FROM=20m TO=25m")
     circuit.meas("TRAN", "ripple_reduction", "PARAM raw_ripple_pp/filtered_ripple_pp")

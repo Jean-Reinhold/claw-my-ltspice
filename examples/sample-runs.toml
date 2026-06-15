@@ -140,7 +140,7 @@ generator = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigg
 circuit = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.cir"
 schematic = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.asc"
 analysis = "tran"
-expected_measurements = ["turn_on_sensor", "turn_off_sensor", "hysteresis_width", "fan_on_time", "ripple_reduction"]
+expected_measurements = ["turn_on_sensor", "turn_off_sensor", "hysteresis_width", "fan_on_time", "fan_en_avg", "ripple_reduction"]
 
 [[runs]]
 id = "sallen-key-highpass"

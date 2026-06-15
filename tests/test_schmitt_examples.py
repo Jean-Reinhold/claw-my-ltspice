@@ -59,6 +59,7 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("WHEN V(fan_en)=2.5 RISE=1", netlist)
         self.assertIn("WHEN V(fan_en)=2.5 FALL=1", netlist)
         self.assertIn("TRIG V(fan_en) VAL=2.5 RISE=1", netlist)
+        self.assertIn(".meas TRAN fan_en_avg AVG V(fan_en) FROM=0 TO=200m", netlist)
         self.assertIn(".meas TRAN ripple_reduction PARAM raw_ripple_pp/filtered_ripple_pp", netlist)
 
     def test_schmitt_readmes_document_expected_measurements(self) -> None:
@@ -81,6 +82,7 @@ class SchmittExampleTests(unittest.TestCase):
             "expected_upper",
             "expected_lower",
             "fan_on_time",
+            "fan_en_avg",
             "raw_ripple_pp",
             "filtered_ripple_pp",
             "ripple_reduction",

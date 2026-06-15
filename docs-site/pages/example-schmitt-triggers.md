@@ -82,7 +82,7 @@ about `460 mV`.
 ![Temperature switch Schmitt trigger plot](assets/plots/schmitt-trigger-temperature-switch.svg)
 
 Key measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
-`expected_upper`, `expected_lower`, `fan_on_time`, `raw_ripple_pp`,
+`expected_upper`, `expected_lower`, `fan_on_time`, `fan_en_avg`, `raw_ripple_pp`,
 `filtered_ripple_pp`, and `ripple_reduction`.
 
 | Measurement | Default expectation |

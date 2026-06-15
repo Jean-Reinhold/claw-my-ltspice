@@ -358,7 +358,7 @@ setpoint.
 ```
 
 Measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
-`fan_on_time`, `ripple_reduction`.
+`fan_on_time`, `fan_en_avg`, `ripple_reduction`.
 
 ![Temperature switch Schmitt trigger plot](assets/plots/schmitt-trigger-temperature-switch.svg)
 
