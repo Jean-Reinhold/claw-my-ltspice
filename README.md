@@ -31,7 +31,7 @@ and humans use during the engineering loop.
 
 <p>
   <img src="docs-site/pages/assets/plots/opamp-summing.svg" alt="Op-amp summing amplifier waveform plot" width="49%">
-  <img src="docs-site/pages/assets/plots/sallen-key-lowpass-fft.svg" alt="Sallen-Key low-pass FFT plot" width="49%">
+  <img src="docs-site/pages/assets/plots/schmitt-trigger-temperature-switch.svg" alt="Noisy temperature Schmitt trigger waveform plot" width="49%">
 </p>
 
 ## Project Goal
@@ -169,6 +169,8 @@ generation, simulation, rendering, and documentation loop.
 | Passive RC spectrum split | `examples/transient/passive-rc-spectrum-split/preview.svg` |
 | Practical op-amp integrator | `examples/transient/opamp-practical-integrator/preview.svg` |
 | Practical op-amp differentiator | `examples/transient/opamp-practical-differentiator/preview.svg` |
+| Simple configurable Schmitt trigger | `examples/transient/schmitt-trigger-simple/preview.svg` |
+| Noisy temperature switch Schmitt trigger | `examples/transient/schmitt-trigger-temperature-switch/preview.svg` |
 | Sallen-Key high-pass filter | `examples/transient/sallen-key-highpass/preview.svg` |
 
 Refresh generated example outputs and docs assets through Docker:
