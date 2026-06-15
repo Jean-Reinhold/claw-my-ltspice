@@ -4,6 +4,10 @@ The examples are executable specifications. Each one has a Python generator, a
 committed `.cir` netlist, a committed `.asc` schematic, expected `.meas` values,
 a rendered schematic preview, and an expected signal-shape plot.
 
+The Schmitt trigger examples are included as a pair: one small configurable
+threshold circuit for learning the hysteresis math, and one practical noisy
+temperature-switch circuit for a real load-control use case.
+
 List the configured samples:
 
 ```bash
