@@ -134,6 +134,15 @@ analysis = "tran"
 expected_measurements = ["upper_trip", "lower_trip", "hysteresis_width", "expected_trip"]
 
 [[runs]]
+id = "schmitt-trigger-temperature-switch"
+name = "Noisy temperature switch Schmitt trigger transient"
+generator = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.py"
+circuit = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.cir"
+schematic = "examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.asc"
+analysis = "tran"
+expected_measurements = ["turn_on_sensor", "turn_off_sensor", "hysteresis_width", "fan_on_time"]
+
+[[runs]]
 id = "sallen-key-highpass"
 name = "Generic op-amp Sallen-Key high-pass transient"
 generator = "examples/transient/sallen-key-highpass/sallen_key_highpass.py"

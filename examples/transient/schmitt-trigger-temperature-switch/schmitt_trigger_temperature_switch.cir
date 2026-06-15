@@ -1,0 +1,32 @@
+* Noisy temperature switch Schmitt trigger
+.include ../../lib/claw_opamps.lib
+VRIPPLE sensor_raw temp_base SINE(0 80m 600)
+VTEMP temp_base 0 PWL(0 2.0 50m 3.1 100m 2.0 150m 3.1 200m 2.0)
+VCC vcc 0 5
+RFLT sensor_raw sense 4.7k
+CFILT sense 0 1u
+RSENSE sense 0 1Meg
+RIN sense cmp {RIN}
+RHYS fan_en cmp {RHYS}
+RTOP vcc ref 100k
+RBOT ref 0 100k
+CREF ref 0 100n
+XU1 cmp ref vcc 0 fan_en CLAW_IDEAL_OPAMP
+RLOAD fan_en 0 10k
+.param RIN=100k
+.param RHYS=1Meg
+.param VREF=2.5
+.param VOUT_H=4.8
+.param VOUT_L=0.2
+.param UPPER_TRIP=VREF*(1+RIN/RHYS)-VOUT_L*(RIN/RHYS)
+.param LOWER_TRIP=VREF*(1+RIN/RHYS)-VOUT_H*(RIN/RHYS)
+.tran 0 200m 0 20u
+.meas TRAN turn_on_sensor FIND V(sense) WHEN V(fan_en)=2.5 RISE=1
+.meas TRAN turn_off_sensor FIND V(sense) WHEN V(fan_en)=2.5 FALL=1
+.meas TRAN hysteresis_width PARAM turn_on_sensor-turn_off_sensor
+.meas TRAN expected_upper PARAM UPPER_TRIP
+.meas TRAN expected_lower PARAM LOWER_TRIP
+.meas TRAN fan_on_time TRIG V(fan_en) VAL=2.5 RISE=1 TARG V(fan_en) VAL=2.5 FALL=1
+.meas TRAN raw_ripple_pp PP V(sensor_raw) FROM=20m TO=25m
+.meas TRAN filtered_ripple_pp PP V(sense) FROM=20m TO=25m
+.end

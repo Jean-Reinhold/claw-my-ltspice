@@ -334,6 +334,27 @@ positive feedback. A slow triangle-like input crosses the two thresholds, while
 
 Measurements: `upper_trip`, `lower_trip`, `hysteresis_width`, `expected_trip`.
 
+## Noisy Temperature Switch Schmitt Trigger
+
+<div class="schematic-frame" markdown>
+![Rendered temperature switch Schmitt trigger schematic](assets/generated/schmitt-trigger-temperature-switch.svg)
+</div>
+
+The `schmitt-trigger-temperature-switch` example turns a noisy analog
+temperature signal into a clean `fan_en` output. It combines input filtering, a
+quiet mid-supply reference, and configurable hysteresis so the output changes
+state at useful turn-on and turn-off points instead of chattering around the
+setpoint.
+
+```bash
+./claw-spice code build examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.py
+./claw-spice sim run examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.cir
+./claw-spice raw plot examples/transient/schmitt-trigger-temperature-switch/schmitt_trigger_temperature_switch.raw V(sensor_raw) V(sense) V(fan_en) --output runs/latest/schmitt_trigger_temperature_switch.svg
+```
+
+Measurements: `turn_on_sensor`, `turn_off_sensor`, `hysteresis_width`,
+`fan_on_time`.
+
 ## Sallen-Key High-Pass Filter
 
 <div class="schematic-frame" markdown>

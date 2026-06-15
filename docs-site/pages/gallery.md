@@ -67,6 +67,10 @@ examples using the Dockerized toolchain.
 </div>
 
 <div class="schematic-frame" markdown>
+![Rendered temperature switch Schmitt trigger schematic](assets/generated/schmitt-trigger-temperature-switch.svg)
+</div>
+
+<div class="schematic-frame" markdown>
 ![Rendered Sallen-Key high-pass schematic](assets/generated/sallen-key-highpass.svg)
 </div>
 

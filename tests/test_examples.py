@@ -23,6 +23,7 @@ EXPECTED_SAMPLE_IDS = {
     "opamp-practical-integrator",
     "opamp-practical-differentiator",
     "schmitt-trigger-simple",
+    "schmitt-trigger-temperature-switch",
     "sallen-key-highpass",
 }
 
