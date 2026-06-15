@@ -17,6 +17,19 @@ class SimulationResult:
     stdout: str
     stderr: str
 
+    @property
+    def missing_artifacts(self) -> tuple[str, ...]:
+        missing = []
+        if self.log_path is None:
+            missing.append("log")
+        if self.raw_path is None:
+            missing.append("raw")
+        return tuple(missing)
+
+    @property
+    def ok(self) -> bool:
+        return self.returncode == 0 and not self.missing_artifacts
+
 
 def ltspice_command() -> list[str]:
     configured = os.environ.get("LTSPICE_CMD")
@@ -40,7 +53,10 @@ def wine_path(path: Path) -> str:
 def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResult:
     source = Path(input_path).resolve()
     base_command = ltspice_command()
-    command = [*base_command, "-b", "-Run", wine_path(source)]
+    if source.suffix.lower() == ".asc":
+        command = [*base_command, "-Run", "-b", wine_path(source)]
+    else:
+        command = [*base_command, "-b", wine_path(source)]
     result = subprocess.run(
         command,
         cwd=str(source.parent),

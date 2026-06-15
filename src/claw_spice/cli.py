@@ -200,6 +200,8 @@ def cmd_sim_run(args: argparse.Namespace) -> int:
         "returncode": result.returncode,
         "log": str(result.log_path) if result.log_path else None,
         "raw": str(result.raw_path) if result.raw_path else None,
+        "missing_artifacts": list(result.missing_artifacts),
+        "ok": result.ok,
         "stdout": result.stdout,
         "stderr": result.stderr,
     }
@@ -210,7 +212,9 @@ def cmd_sim_run(args: argparse.Namespace) -> int:
         print(f"Return code: {result.returncode}")
         print(f"Log: {result.log_path or 'not produced'}")
         print(f"Raw: {result.raw_path or 'not produced'}")
-    return result.returncode
+        if result.missing_artifacts:
+            print(f"Missing artifacts: {', '.join(result.missing_artifacts)}")
+    return 0 if result.ok else 1
 
 
 def cmd_sim_netlist(args: argparse.Namespace) -> int:
@@ -346,8 +350,11 @@ def cmd_examples_run(args: argparse.Namespace) -> int:
         if "cir" not in outputs:
             continue
         result = run_simulation(outputs["cir"])
-        print(f"{name}: simulation return code {result.returncode}")
-        failed += 1 if result.returncode != 0 else 0
+        status = f"{name}: simulation return code {result.returncode}"
+        if result.missing_artifacts:
+            status += f" missing artifacts: {', '.join(result.missing_artifacts)}"
+        print(status)
+        failed += 1 if not result.ok else 0
     return 1 if failed else 0
 
 

@@ -1,7 +1,9 @@
 # Simulation And Analysis
 
 Simulation evidence comes from LTspice return codes, logs, measurements, raw
-traces, waveform plots, and FFT plots. A passing command alone is not enough.
+traces, waveform plots, and FFT plots. A passing command alone is not enough;
+`sim run` treats a zero return code without `.log` and `.raw` artifacts as a
+failed simulation.
 
 ## Transient Setup
 
