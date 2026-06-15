@@ -115,6 +115,8 @@ class SchmittExampleTests(unittest.TestCase):
         self.assertIn("fan_en", page)
         self.assertIn("near `+0.8 V`", page)
         self.assertIn("near `2.73 V`", page)
+        self.assertIn("Quick tuning recipes", page)
+        self.assertIn("RFLT * CFILT", page)
 
 
 if __name__ == "__main__":
