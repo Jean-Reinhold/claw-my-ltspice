@@ -14,6 +14,12 @@ Use the simple trigger first when validating threshold equations or schematic
 routing. Use the temperature switch when you want a realistic single-supply
 signal-conditioning problem with a noisy sensor and a load-control output.
 
+List the registered examples with:
+
+```bash
+./claw-spice examples list
+```
+
 ## Simple Configurable Trigger
 
 The simple example is an inverting Schmitt comparator. The input drives the
