@@ -20,6 +20,7 @@ RLOAD fan_en 0 10k
 .param VOUT_L=0.2
 .param UPPER_TRIP=VREF*(1+RIN/RHYS)-VOUT_L*(RIN/RHYS)
 .param LOWER_TRIP=VREF*(1+RIN/RHYS)-VOUT_H*(RIN/RHYS)
+.options plotwinsize=0
 .tran 0 200m 0 20u
 .meas TRAN turn_on_sensor FIND V(sense) WHEN V(fan_en)=2.5 RISE=1
 .meas TRAN turn_off_sensor FIND V(sense) WHEN V(fan_en)=2.5 FALL=1

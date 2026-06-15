@@ -16,6 +16,7 @@ def create_circuit(include_path: str = "../../lib/claw_opamps.lib") -> Circuit:
     circuit.directive(".param VOUT_L=0.2")
     circuit.directive(".param UPPER_TRIP=VREF*(1+RIN/RHYS)-VOUT_L*(RIN/RHYS)")
     circuit.directive(".param LOWER_TRIP=VREF*(1+RIN/RHYS)-VOUT_H*(RIN/RHYS)")
+    circuit.directive(".options plotwinsize=0")
     circuit.voltage("VRIPPLE", "sensor_raw", "temp_base", "SINE(0 80m 600)", at=(96, 352))
     circuit.voltage("VTEMP", "temp_base", "0", "PWL(0 2.0 50m 3.1 100m 2.0 150m 3.1 200m 2.0)", at=(96, 544))
     circuit.voltage("VCC", "vcc", "0", "5", at=(448, 64))
