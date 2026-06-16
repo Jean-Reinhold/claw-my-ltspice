@@ -46,6 +46,7 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn("XDG_RUNTIME_DIR", entrypoint)
         self.assertIn("XDG_CACHE_HOME", entrypoint)
         self.assertIn("XDG_CONFIG_HOME", entrypoint)
+        self.assertIn("winemenubuilder.exe=d", entrypoint)
         self.assertIn("/tmp/claw-home-$(id -u)", entrypoint)
         self.assertIn("[ ! -w \"$HOME\" ]", entrypoint)
         self.assertIn("chmod 700 \"$XDG_RUNTIME_DIR\"", entrypoint)
