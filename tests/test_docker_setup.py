@@ -31,6 +31,13 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn(".[runtime,docs,dev]", dockerfile)
         self.assertIn("claw-spice-entrypoint", dockerfile)
 
+    def test_ltspice_wrapper_waits_for_wine_children(self) -> None:
+        wrapper = Path("docker/ltspice").read_text()
+
+        self.assertIn("wine \"$LTSPICE_EXE\"", wrapper)
+        self.assertIn("wineserver -w", wrapper)
+        self.assertNotIn("exec wine", wrapper)
+
     def test_compose_uses_linux_amd64_and_workspace_mount(self) -> None:
         compose = Path("docker-compose.yml").read_text()
 

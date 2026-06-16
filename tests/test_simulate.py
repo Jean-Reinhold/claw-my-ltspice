@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-from claw_spice.simulate import SimulationResult, ltspice_command, run_simulation, wine_path
+from claw_spice.simulate import SimulationResult, _run_ltspice_command, ltspice_command, simulation_command, wine_path
 
 
 class SimulateTests(unittest.TestCase):
@@ -25,25 +26,21 @@ class SimulateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / "example.cir"
             source.write_text(".end\n")
-            with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]), mock.patch(
-                "claw_spice.simulate.subprocess.run",
-                return_value=subprocess.CompletedProcess([], 0, "", ""),
-            ) as run:
-                run_simulation(source)
 
-        self.assertEqual(run.call_args.args[0], ["ltspice", "-b", wine_path(source)])
+            with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]):
+                command = simulation_command(source)
+
+            self.assertEqual(command, ["ltspice", "-b", wine_path(source)])
 
     def test_run_simulation_keeps_run_flag_for_schematics(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / "example.asc"
             source.write_text("Version 4\n")
-            with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]), mock.patch(
-                "claw_spice.simulate.subprocess.run",
-                return_value=subprocess.CompletedProcess([], 0, "", ""),
-            ) as run:
-                run_simulation(source)
 
-        self.assertEqual(run.call_args.args[0], ["ltspice", "-Run", "-b", wine_path(source)])
+            with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]):
+                command = simulation_command(source)
+
+            self.assertEqual(command, ["ltspice", "-Run", "-b", wine_path(source)])
 
     def test_successful_return_code_requires_log_and_raw_artifacts(self) -> None:
         result = SimulationResult(Path("example.cir"), ["ltspice"], 0, None, None, "", "")
@@ -64,6 +61,20 @@ class SimulateTests(unittest.TestCase):
 
         self.assertTrue(result.ok)
         self.assertEqual(result.missing_artifacts, ())
+
+    def test_ltspice_timeout_kills_process_group(self) -> None:
+        process = mock.Mock()
+        process.pid = 1234
+        process.communicate.side_effect = [subprocess.TimeoutExpired(["ltspice"], 5), ("", "")]
+
+        with mock.patch("claw_spice.simulate.subprocess.Popen", return_value=process) as popen, mock.patch(
+            "claw_spice.simulate.os.killpg"
+        ) as killpg:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                _run_ltspice_command(["ltspice"], Path("."), 5)
+
+        self.assertTrue(popen.call_args.kwargs["start_new_session"])
+        killpg.assert_called_once_with(1234, signal.SIGKILL)
 
 
 if __name__ == "__main__":

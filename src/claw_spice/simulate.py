@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import signal
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -50,22 +51,18 @@ def wine_path(path: Path) -> str:
     return "Z:" + str(resolved).replace("/", "\\")
 
 
-def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResult:
+def simulation_command(input_path: str | Path) -> list[str]:
     source = Path(input_path).resolve()
     base_command = ltspice_command()
     if source.suffix.lower() == ".asc":
-        command = [*base_command, "-Run", "-b", wine_path(source)]
-    else:
-        command = [*base_command, "-b", wine_path(source)]
-    result = subprocess.run(
-        command,
-        cwd=str(source.parent),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout,
-        check=False,
-    )
+        return [*base_command, "-Run", "-b", wine_path(source)]
+    return [*base_command, "-b", wine_path(source)]
+
+
+def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResult:
+    source = Path(input_path).resolve()
+    command = simulation_command(source)
+    result = _run_ltspice_command(command, source.parent, timeout)
     log_path = source.with_suffix(".log") if source.with_suffix(".log").exists() else None
     raw_path = source.with_suffix(".raw") if source.with_suffix(".raw").exists() else None
     return SimulationResult(source, command, result.returncode, log_path, raw_path, result.stdout, result.stderr)
@@ -74,15 +71,7 @@ def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResu
 def create_netlist(asc_path: str | Path, timeout: int = 120) -> Path:
     source = Path(asc_path).resolve()
     command = [*ltspice_command(), "-netlist", wine_path(source)]
-    result = subprocess.run(
-        command,
-        cwd=str(source.parent),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout,
-        check=False,
-    )
+    result = _run_ltspice_command(command, source.parent, timeout)
     output = source.with_suffix(".net")
     if result.returncode != 0 or not output.exists():
         raise RuntimeError(
@@ -92,3 +81,28 @@ def create_netlist(asc_path: str | Path, timeout: int = 120) -> Path:
             f"stderr: {result.stderr}"
         )
     return output
+
+
+def _run_ltspice_command(command: list[str], cwd: Path, timeout: int) -> subprocess.CompletedProcess[str]:
+    process = subprocess.Popen(
+        command,
+        cwd=str(cwd),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        _kill_process_group(process.pid)
+        stdout, stderr = process.communicate()
+        raise subprocess.TimeoutExpired(command, timeout, output=stdout, stderr=stderr) from exc
+    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
+
+def _kill_process_group(pid: int) -> None:
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass

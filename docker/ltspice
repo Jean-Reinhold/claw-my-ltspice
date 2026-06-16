@@ -2,4 +2,9 @@
 set -euo pipefail
 
 LTSPICE_EXE="${LTSPICE_EXE:-$WINEPREFIX/drive_c/Program Files/ADI/LTspice/LTspice.exe}"
-exec wine "$LTSPICE_EXE" "$@"
+set +e
+wine "$LTSPICE_EXE" "$@"
+status=$?
+set -e
+wineserver -w || true
+exit "$status"
