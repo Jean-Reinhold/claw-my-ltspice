@@ -23,6 +23,8 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn("xvfb", dockerfile.lower())
         self.assertIn("pip install", dockerfile)
         self.assertIn(".[runtime,docs,dev]", dockerfile)
+        self.assertIn("find /opt/ltspice -type d -exec chmod a+rwx", dockerfile)
+        self.assertIn("find /opt/ltspice -type f -exec chmod a+rw", dockerfile)
 
     def test_prebuilt_dockerfile_documents_fallback(self) -> None:
         dockerfile = Path("Dockerfile.prebuilt").read_text()

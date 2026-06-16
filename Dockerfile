@@ -74,8 +74,8 @@ USER root
 RUN mv "/home/claw/.wine/drive_c/Program Files/ADI/LTspice" /opt/ltspice \
     && ln -s /opt/ltspice "/home/claw/.wine/drive_c/Program Files/ADI/LTspice" \
     && mv /home/claw/.wine /opt/wineprefix-template \
-    && find /opt/ltspice -type d -exec chmod a+rx {} + \
-    && find /opt/ltspice -type f -exec chmod a+r {} + \
+    && find /opt/ltspice -type d -exec chmod a+rwx {} + \
+    && find /opt/ltspice -type f -exec chmod a+rw {} + \
     && find /opt/wineprefix-template -type d -exec chmod a+rwx {} + \
     && find /opt/wineprefix-template -type f -exec chmod a+rw {} +
 
