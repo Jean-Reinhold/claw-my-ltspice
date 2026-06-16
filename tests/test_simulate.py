@@ -8,7 +8,14 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from claw_spice.simulate import SimulationResult, _run_ltspice_command, ltspice_command, simulation_command, wine_path
+from claw_spice.simulate import (
+    SimulationResult,
+    _run_ltspice_command,
+    create_netlist,
+    ltspice_command,
+    simulation_command,
+    wine_path,
+)
 
 
 class SimulateTests(unittest.TestCase):
@@ -30,17 +37,38 @@ class SimulateTests(unittest.TestCase):
             with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]):
                 command = simulation_command(source)
 
-            self.assertEqual(command, ["ltspice", "-b", wine_path(source)])
+            self.assertEqual(command, ["ltspice", "-wine", "-b", wine_path(source)])
 
     def test_run_simulation_keeps_run_flag_for_schematics(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
-            source = Path(temp) / "example.asc"
+            source = (Path(temp) / "example.asc").resolve()
             source.write_text("Version 4\n")
 
             with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]):
                 command = simulation_command(source)
 
-            self.assertEqual(command, ["ltspice", "-Run", "-b", wine_path(source)])
+            self.assertEqual(command, ["ltspice", "-wine", "-Run", "-b", wine_path(source)])
+
+    def test_create_netlist_forces_wine_workarounds(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            source = (Path(temp) / "example.asc").resolve()
+            output = source.with_suffix(".net")
+            source.write_text("Version 4\n")
+
+            def run_command(
+                command: list[str], _cwd: Path, _timeout: int
+            ) -> subprocess.CompletedProcess[str]:
+                output.write_text("* netlist\n")
+                return subprocess.CompletedProcess(command, 0, "", "")
+
+            with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]), mock.patch(
+                "claw_spice.simulate._run_ltspice_command", side_effect=run_command
+            ) as run:
+                self.assertEqual(create_netlist(source), output)
+
+            self.assertEqual(
+                run.call_args.args[0], ["ltspice", "-wine", "-netlist", wine_path(source)]
+            )
 
     def test_successful_return_code_requires_log_and_raw_artifacts(self) -> None:
         result = SimulationResult(Path("example.cir"), ["ltspice"], 0, None, None, "", "")
