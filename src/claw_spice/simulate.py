@@ -48,15 +48,13 @@ def ltspice_command() -> list[str]:
 
 def wine_path(path: Path) -> str:
     resolved = path.resolve()
-    return "Z:" + str(resolved).replace("/", "\\")
+    return "Z:" + resolved.as_posix()
 
 
 def simulation_command(input_path: str | Path) -> list[str]:
     source = Path(input_path).resolve()
     base_command = ltspice_command()
-    if source.suffix.lower() == ".asc":
-        return [*base_command, "-Run", "-b", wine_path(source)]
-    return [*base_command, "-b", wine_path(source)]
+    return [*base_command, "-Run", "-b", wine_path(source)]
 
 
 def run_simulation(input_path: str | Path, timeout: int = 300) -> SimulationResult:
