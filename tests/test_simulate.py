@@ -22,7 +22,7 @@ class SimulateTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {"LTSPICE_CMD": "ltspice-custom -flag"}, clear=False):
             self.assertEqual(ltspice_command(), ["ltspice-custom", "-flag"])
 
-    def test_run_simulation_uses_wine_batch_form_for_netlists(self) -> None:
+    def test_run_simulation_uses_batch_form_for_netlists(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / "example.cir"
             source.write_text(".end\n")
@@ -30,7 +30,7 @@ class SimulateTests(unittest.TestCase):
             with mock.patch("claw_spice.simulate.ltspice_command", return_value=["ltspice"]):
                 command = simulation_command(source)
 
-            self.assertEqual(command, ["ltspice", "-Run", "-b", wine_path(source)])
+            self.assertEqual(command, ["ltspice", "-b", wine_path(source)])
 
     def test_run_simulation_keeps_run_flag_for_schematics(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
