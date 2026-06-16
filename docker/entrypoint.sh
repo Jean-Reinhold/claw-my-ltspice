@@ -5,8 +5,16 @@ export HOME="${HOME:-/tmp/claw-home}"
 export WINEPREFIX="${WINEPREFIX:-/tmp/wine-prefix}"
 export LOGNAME="${LOGNAME:-claw}"
 export USER="${USER:-claw}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/xdg-runtime-$(id -u)}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/tmp/xdg-cache-$(id -u)}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-/tmp/xdg-config-$(id -u)}"
 
+if [ -e "$HOME" ] && [ ! -w "$HOME" ]; then
+  export HOME="/tmp/claw-home-$(id -u)"
+fi
 mkdir -p "$HOME"
+mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME"
+chmod 700 "$XDG_RUNTIME_DIR"
 
 TEMPLATE=/opt/wineprefix-template
 if [ ! -d "$WINEPREFIX" ]; then

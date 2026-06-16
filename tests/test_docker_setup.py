@@ -38,6 +38,16 @@ class DockerSetupTests(unittest.TestCase):
         self.assertIn("wineserver -w", wrapper)
         self.assertNotIn("exec wine", wrapper)
 
+    def test_entrypoint_sets_writable_xdg_paths_for_wine(self) -> None:
+        entrypoint = Path("docker/entrypoint.sh").read_text()
+
+        self.assertIn("XDG_RUNTIME_DIR", entrypoint)
+        self.assertIn("XDG_CACHE_HOME", entrypoint)
+        self.assertIn("XDG_CONFIG_HOME", entrypoint)
+        self.assertIn("/tmp/claw-home-$(id -u)", entrypoint)
+        self.assertIn("[ ! -w \"$HOME\" ]", entrypoint)
+        self.assertIn("chmod 700 \"$XDG_RUNTIME_DIR\"", entrypoint)
+
     def test_compose_uses_linux_amd64_and_workspace_mount(self) -> None:
         compose = Path("docker-compose.yml").read_text()
 
