@@ -5,29 +5,38 @@ description: Build UFPel-styled lab report PDFs (official texufpel class) from c
 
 # ufpel-report — lab reports build in Docker, nowhere else
 
-The `latex` compose service (texlive image, `latex/` mounted at
-`/workspace`) is the ONLY build environment. There is no host TeX
-dependency and there must never be one.
+The `latex` compose service (texlive image, repo mounted at `/workspace`)
+is the ONLY build environment. There is no host TeX dependency and there
+must never be one.
+
+## Layout
+
+- `reports/<slug>/` — one report per directory: `main.tex`,
+  `chapters/*.tex` (introducao, metodologia, resultados, conclusao,
+  apendices), `bibliografia.bib`, `imagens/generated/` (committed PNGs).
+  Deliverable: `reports/<slug>/build/main.pdf` (`build/` is gitignored).
+- `experiments/<slug>/` — the paired circuit workspace (`.py`, `.cir`,
+  `.asc` sources, committed; `.raw`/`.log`/`.net` are gitignored). Same
+  slug as the report it feeds. See `experiments/README.md`.
+- `latex/` — shared UFPel assets (`texufpel.cls`, `abnt.bst`, logos),
+  reached via TEXINPUTS/BSTINPUTS set on the compose service. Do not edit
+  the class; do not copy it into report directories.
+- `reports/_template/` — skeleton for new reports; scaffold a new
+  report + experiment pair with `./claw-spice report new <slug>`.
 
 ## Rules
 
-- ALWAYS build via `./claw-spice report` (or `make report`), which runs
-  `scripts/report/build_report.sh`. Never call `latexmk`/`pdflatex` on the
-  host; never `pip`/`tlmgr` install anything.
+- ALWAYS build via `./claw-spice report <slug>` (or `report` alone for
+  all reports), which runs `scripts/report/build_report.sh`. Never call
+  `latexmk`/`pdflatex` on the host; never `pip`/`tlmgr` install anything.
 - First build pulls the texlive image (~3GB, one-time). Expect it; do not
   abort.
-- All output lands in `latex/build/` (gitignored). The deliverable is
-  `latex/build/main.pdf`. Never edit files in `build/` — fix the sources.
-- Report sources live in `latex/`: `main.tex` (identification fields and
-  document skeleton), `chapters/*.tex` (introducao, metodologia,
-  resultados, conclusao, apendices), `bibliografia.bib` (ABNT via the
-  bundled `abnt.bst`), `texufpel.cls` (official UFPel class — do not
-  edit it).
-- One report per branch/experiment: fill the `<...>` placeholders in
-  `main.tex` (experiment name, author, professor, disciplina, keywords,
-  resumo) and replace the `\fbox` placeholder boxes in the chapters with
-  real `\includegraphics` calls before calling a report final.
-- `main.tex` already overrides the class's TCC identification texts via
+- Never edit files in `build/` — fix the sources.
+- Fill the `<...>` placeholders in `main.tex` (experiment name, author,
+  professor, disciplina, keywords, resumo) and replace the `\fbox`
+  placeholder boxes in the chapters with real `\includegraphics` calls
+  before calling a report final.
+- `main.tex` overrides the class's TCC identification texts via
   `\documento`/`\tipodocumento`/`\descricaodocumento` so the cover and
   title page read "Relatório de Laboratório" — keep those overrides when
   editing the preamble.
@@ -35,17 +44,18 @@ dependency and there must never be one.
 ## Getting simulation artifacts into the report
 
 pdflatex cannot read SVG. Everything claw-spice renders is SVG, so always
-convert with `--png` and store the images in `latex/imagens/generated/`
-(committed — plots and circuit drawings are part of the report):
+convert with `--png` and store the images in
+`reports/<slug>/imagens/generated/` (committed — plots and circuit
+drawings are part of the report):
 
 ```bash
 # schematic drawing straight into the report tree (--png converts next to it)
-./claw-spice render <circuit>.asc \
-    --output latex/imagens/generated/<name>.svg --png
+./claw-spice render experiments/<slug>/<circuit>.asc \
+    --output reports/<slug>/imagens/generated/<name>.svg --png
 
 # waveform plot straight into the report tree
 ./claw-spice raw plot <run>.raw V(out) \
-    --output latex/imagens/generated/<name>.svg --png
+    --output reports/<slug>/imagens/generated/<name>.svg --png
 ```
 
 Then in a chapter: `\includegraphics[width=\textwidth]{<name>.png}` —
@@ -57,27 +67,28 @@ theory. Paste the exact simulated netlist into the `ap:netlist` appendix.
 
 ## Build → read → fix loop (iterate until clean)
 
-1. `./claw-spice report`. On failure the script extracts the first LaTeX
-   error block from `latex/build/main.log` — read it there, not by
-   scrolling raw latexmk noise.
+1. `./claw-spice report <slug>`. On failure the script extracts the first
+   LaTeX error block from `reports/<slug>/build/main.log` — read it
+   there, not by scrolling raw latexmk noise.
 2. Fix the `.tex` source (never the files in `build/`), rebuild.
 3. On success, VISUAL INSPECTION IS MANDATORY: Read the built PDF
-   (`latex/build/main.pdf` — pages render as images) and check every page
-   you changed plus the sumário: broken layout, overfull lines, missing
-   figures/references ("??"), leftover `<placeholder>` fields, unreadable
-   schematic renders. Never declare a report done without having looked
-   at the rendered pages. Warnings worth chasing live in `main.log`
-   (`Overfull \hbox`, `undefined references`).
+   (`reports/<slug>/build/main.pdf` — pages render as images) and check
+   every page you changed plus the sumário: broken layout, overfull
+   lines, missing figures/references ("??"), leftover `<placeholder>`
+   fields, unreadable schematic renders. Never declare a report done
+   without having looked at the rendered pages. Warnings worth chasing
+   live in `main.log` (`Overfull \hbox`, `undefined references`).
 4. When the user asked only for a check, finish with
-   `./claw-spice report clean`; when they asked for the document, keep
-   the PDF.
+   `./claw-spice report clean <slug>`; when they asked for the document,
+   keep the PDF.
 
 ## Hot preview (the Overleaf replacement)
 
-- `./claw-spice report watch` — continuous rebuild (latexmk -pvc) inside
-  the container: every save of a `.tex` file rebuilds the PDF.
+- `./claw-spice report watch <slug>` — continuous rebuild (latexmk -pvc)
+  inside the container: every save of a `.tex` file rebuilds the PDF.
   Long-running; launch it for the user, don't sit blocking on it.
-- `./claw-spice report serve` — auto-refreshing browser viewer at
-  http://localhost:8001 that reloads whenever `main.pdf` changes.
+- `./claw-spice report serve <slug>` — auto-refreshing browser viewer at
+  http://localhost:8001 that reloads whenever that report's `main.pdf`
+  changes.
 - Together they give live editing: change a chapter, the browser updates
   seconds later.

@@ -54,12 +54,16 @@ Before accepting schematic work:
    symbols when the rendered SVG is ugly. Do not solve this by adding fake
    fallback schematic art.
 
-## Lab Reports
+## Lab Reports and Experiments
 
-UFPel-styled lab report PDFs build only in Docker via `./claw-spice report`
-(texlive compose service; sources in `latex/`, deliverable
-`latex/build/main.pdf`). Plots and schematics are embedded as PNG from
-`latex/imagens/generated/`. Follow `.claude/skills/ufpel-report/SKILL.md`.
+UFPel-styled lab report PDFs build only in Docker via
+`./claw-spice report <slug>` (texlive compose service). One report per
+directory under `reports/` (deliverable `reports/<slug>/build/main.pdf`),
+paired with circuit sources in `experiments/<slug>/`. Shared class/style
+assets live in `latex/`; `reports/_template/` is the skeleton for
+`./claw-spice report new <slug>`. Plots and schematics are embedded as PNG
+from `reports/<slug>/imagens/generated/`. Follow
+`.claude/skills/ufpel-report/SKILL.md`.
 
 ## Dependency Policy
 

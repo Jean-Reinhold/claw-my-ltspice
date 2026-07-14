@@ -45,10 +45,10 @@ o passo/janela de tempo e as diretivas \texttt{.meas} definidas. Liste os
 comandos executados, por exemplo:>
 
 \begin{verbatim}
-./claw-spice sim run <circuito>.cir
+./claw-spice sim run experiments/<slug>/<circuito>.cir
 ./claw-spice log summary <circuito>.log
 ./claw-spice raw plot <circuito>.raw V(out) \
-    --output latex/imagens/generated/<plot>.svg --png
+    --output reports/<slug>/imagens/generated/<plot>.svg --png
 \end{verbatim}
 
 <A netlist completa está no Apêndice~\ref{ap:netlist}.>

@@ -1,0 +1,21 @@
+\chapter{Netlist do circuito}
+\label{ap:netlist}
+
+<Cole aqui a netlist \texttt{.cir}/\texttt{.net} exatamente como foi
+simulada, para reprodutibilidade.>
+
+\begin{verbatim}
+* <circuito>.cir
+V1 in 0 PULSE(0 5 1m 1u 1u 10m 20m)
+R1 in out 1k
+C1 out 0 1u
+.tran 0 20m 0 10u
+.meas tran tau FIND time WHEN V(out)=3.1606 RISE=1
+.end
+\end{verbatim}
+
+\chapter{Código gerador}
+\label{ap:codigo}
+
+<Opcional: inclua o script Python que gera o circuito
+(\texttt{./claw-spice code build}) ou remova este apêndice.>

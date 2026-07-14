@@ -14,7 +14,7 @@ import json
 import os
 import sys
 
-PDF_PATH = os.environ.get("REPORT_PDF", "/workspace/build/main.pdf")
+PDF_PATH = os.environ.get("REPORT_PDF", "/workspace/reports/lab-01/build/main.pdf")
 
 PAGE = """<!doctype html>
 <html>
@@ -44,7 +44,7 @@ PAGE = """<!doctype html>
           'reloaded ' + new Date().toLocaleTimeString();
       } else if (mtime === 0) {
         document.getElementById('status').textContent =
-          'no PDF yet — run: ./claw-spice report';
+          'no PDF yet — run: ./claw-spice report <slug>';
       }
       last = mtime;
     } catch (e) {
@@ -74,7 +74,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self._send(200, "application/json", json.dumps({"mtime": mtime}).encode())
         elif self.path.startswith("/main.pdf"):
             if not os.path.exists(PDF_PATH):
-                self.send_error(404, "PDF not built yet - run: ./claw-spice report")
+                self.send_error(404, "PDF not built yet - run: ./claw-spice report <slug>")
                 return
             with open(PDF_PATH, "rb") as f:
                 self._send(200, "application/pdf", f.read())

@@ -1,0 +1,94 @@
+% ============================================================================
+% Relatório de laboratório — visual oficial UFPel (classe texufpel,
+% https://github.com/notcc/texufpel), adaptado do modelo de TCC para
+% relatórios de experimentos de circuitos deste repositório.
+%
+% Compile SOMENTE via: ./claw-spice report <slug>   (Docker; nenhum TeX no
+% host). A classe/estilo/logos compartilhados vivem em latex/ e são
+% encontrados via TEXINPUTS. Plots e esquemáticos gerados pelo claw-spice
+% entram como PNG em imagens/generated/ deste relatório (use --png).
+%
+% Campos entre <...> são placeholders: preencha antes de compilar a
+% versão final. Veja .claude/skills/ufpel-report/SKILL.md.
+% ============================================================================
+\documentclass[tcc,capa,oneside]{texufpel}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{booktabs} % tabelas de medidas (.meas)
+\usepackage{siunitx}  % unidades: \SI{2.2}{\kilo\ohm}, \SI{10}{\micro\farad}
+
+\graphicspath{{imagens/}{imagens/generated/}}
+
+\hypersetup{
+    hidelinks,    % remove coloração e caixas dos links
+    unicode=true, % permite acentuação no bookmark
+    linktoc=all   % habilita link no nome e página do sumário
+}
+
+\unidade{<Centro de Desenvolvimento Tecnológico>}
+\curso{<Ciência da Computação>}
+\nomecurso{<Bacharelado em Ciência da Computação>}
+\titulocurso{<Bacharel em Ciência da Computação>}
+
+\unidadeeng{<Technology Development Center>}
+\cursoeng{<Computer Science>}
+
+% A opção "tcc" traz o visual oficial da capa/folha de rosto; os textos
+% de identificação do documento são sobrescritos para relatório de
+% laboratório (a classe expõe \documento/\tipodocumento/\descricaodocumento).
+\documento{Relatório de Laboratório}
+\tipodocumento{Relatório de Laboratório (\cursoname) -- \unidadename}
+\makeatletter
+\descricaodocumento{Relatório de laboratório apresentado à disciplina de
+<Disciplina> do \@unidade\ da \@universidade.}
+\makeatother
+
+\title{<Nome do Experimento>}
+
+\author{<Sobrenome>}{<Nome do Autor>}
+\advisor[Prof.~Dr.]{<Sobrenome>}{<Nome do Professor>}
+
+% Palavras-chave: minúsculas, separadas por ';', a última terminada em '.'
+\keyword{<circuito>;}
+\keyword{<simulação>;}
+\keyword{ltspice.}
+
+\begin{document}
+
+% O modelo de TCC chama o campo de "Orientador"; num relatório de
+% laboratório a figura é o professor da disciplina.
+\renewcommand{\advisorname}{Professor}
+%\renewcommand{\advisorname}{Professora}
+
+\maketitle
+
+\sloppy
+
+% Resumo do experimento (objetivo, método, principal resultado).
+\begin{abstract}
+<Resumo do experimento em um parágrafo: qual circuito foi estudado, como
+foi simulado com o claw-spice/LTspice e qual foi o principal resultado
+quantitativo observado.>
+\end{abstract}
+
+\listoffigures
+
+\listoftables
+
+\tableofcontents
+
+\input{chapters/introducao}
+\input{chapters/metodologia}
+\input{chapters/resultados}
+\input{chapters/conclusao}
+
+\bibliographystyle{abnt}
+\bibliography{bibliografia}
+
+% Apêndices: netlists, código gerador e logs de medida do experimento.
+\apendices
+\input{chapters/apendices}
+
+\end{document}

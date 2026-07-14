@@ -1,0 +1,54 @@
+\chapter{Materiais e Métodos}
+\label{cap:metodologia}
+
+<Descreva o circuito e o procedimento de simulação. Todo o fluxo roda em
+Docker via \texttt{./claw-spice}: geração do circuito, simulação LTspice,
+extração de medidas e renderização do esquemático.>
+
+\section{Circuito}
+\label{sec:circuito}
+
+<Descreva a topologia e os valores dos componentes. O esquemático da
+Figura~\ref{fig:esquematico} foi renderizado a partir do arquivo
+\texttt{.asc} com \texttt{./claw-spice show <circuito>.asc --png}.>
+
+\begin{figure}[htb]
+  \centering
+  % Substitua pelo PNG do esquemático em imagens/generated/
+  %\includegraphics[width=0.8\textwidth]{<circuito>.png}
+  \fbox{\parbox[c][4cm][c]{0.8\textwidth}{\centering <esquemático:
+  imagens/generated/<circuito>.png>}}
+  \caption{Esquemático do circuito simulado.}
+  \label{fig:esquematico}
+\end{figure}
+
+\begin{table}[htb]
+  \centering
+  \caption{Componentes do circuito.}
+  \label{tab:componentes}
+  \begin{tabular}{lll}
+    \toprule
+    Referência & Componente & Valor \\
+    \midrule
+    R1 & Resistor  & \SI{1}{\kilo\ohm} \\
+    C1 & Capacitor & \SI{1}{\micro\farad} \\
+    V1 & Fonte de tensão & degrau de \SI{0}{\volt} a \SI{5}{\volt} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Simulação}
+\label{sec:simulacao}
+
+<Descreva a análise usada (\texttt{.tran}, \texttt{.ac}, \texttt{.op}),
+o passo/janela de tempo e as diretivas \texttt{.meas} definidas. Liste os
+comandos executados, por exemplo:>
+
+\begin{verbatim}
+./claw-spice sim run experiments/<slug>/<circuito>.cir
+./claw-spice log summary <circuito>.log
+./claw-spice raw plot <circuito>.raw V(out) \
+    --output reports/<slug>/imagens/generated/<plot>.svg --png
+\end{verbatim}
+
+<A netlist completa está no Apêndice~\ref{ap:netlist}.>

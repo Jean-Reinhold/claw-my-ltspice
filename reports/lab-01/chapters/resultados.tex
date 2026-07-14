@@ -1,0 +1,42 @@
+\chapter{Resultados e Discussão}
+\label{cap:resultados}
+
+<Apresente as formas de onda e as medidas extraídas do \texttt{.raw} e do
+\texttt{.log}. Cada plot gerado com \texttt{./claw-spice raw plot ... --png}
+entra como figura a partir de \texttt{imagens/generated/}.>
+
+\begin{figure}[htb]
+  \centering
+  % Substitua pelo PNG do plot em imagens/generated/
+  %\includegraphics[width=\textwidth]{<plot>.png}
+  \fbox{\parbox[c][4cm][c]{\textwidth}{\centering <forma de onda:
+  imagens/generated/<plot>.png>}}
+  \caption{<Descrição da forma de onda, ex.: resposta ao degrau de
+  $V(\mathrm{out})$>.}
+  \label{fig:resposta}
+\end{figure}
+
+\section{Medidas}
+\label{sec:medidas}
+
+<Transcreva os resultados \texttt{.meas} do \texttt{.log}
+(\texttt{./claw-spice log summary}) e compare com os valores teóricos.>
+
+\begin{table}[htb]
+  \centering
+  \caption{Medidas da simulação e valores teóricos.}
+  \label{tab:medidas}
+  \begin{tabular}{lSSS}
+    \toprule
+    Grandeza & {Simulado} & {Teórico} & {Erro (\%)} \\
+    \midrule
+    <constante de tempo $\tau$> & 1.002 & 1.000 & 0.2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Discussão}
+\label{sec:discussao}
+
+<Discuta as diferenças entre simulado e teórico, avisos relevantes do
+\texttt{.log}, limitações do modelo e fontes de erro.>

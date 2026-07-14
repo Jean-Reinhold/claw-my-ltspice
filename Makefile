@@ -22,14 +22,16 @@ serve:
 shell:
 	./claw-spice shell
 
+SLUG ?= lab-01
+
 report:
 	./claw-spice report
 
 report-watch:
-	./claw-spice report watch
+	./claw-spice report watch $(SLUG)
 
 report-serve:
-	./claw-spice report serve
+	./claw-spice report serve $(SLUG)
 
 report-clean:
 	./claw-spice report clean
