@@ -20,6 +20,7 @@ Use these commands for normal work:
 ./claw-spice show <schematic.asc> --terminal
 ./claw-spice show <schematic.asc>
 ./claw-spice docs assets
+./claw-spice report
 ```
 
 ## Engineering Loop
@@ -52,6 +53,13 @@ Before accepting schematic work:
 5. Fix source layout, component coordinates, wires, flags, or bundled `.asy`
    symbols when the rendered SVG is ugly. Do not solve this by adding fake
    fallback schematic art.
+
+## Lab Reports
+
+UFPel-styled lab report PDFs build only in Docker via `./claw-spice report`
+(texlive compose service; sources in `latex/`, deliverable
+`latex/build/main.pdf`). Plots and schematics are embedded as PNG from
+`latex/imagens/generated/`. Follow `.claude/skills/ufpel-report/SKILL.md`.
 
 ## Dependency Policy
 

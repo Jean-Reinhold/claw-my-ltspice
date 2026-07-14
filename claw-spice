@@ -83,6 +83,10 @@ case "$1" in
       open_svg "$svg"
     fi
     ;;
+  report)
+    shift
+    bash "$ROOT/scripts/report/build_report.sh" "$@"
+    ;;
   *)
     run_cli "$@"
     ;;

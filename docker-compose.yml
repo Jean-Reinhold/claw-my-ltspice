@@ -17,5 +17,19 @@ services:
     ports:
       - "8000:8000"
 
+  # UFPel lab-report builds (latexmk + texufpel class). ~3GB image, pulled
+  # once. Use via: ./claw-spice report — never latexmk on the host.
+  latex:
+    image: texlive/texlive:latest
+    working_dir: /workspace
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      HOME: /tmp
+    volumes:
+      - ./latex:/workspace
+      - ./scripts/report:/opt/report:ro
+    ports:
+      - "8001:8001"
+
 volumes:
   claw-spice-cache:
