@@ -385,6 +385,17 @@ def build(output_dir: str | Path) -> dict[str, Path]:
             output / "rs2_completo_vendor.cir"
         )
 
+    # Teste com AmpOp moderno: ADA4610 (JFET, 36 V, modelo embarcado no
+    # LTspice), mesmo circuito completo e mesmas medidas do teste vendor.
+    moderno_circuit = build_completo(subckt="ADA4610", include=None)
+    moderno_circuit.includes = []
+    moderno_circuit.title = "RS2 completo, AmpOp moderno ADA4610 (21101175)"
+    moderno_circuit.directive(".lib ADA4610.lib")
+    _add_global_overlay(moderno_circuit)
+    results["completo_moderno_cir"] = moderno_circuit.write_netlist(
+        output / "rs2_completo_moderno.cir"
+    )
+
     return results
 
 

@@ -132,14 +132,29 @@ mostra a distribuição dos resistores, todos entre uns
   \label{fig:resistores}
 \end{figure}
 
-Foram geradas duas versões do mesmo circuito. A primeira usa um modelo
+Foram geradas três versões do mesmo circuito. A primeira usa um modelo
 ideal de AmpOp (ganho $10^5$, saturação a \SI{0,2}{\volt} dos trilhos).
 A segunda usa o macromodelo comercial do LM741. Como o 741 não chega
 perto dos trilhos, as alimentações dessa versão foram calibradas em uma
 bancada separada (\texttt{bench\_741\_sat.cir}): mede-se onde o 741
 satura de verdade para cada par de trilhos e escolhe-se o par que
 coloca a saturação dos neurônios ocultos em \SI{0}{\volt} e
-\SI{4,8}{\volt}, os mesmos limites usados no treino.
+\SI{4,8}{\volt}, os mesmos limites usados no treino. A terceira versão
+usa um AmpOp moderno, o LT1810 (\SI{325}{\mega\hertz}, slew rate de
+\SI{350}{\volt\per\micro\second}, saída que chega até os trilhos),
+com o modelo que já vem embarcado no LTspice. A bancada de saturação
+(\texttt{bench\_moderno\_sat.cir}) mostrou folga de só
+\SI{2,4}{\milli\volt} para o trilho de cima e \SI{1,2}{\milli\volt}
+para o de baixo, então os neurônios ocultos rodam com \SI{4,8}{\volt}
+e o próprio terra, sem trilho negativo. Há um porém de simulação: o
+modelo de \SI{325}{\mega\hertz} força o simulador a passos de menos de
+um nanosegundo, e a rede completa com 260 desses modelos levaria dias
+de CPU. Por isso o LT1810 foi caracterizado em duas bancadas: a de
+saturação e uma cadeia de cinco somadores mais o comparador
+(\texttt{bench\_chain\_moderno.cir}), que reproduz o caminho crítico
+da rede e mede a latência de decisão. A mesma cadeia com o LM741
+(\texttt{bench\_chain\_741.cir}) valida a metodologia contra a
+latência medida na rede completa.
 
 Na simulação, vinte dígitos do conjunto de teste (dois por classe)
 entram em sequência, um a cada \SI{250}{\micro\second}, por 64 fontes
@@ -152,6 +167,8 @@ Seção~\ref{sec:resultados}:
 \begin{verbatim}
 ./claw-spice sim run experiments/analog-mlp/analog_mlp.cir --timeout 2400
 ./claw-spice sim run experiments/analog-mlp/analog_mlp_741.cir --timeout 2400
+./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
+./claw-spice sim run experiments/analog-mlp/bench_chain_741.cir --timeout 1800
 ./claw-spice code build experiments/analog-mlp/analyze_results.py \
     --output-dir experiments/analog-mlp
 \end{verbatim}

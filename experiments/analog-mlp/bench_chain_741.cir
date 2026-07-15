@@ -1,0 +1,34 @@
+* Latencia do caminho critico com LM741, para validar a metodologia da
+* bancada: a mesma cadeia de 5 somadores inversores + comparador usada
+* no bench_chain_moderno.cir. A cadeia e o pior caso sequencial (cada
+* estagio so acomoda depois do anterior); na rede completa os estagios
+* acomodam em paralelo e a latencia medida e menor.
+.include models/lm741.lib
+VCC vcc 0 5.8
+VEE vee 0 -5.8
+VEER veer 0 -0.97
+VTH vth 0 2.65
+VIN in 0 PWL(0 3 5u 3 5.01u -3 300u -3)
+R1 in s1 100k
+RF1 a1 s1 100k
+X1 0 s1 vcc vee a1 LM741
+R2 a1 s2 100k
+RF2 a2 s2 100k
+X2 0 s2 vcc vee a2 LM741
+R3 a2 s3 100k
+RF3 a3 s3 100k
+X3 0 s3 vcc vee a3 LM741
+R4 a3 s4 100k
+RF4 a4 s4 100k
+X4 0 s4 vcc vee a4 LM741
+R5 a4 s5 100k
+RF5 z s5 100k
+X5 0 s5 vcc vee z LM741
+XC z vth vcc veer outc LM741
+RL outc 0 100k
+.options method=Gear
+.options cshunt=100f trtol=7 reltol=2e-3 vntol=1e-5 abstol=1e-9 itl4=100 gmin=1e-10
+.tran 0 300u 0 100n startup
+.meas TRAN t_dec WHEN V(outc)=2.4 RISE=1
+.meas TRAN lat_us PARAM (t_dec-5.01u)/1e-6
+.end

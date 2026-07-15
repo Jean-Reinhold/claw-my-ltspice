@@ -1,0 +1,32 @@
+* Latencia do caminho critico com LT1810: cadeia de 5 somadores inversores
+* unitarios (Rf = Ri = 100k, mesmos ganhos de pior caso da rede) seguida do
+* comparador contra VTH. A rede completa com o modelo de 325 MHz do LT1810
+* exigiria passos de sub-nanosegundo por horas; o caminho critico de cinco
+* estagios da a mesma latencia de decisao com 6 AmpOps.
+.lib LTC.lib
+VCC vcc 0 4.8
+VEE vee 0 -4.8
+VEER veer 0 0
+VTH vth 0 2.65
+VIN in 0 PWL(0 3 5u 3 5.01u -3 20u -3)
+R1 in s1 100k
+RF1 a1 s1 100k
+X1 0 s1 vcc vee a1 LT1810
+R2 a1 s2 100k
+RF2 a2 s2 100k
+X2 0 s2 vcc vee a2 LT1810
+R3 a2 s3 100k
+RF3 a3 s3 100k
+X3 0 s3 vcc vee a3 LT1810
+R4 a3 s4 100k
+RF4 a4 s4 100k
+X4 0 s4 vcc vee a4 LT1810
+R5 a4 s5 100k
+RF5 z s5 100k
+X5 0 s5 vcc vee z LT1810
+XC z vth vcc veer outc LT1810
+RL outc 0 100k
+.tran 0 20u 0 2n startup
+.meas TRAN t_dec WHEN V(outc)=2.4 RISE=1
+.meas TRAN lat_us PARAM (t_dec-5.01u)/1e-6
+.end

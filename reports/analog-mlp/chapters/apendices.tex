@@ -3,10 +3,11 @@
 \section{Netlist do circuito}
 \label{ap:netlist}
 
-As duas netlists completas (\texttt{analog\_mlp.cir} com o AmpOp ideal
-e \texttt{analog\_mlp\_741.cir} com o LM741, cerca de 6600 linhas cada)
-são geradas automaticamente a partir dos pesos treinados e ficam em
-\texttt{experiments/analog-mlp/}. Abaixo, um trecho representativo,
+As três netlists completas (\texttt{analog\_mlp.cir} com o AmpOp ideal,
+\texttt{analog\_mlp\_741.cir} com o LM741 e
+\texttt{analog\_mlp\_moderno.cir} com o LT1810, cerca de 6600 linhas
+cada) são geradas automaticamente a partir dos pesos treinados e ficam
+em \texttt{experiments/analog-mlp/}. Abaixo, um trecho representativo,
 exatamente como simulado: trilhos, um pixel de entrada, um neurônio
 oculto completo e os comparadores.
 
@@ -48,11 +49,13 @@ RL0 out0 0 100k
 \end{verbatim}
 }
 
-Na variante LM741 mudam só o \texttt{.include}
-(\texttt{models/lm741.lib}, modelo do fabricante, baixado à parte por
-não ser redistribuível) e os valores dos trilhos, calibrados com
-\texttt{bench\_741\_sat.cir} para colocar a saturação dos neurônios em
-\SI{0}{\volt} e \SI{4,8}{\volt}. O modelo ideal da primeira variante:
+Nas variantes com AmpOp real mudam só a biblioteca
+(\texttt{models/lm741.lib} para o LM741, baixado à parte por não ser
+redistribuível, e \texttt{LTC.lib} embarcada no LTspice para o LT1810)
+e os valores dos trilhos, calibrados com \texttt{bench\_741\_sat.cir} e
+\texttt{bench\_moderno\_sat.cir} para colocar a saturação dos neurônios
+em \SI{0}{\volt} e \SI{4,8}{\volt}. O modelo ideal da primeira
+variante:
 
 {\small
 \begin{verbatim}
@@ -70,10 +73,12 @@ COUT OUT 0 {Cload}
 
 Os scripts ficam em \texttt{experiments/analog-mlp/}:
 \texttt{train\_analog\_mlp.py} baixa o MNIST, treina com as regras do
-circuito e grava os pesos; \texttt{analog\_mlp.py} gera as duas
+circuito e grava os pesos; \texttt{analog\_mlp.py} gera as três
 netlists, os esquemáticos e a figura de topologia;
-\texttt{bench\_741\_sat.cir} é a bancada de calibração da saturação do
-LM741; \texttt{analyze\_results.py} compara as simulações com o modelo,
+\texttt{bench\_741\_sat.cir} e \texttt{bench\_moderno\_sat.cir} calibram
+a saturação do LM741 e do LT1810; \texttt{bench\_chain\_741.cir} e
+\texttt{bench\_chain\_moderno.cir} medem a latência do caminho crítico
+de cinco estágios; \texttt{analyze\_results.py} compara as simulações com o modelo,
 extrai a latência dos comparadores e gera as figuras e tabelas deste
 relatório; \texttt{bench\_host\_inference.py} mede o tempo de
 inferência em numpy no hospedeiro. Sequência completa:
@@ -85,6 +90,8 @@ inferência em numpy no hospedeiro. Sequência completa:
     --output-dir experiments/analog-mlp
 ./claw-spice sim run experiments/analog-mlp/analog_mlp.cir --timeout 2400
 ./claw-spice sim run experiments/analog-mlp/analog_mlp_741.cir --timeout 2400
+./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
+./claw-spice sim run experiments/analog-mlp/bench_chain_741.cir --timeout 1800
 ./claw-spice code build experiments/analog-mlp/analyze_results.py \
     --output-dir experiments/analog-mlp
 python3 experiments/analog-mlp/bench_host_inference.py

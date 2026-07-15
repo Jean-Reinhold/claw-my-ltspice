@@ -50,6 +50,11 @@ FIRE_LEVEL = 2.4  # comparator output above this counts as "fired"
 SAMPLE_WINDOW = 3  # the window whose digit gets the detailed figures
 HIDDEN_SIZES = [48, 32, 24, 16]
 
+PARAM_RE = re.compile(
+    r"^lat_us:\s*.*?=\s*(?P<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)",
+    re.IGNORECASE,
+)
+
 MEAS_RE = re.compile(
     r"^(?P<name>(?:z|out)_v\d+_d\d+):.*?=\s*(?P<value>[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)",
     re.IGNORECASE,
@@ -229,8 +234,8 @@ def fig_scatter(numpy_z, runs, out_png: Path) -> None:
     lo = min(numpy_z.min(), *[run["z"].min() for run in runs.values()]) - 0.3
     hi = max(numpy_z.max(), *[run["z"].max() for run in runs.values()]) + 0.3
     ax.plot([lo, hi], [lo, hi], color=GRID, linewidth=1.2, zorder=1)
-    colors = {"ideal": C_BLUE, "741": C_ORANGE}
-    names = {"ideal": "AmpOp ideal", "741": "LM741"}
+    colors = {"ideal": C_BLUE, "741": C_ORANGE, "moderno": C_AQUA}
+    names = {"ideal": "AmpOp ideal", "741": "LM741", "moderno": "LT1810"}
     for variant, run in runs.items():
         err = np.abs(run["z"] - numpy_z)
         ax.scatter(
@@ -323,8 +328,8 @@ def fig_transition(raws, vectors, theta, out_png: Path, window=SAMPLE_WINDOW) ->
     label = vectors[window]["label"]
     t0 = window * WINDOW_MS
     t1 = t0 + 0.09
-    names = {"ideal": "AmpOp ideal", "741": "LM741"}
-    colors = {"ideal": C_BLUE, "741": C_ORANGE}
+    names = {"ideal": "AmpOp ideal", "741": "LM741", "moderno": "LT1810"}
+    colors = {"ideal": C_BLUE, "741": C_ORANGE, "moderno": C_AQUA}
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8.6, 4.6), sharex=True)
     for variant, (time_ms, trace) in raws.items():
         mask = (time_ms >= t0 - 0.005) & (time_ms <= t1)
@@ -381,12 +386,16 @@ def fire_latencies_us(time_ms, trace, vectors) -> list[float]:
 
 def latex_table(vectors, runs, out_tex: Path) -> None:
     has_741 = "741" in runs
+    has_mod = "moderno" in runs
     ref = runs["741"] if has_741 else runs["ideal"]
     cols = "c S[table-format=1.3] S[table-format=1.3]"
     header = "{Dígito} & {$z$ modelo (\\si{\\volt})} & {$z$ ideal (\\si{\\volt})}"
     if has_741:
         cols += " S[table-format=1.3]"
         header += " & {$z$ LM741 (\\si{\\volt})}"
+    if has_mod:
+        cols += " S[table-format=1.3]"
+        header += " & {$z$ LT1810 (\\si{\\volt})}"
     cols += " S[table-format=-1.3] c"
     header += " & {maior errada (\\si{\\volt})} & {Disparo} \\\\"
     lines = [
@@ -405,13 +414,28 @@ def latex_table(vectors, runs, out_tex: Path) -> None:
         row = f"{k} & {vec['logits'][k]:.3f} & {runs['ideal']['z'][j][k]:.3f}"
         if has_741:
             row += f" & {runs['741']['z'][j][k]:.3f}"
+        if has_mod:
+            row += f" & {runs['moderno']['z'][j][k]:.3f}"
         row += f" & {runner_up:.3f} & {status} \\\\"
         lines.append(row)
     lines += ["\\bottomrule", "\\end{tabular}"]
     out_tex.write_text("\n".join(lines) + "\n")
 
 
-def latex_values(numpy_z, runs, timing, out_tex: Path) -> None:
+def chain_latency_us(log_path: Path) -> float | None:
+    if not log_path.exists():
+        return None
+    text = log_path.read_text(encoding="utf-8", errors="replace")
+    if "\x00" in text:
+        text = log_path.read_bytes().decode("utf-16-le", errors="replace")
+    for line in text.splitlines():
+        match = PARAM_RE.match(line.strip())
+        if match:
+            return float(match.group("value"))
+    return None
+
+
+def latex_values(numpy_z, runs, timing, chain, out_tex: Path) -> None:
     def err(variant):
         return np.abs(runs[variant]["z"] - numpy_z) * 1000.0
 
@@ -422,21 +446,37 @@ def latex_values(numpy_z, runs, timing, out_tex: Path) -> None:
     if "741" in runs:
         lines.append(f"\\newcommand{{\\vErrLmMedio}}{{{err('741').mean():.0f}}}")
         lines.append(f"\\newcommand{{\\vErrLmMax}}{{{err('741').max():.0f}}}")
+    variant_names = {"ideal": "Ideal", "741": "Lm", "moderno": "Mod"}
+    if "moderno" in runs:
+        lines.append(f"\\newcommand{{\\vErrModMedio}}{{{err('moderno').mean():.0f}}}")
+        lines.append(f"\\newcommand{{\\vErrModMax}}{{{err('moderno').max():.0f}}}")
     for variant, values in timing.items():
         if values:
-            name = "Ideal" if variant == "ideal" else "Lm"
+            name = variant_names[variant]
             lines.append(
                 f"\\newcommand{{\\vLatencia{name}Mediana}}{{{np.median(values):.1f}}}".replace(".", ",")
             )
             lines.append(f"\\newcommand{{\\vLatencia{name}Max}}{{{max(values):.1f}}}".replace(".", ","))
+            fps = 1e6 / max(values)
+            fps_text = f"{fps:,.0f}".replace(",", " ")
+            lines.append(f"\\newcommand{{\\vFps{name}}}{{{fps_text}}}")
     for variant, run in runs.items():
         fires = run["out"] > FIRE_LEVEL
         labels = run["labels"]
         clean = sum(
             bool(fires[j, labels[j]] and fires[j].sum() == 1) for j in range(len(labels))
         )
-        name = "Ideal" if variant == "ideal" else "Lm"
+        name = variant_names[variant]
         lines.append(f"\\newcommand{{\\vDisparos{name}}}{{{clean}}}")
+    for key, name in [("moderno", "Mod"), ("741", "Lm")]:
+        lat = chain.get(key)
+        if lat is not None:
+            lines.append(
+                f"\\newcommand{{\\vLatenciaCadeia{name}}}{{{lat:.1f}}}".replace(".", ",")
+            )
+    if chain.get("moderno") is not None:
+        fps = f"{1e6 / chain['moderno']:,.0f}".replace(",", " ")
+        lines.append(f"\\newcommand{{\\vFpsMod}}{{{fps}}}")
     out_tex.write_text("\n".join(lines) + "\n")
 
 
@@ -454,7 +494,11 @@ def build(output_dir: str | Path) -> dict[str, object]:
     labels = [vec["label"] for vec in vectors]
 
     runs = {}
-    for variant, stem in [("ideal", "analog_mlp"), ("741", "analog_mlp_741")]:
+    for variant, stem in [
+        ("ideal", "analog_mlp"),
+        ("741", "analog_mlp_741"),
+        ("moderno", "analog_mlp_moderno"),
+    ]:
         log_path = exp / f"{stem}.log"
         if not log_path.exists():
             continue
@@ -500,7 +544,11 @@ def build(output_dir: str | Path) -> dict[str, object]:
     if raws:
         fig_transition(raws, vectors, theta, images / "transicao_janela.png")
 
-    latex_values(numpy_z, runs, timing, tables / "valores_sim.tex")
+    chain = {
+        "moderno": chain_latency_us(exp / "bench_chain_moderno.log"),
+        "741": chain_latency_us(exp / "bench_chain_741.log"),
+    }
+    latex_values(numpy_z, runs, timing, chain, tables / "valores_sim.tex")
 
     summary = {
         "variants": {

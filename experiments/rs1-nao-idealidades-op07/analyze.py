@@ -200,6 +200,45 @@ def phase_report() -> None:
     plot("t (us)", ts_us, [("dV(out)/dt (V/us)", d6_us)], "item6_deriv",
          "Item 6 - ddt(V(out)): slew rate (recortado em +/-1 V/us)")
 
+    # Teste extra (item 7): slew rate de um AmpOp moderno (ADA4610) no mesmo
+    # seguidor do item 6, para comparacao. So roda se a simulacao existir.
+    try:
+        raw7 = raw_path("item7_slew_ada")
+    except FileNotFoundError:
+        raw7 = None
+    if raw7 is not None:
+        ts7, vout7 = sweep(raw7, "V(out)")
+        d7 = central_derivative(ts7, vout7)
+        ramp7 = [i for i in range(len(d7)) if abs(vout7[i]) < 10.0]
+        idx7 = max(ramp7, key=lambda i: abs(d7[i])) if ramp7 else max(
+            range(len(d7)), key=lambda i: abs(d7[i]))
+        from statistics import median as _median
+        sr7_plateau = _median(abs(d7[i]) for i in ramp7) / 1e6 if ramp7 else abs(d7[idx7]) / 1e6
+        results["item7"] = {
+            "sr_max_V_per_us": abs(d7[idx7]) / 1e6,
+            "sr_patamar_V_per_us": sr7_plateau,
+            "sr_media_10V_meas_V_per_us": measurement(LAB / "item7_slew_ada.log", "sr_avg"),
+            "t_lo_s": measurement(LAB / "item7_slew_ada.log", "t_lo"),
+            "t_hi_s": measurement(LAB / "item7_slew_ada.log", "t_hi"),
+        }
+        # Comparacao das subidas: mesmo degrau, dois amplificadores.
+        ts7_us = [t * 1e6 for t in ts7]
+        window6 = [i for i in range(len(ts)) if ts[i] <= 60e-6]
+        plot(
+            "t (us)",
+            [ts_us[i] for i in window6],
+            [("V(out) OP07", [vout6[i] for i in window6])],
+            "item7_op07_janela",
+            "Item 7 - OP07 no mesmo degrau (0 a 60 us)",
+        )
+        plot(
+            "t (us)",
+            ts7_us,
+            [("V(out) ADA4610", vout7)],
+            "item7_ada_step",
+            "Item 7 - ADA4610: resposta ao degrau -15 V -> +15 V (seguidor)",
+        )
+
     (LAB / "results.json").write_text(json.dumps(results, indent=2))
 
     lines = [
@@ -214,6 +253,11 @@ def phase_report() -> None:
         f"- Item 6: SR(max ddt) = {sr_max:.4g} V/us ; SR(patamar) = {sr_plateau:.4g} V/us ; "
         f"SR(-10V->+10V) = {results['item6']['sr_media_10V_meas_V_per_us']} V/us",
     ]
+    if "item7" in results:
+        lines.append(
+            f"- Item 7 (ADA4610): SR(patamar) = {results['item7']['sr_patamar_V_per_us']:.4g} V/us ; "
+            f"SR(-10V->+10V) = {results['item7']['sr_media_10V_meas_V_per_us']} V/us"
+        )
     (LAB / "results.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 

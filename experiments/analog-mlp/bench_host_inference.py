@@ -62,12 +62,16 @@ def main() -> None:
 
     single = f"{t_single_us:.0f}"
     batch = f"{t_batch_us:.2f}".replace(".", ",")
+    fps_single = f"{1e6 / t_single_us:,.0f}".replace(",", " ")
+    fps_batch = f"{1e6 / t_batch_us:,.0f}".replace(",", " ")
     out = exp.parents[1] / "reports" / "analog-mlp" / "gerado"
     out.mkdir(parents=True, exist_ok=True)
     (out / "valores_host.tex").write_text(
         "% Gerado por bench_host_inference.py (host) - nao editar a mao.\n"
         f"\\newcommand{{\\vMacUmaImagem}}{{{single}}}\n"
         f"\\newcommand{{\\vMacLote}}{{{batch}}}\n"
+        f"\\newcommand{{\\vMacFpsUma}}{{{fps_single}}}\n"
+        f"\\newcommand{{\\vMacFpsLote}}{{{fps_batch}}}\n"
     )
 
 

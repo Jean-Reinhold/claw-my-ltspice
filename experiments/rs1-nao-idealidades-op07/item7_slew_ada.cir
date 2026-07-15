@@ -1,0 +1,15 @@
+* RS1 - teste extra: slew rate de um AmpOp moderno (ADA4610) para comparar
+* com o OP07 do item 6. Mesmo seguidor unitario e mesmo degrau abrupto de
+* Vin: -15 V -> +15 V em t=20 us com trise=1 ps. Sem compensacao de VOS
+* (o VOS do ADA4610 e da ordem de microvolts e nao afeta a medida de slew).
+* Modelo ADA4610 embarcado no LTspice (ADA4610.lib).
+.lib ADA4610.lib
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 PULSE(-15 15 20u 1p 1p 460u 1m 1)
+XU1 vin out vcc vee out ADA4610
+.tran 0 60u 0 10n
+.meas TRAN t_lo WHEN V(out)=-10 RISE=1
+.meas TRAN t_hi WHEN V(out)=10 RISE=1
+.meas TRAN sr_avg PARAM (20/(t_hi-t_lo))/1e6
+.end

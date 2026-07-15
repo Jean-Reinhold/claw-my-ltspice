@@ -46,15 +46,14 @@ vinte imagens.
 
 O arquivo \texttt{.raw} da variante com AmpOp ideal guarda os 120
 neurônios ocultos, então dá para ver o que o circuito está fazendo por
-dentro. É aqui que o experimento
-vira eletrônica de verdade: cada fenômeno da rede neural corresponde a
-um comportamento clássico de AmpOp, medível com o cursor em cima da
-forma de onda. A Figura~\ref{fig:estados} mostra as quatro camadas
+dentro. Cada efeito da rede neural corresponde a um comportamento
+clássico de AmpOp, e todos aparecem nas formas de onda. A
+Figura~\ref{fig:estados} mostra as quatro camadas
 ocultas no instante em que o dígito 3 está na entrada: a maior parte
 dos neurônios está desligada (\SI{0}{\volt}, AmpOp saturado no trilho
 de baixo), alguns operam na região linear e uns poucos encostam no teto
-de \SI{4,8}{\volt}. A ReLU do modelo é literalmente o estágio de saída
-do amplificador batendo no trilho.
+de \SI{4,8}{\volt}. A ReLU do modelo é o estágio de saída do
+amplificador saturando no trilho.
 
 \begin{figure}[htb]
   \centering
@@ -97,9 +96,9 @@ virtual são o mesmo evento, visto de dois nós diferentes.
 \label{sec:medidas}
 
 A Tabela~\ref{tab:medidas} compara, para as dez primeiras janelas, a
-saída $z$ do dígito correto no modelo em software e nas duas simulações. A
-Figura~\ref{fig:scatter} estende a comparação às 200 medidas de $z$
-de cada variante. Com o AmpOp ideal o erro fica em
+saída $z$ do dígito correto no modelo em software e nas duas simulações
+da rede completa. A Figura~\ref{fig:scatter} estende a comparação às
+200 medidas de $z$ de cada variante. Com o AmpOp ideal o erro fica em
 \vErrIdealMedio~\si{\milli\volt} na média. Com o LM741 o erro médio
 sobe para \vErrLmMedio~\si{\milli\volt}, mas ele se concentra na
 região bem negativa, dos dígitos rejeitados, onde offset, ganho finito
@@ -152,13 +151,22 @@ em baixa resolução, como 4 com 9 e 5 com 3.
 
 No circuito, a inferência é o tempo de acomodação: da troca da imagem
 na entrada até o comparador correto cruzar o nível de decisão. A
-Figura~\ref{fig:transicao} amplia uma dessas trocas e compara as duas
-variantes. Com o AmpOp ideal a saída acompanha a entrada quase
-instantaneamente; com o LM741 dá para ver a rampa do slew rate de uns
-\SI{0,5}{\volt\per\micro\second} atravessando os cinco estágios até o
-comparador virar. Medindo nas formas de onda do LM741, a mediana da
-latência fica em \vLatenciaLmMediana~\si{\micro\second} e o pior caso
-em \vLatenciaLmMax~\si{\micro\second}.
+Figura~\ref{fig:transicao} amplia uma dessas trocas. Com o AmpOp ideal
+a saída acompanha a entrada quase instantaneamente; com o LM741 dá para
+ver a rampa do slew rate de uns \SI{0,5}{\volt\per\micro\second}
+atravessando os cinco estágios até o comparador virar. Medindo nas
+formas de onda da rede completa, a mediana da latência do LM741 fica em
+\vLatenciaLmMediana~\si{\micro\second} e o pior caso em
+\vLatenciaLmMax~\si{\micro\second}. A bancada do caminho crítico aproxima a rede por cinco estágios em
+série. Com o LM741 ela decide em
+\vLatenciaCadeiaLm~\si{\micro\second}, abaixo dos
+\vLatenciaLmMax~\si{\micro\second} medidos na rede completa: o tempo
+do 741 é dominado pelo slew rate, e as excursões da bancada (\SI{3}{\volt}
+por estágio) são menores que as da rede. Com o LT1810 a mesma cadeia
+decide em \vLatenciaCadeiaMod~\si{\micro\second}; como o tempo dele
+quase não depende da excursão (o slew de
+\SI{350}{\volt\per\micro\second} cruza a faixa toda em nanossegundos),
+esse valor é uma estimativa razoável para a rede completa.
 
 \begin{figure}[htb]
   \centering
@@ -171,10 +179,30 @@ em \vLatenciaLmMax~\si{\micro\second}.
 No computador (este Mac, numpy nativo), o mesmo modelo responde em
 \SI{\vMacUmaImagem}{\micro\second} para uma imagem avulsa, e em
 \SI{\vMacLote}{\micro\second} por imagem quando processa \num{10000} de
-uma vez. Para uma imagem sozinha, a rede de AmpOps de 1968 fica na
-mesma ordem de grandeza do processador; o computador ganha longe quando
-trabalha em lote. Com AmpOps modernos, de slew rate cem vezes maior, a
-latência do circuito cairia para menos de um microssegundo.
+uma vez. A Tabela~\ref{tab:fps} traduz tudo em imagens por segundo,
+usando o pior caso de cada circuito como período seguro de amostragem.
+Para uma imagem sozinha, a rede de AmpOps de 1968 fica na mesma ordem
+de grandeza do processador, e a versão com o AmpOp moderno passa na
+frente da inferência avulsa do Mac. Em lote, o computador ganha com
+folga.
+
+\begin{table}[htb]
+  \centering
+  \caption{Tempo por imagem e taxa de imagens por segundo de cada
+  implementação. Para os circuitos, o período é o pior caso medido da
+  latência de decisão.}
+  \label{tab:fps}
+  \begin{tabular}{lrr}
+    \toprule
+    Implementação & Tempo por imagem & Imagens por segundo \\
+    \midrule
+    Rede com LM741 & \vLatenciaLmMax~\si{\micro\second} & \vFpsLm \\
+    Rede com LT1810 (caminho crítico) & \vLatenciaCadeiaMod~\si{\micro\second} & \vFpsMod \\
+    Mac, uma imagem por vez & \vMacUmaImagem~\si{\micro\second} & \vMacFpsUma \\
+    Mac, lote de \num{10000} & \vMacLote~\si{\micro\second} & \vMacFpsLote \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 Sobre custo, em ordens de grandeza. Montar esta rede com componentes
 discretos (260 LM741, quase 6000 resistores de precisão e as placas
@@ -186,8 +214,7 @@ daria um chip de algumas dezenas de \si{\milli\metre\squared}: o custo
 por chip em volume é de poucos dólares, mas o custo fixo de projeto e
 máscaras fica na casa das centenas de milhares de dólares. Enquanto
 isso, um microcontrolador de poucos reais roda o mesmo modelo em
-software em alguns milissegundos. A conclusão honesta é que o formato
-analógico só compensa quando latência de microssegundos e consumo muito
-baixo são requisitos de verdade. Como ferramenta didática, porém, ele
-tem um valor difícil de bater: cada peso da rede é um resistor que dá
-para apontar no esquemático.
+software em alguns milissegundos. A conclusão é que o formato analógico só compensa quando latência de
+microssegundos e consumo muito baixo são requisitos reais. Como
+ferramenta didática, porém, o formato tem a vantagem de ser concreto:
+cada peso da rede é um resistor visível no esquemático.

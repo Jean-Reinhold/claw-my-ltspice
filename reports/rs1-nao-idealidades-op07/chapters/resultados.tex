@@ -149,6 +149,35 @@ acompanharia o degrau sem atraso.
   \label{fig:item6}
 \end{figure}
 
+\subsection{Item 7 (extra): o mesmo degrau com um AmpOp moderno}
+
+Para dar escala ao resultado do item 6, repetimos o mesmo seguidor e o
+mesmo degrau com um amplificador moderno, o ADA4610 (JFET, modelo
+embarcado no LTspice), sem compensação de offset, que nesse
+amplificador é da ordem de microvolts. A saída cruza de \SI{-10}{\volt}
+a \SI{+10}{\volt} em \SI{0,31}{\micro\second}:
+\[
+  \mathrm{SR} = \frac{20\,\mathrm{V}}{0{,}31\,\mu\mathrm{s}}
+              = \SI{65.2}{\volt\per\micro\second},
+\]
+com patamar da derivada em \SI{67.9}{\volt\per\micro\second}. É umas
+250 vezes o slew rate do OP07 no mesmo ensaio
+(Figura~\ref{fig:item7}): a transição que no OP07 leva \SI{77}{\micro\second}
+termina em menos de meio microssegundo. O preço aparece nas outras
+não idealidades: o ADA4610 troca a precisão DC do OP07 por velocidade,
+e a escolha entre os dois depende do que a aplicação pede.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.49\textwidth]{item6_step.png}
+  \includegraphics[width=0.49\textwidth]{item7_ada_step.png}
+  \caption{Item 7: o mesmo degrau do item 6 no OP07 (esquerda, escala de
+  \SI{200}{\micro\second}) e no ADA4610 (direita, escala de
+  \SI{60}{\micro\second}). A rampa do ADA4610 é quase vertical na
+  mesma janela.}
+  \label{fig:item7}
+\end{figure}
+
 \subsection{Verificação das derivadas numéricas}
 \label{sec:derivadas}
 

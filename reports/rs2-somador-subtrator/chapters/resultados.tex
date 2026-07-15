@@ -120,6 +120,24 @@ Figura~\ref{fig:vendor}.
   \label{fig:vendor}
 \end{figure}
 
+Como teste extra, o mesmo ensaio global rodou com um amplificador
+moderno, o ADA4610 (JFET, modelo embarcado no LTspice), nos mesmos
+$\pm$\SI{15}{\volt}. O erro máximo caiu de $0{,}27$~V para
+$8{,}7\times10^{-3}$~V (RMS de $3{,}4\times10^{-3}$~V), umas 30 vezes
+menor que o do LM741 e já na casa do por mil da excursão
+(Figura~\ref{fig:moderno}). A leitura é direta: com ganho de malha
+aberta alto até frequências bem maiores, o erro por estágio volta a ser
+dominado pelos resistores, como no modelo ideal. Para este circuito, a
+troca do LM741 por um amplificador moderno elimina na prática o desvio
+observado no ensaio anterior.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{rs2_moderno_overlay.png}
+  \caption{Ensaio global com o amplificador moderno ADA4610.}
+  \label{fig:moderno}
+\end{figure}
+
 \subsection{Discussão}
 \label{sec:discussao}
 
