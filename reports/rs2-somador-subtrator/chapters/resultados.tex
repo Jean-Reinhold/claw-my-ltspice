@@ -7,7 +7,9 @@ A Tabela~\ref{tab:medidas} resume as seis simulações individuais. Ela
 mostra o ganho com sinal de cada entrada até a saída, comparado com o
 coeficiente teórico da função global. Os ganhos parciais confirmam o
 caminho de cada sinal: as entradas 1 a 3 aparecem só em $v_{out1}$ e
-as entradas 4 a 6 só em $v_{out2}$.
+as entradas 4 a 6 só em $v_{out2}$. Além dos ganhos, o nível DC medido
+na saída foi $-2{,}50$~V, contra $-12{,}5\times0{,}2 = -2{,}5$~V
+teóricos do termo constante do bloco A.
 
 \begin{table}[htb]
   \centering
@@ -20,7 +22,7 @@ as entradas 4 a 6 só em $v_{out2}$.
     $v_{out}/v_{in}$ (sim.) & teórico \\
     \midrule
     $v_{in1}$ & $-9{,}00$ & $0$ & $+112{,}48$ & $+112{,}5$ \\
-    $v_{in2}$ & $-2{,}80$ & $0$ & $+34{,}99$ & $+35$ \\
+    $v_{in2}$ & $-3{,}00$ & $0$ & $+37{,}49$ & $+37{,}5$ \\
     $v_{in3}$ & $+2{,}50$ & $0$ & $-31{,}24$ & $-31{,}25$ \\
     $v_{in4}$ & $0$ & $+2{,}00$ & $+25{,}00$ & $+25$ \\
     $v_{in5}$ & $0$ & $+4{,}00$ & $+49{,}99$ & $+50$ \\
@@ -31,8 +33,9 @@ as entradas 4 a 6 só em $v_{out2}$.
 
 A Figura~\ref{fig:individual} mostra os dois casos de maior ganho:
 $v_{in1}$ (ganho $+112{,}5$) e $v_{in6}$ (ganho $-112{,}5$). A
-amplitude de \SI{5.625}{\volt} e as fases opostas batem com o
-esperado.
+amplitude de \SI{5.625}{\volt}, as fases opostas e o nível DC de
+$-2{,}5$~V (as senoides oscilam em torno dele, não do zero) batem com
+o esperado.
 
 \begin{figure}[htb]
   \centering
@@ -68,7 +71,7 @@ em fase (coeficiente positivo) e $v_{in3}$ sai invertida.
 
 Nos ensaios por bloco, a saída de cada bloco foi comparada ponto a
 ponto com a sua função, calculada em paralelo pelo simulador. O erro
-máximo foi $1{,}89\times10^{-4}$~V no bloco A e $1{,}59\times10^{-4}$~V no bloco B. Esses
+máximo foi $2{,}07\times10^{-4}$~V no bloco A e $1{,}59\times10^{-4}$~V no bloco B. Esses
 valores são pequenos e correspondem ao erro esperado para um ganho de
 malha aberta finito de 200 mil. No bloco C o ganho diferencial medido
 foi $+12{,}50$ (o teórico é $12{,}5$) e, mesmo com \SI{1}{\volt} de
@@ -90,11 +93,11 @@ Figura~\ref{fig:blocoab} mostra as formas de onda dos blocos A e B.
 \label{sec:res-global}
 
 Com as seis entradas ativas ao mesmo tempo, a saída acompanhou a
-referência ideal com erro máximo de $6{,}40\times10^{-4}$~V e erro RMS de
-$2{,}71\times10^{-4}$~V, para uma excursão de $-5{,}71$ a $+5{,}71$~V
-(Figura~\ref{fig:global}). Repetindo o ensaio com o macromodelo
-comercial do LM741, o erro máximo subiu para $0{,}275$~V (RMS de
-$0{,}123$~V), abaixo de 5\% da excursão. A causa dominante é o polo
+referência ideal (que inclui o nível DC de $-2{,}5$~V) com erro máximo
+de $9{,}27\times10^{-4}$~V e erro RMS de $3{,}94\times10^{-4}$~V, para uma excursão de
+$-8{,}20$ a $+3{,}20$~V (Figura~\ref{fig:global}). Repetindo o ensaio
+com o macromodelo comercial do LM741, o erro máximo subiu para
+$0{,}27$~V (RMS de $0{,}13$~V), na casa de 5\% da excursão. A causa dominante é o polo
 do LM741 real em \SI{5}{\hertz}: nas frequências do ensaio o ganho de
 malha aberta cai para perto de mil, então o erro de cada estágio
 aumenta em relação ao modelo ideal. Soma-se a isso o offset de entrada de
@@ -128,9 +131,9 @@ blocos sem carregá-los, porque o seu estágio de entrada tem alta
 impedância.
 
 Duas observações práticas. Primeira: os resistores de $100/9$ e
-$100/2{,}8$ \si{\kilo\ohm} não existem na série E96. Numa montagem
-real seriam usadas associações (por exemplo 11k mais 110, e 35,7k, que
-é valor de série), com erro da ordem da tolerância dos componentes.
+$100/3$ \si{\kilo\ohm} não existem na série E96. Numa montagem real
+seriam usadas associações (por exemplo 11k mais 110, e 33k mais 330),
+com erro da ordem da tolerância dos componentes.
 Segunda: os ganhos altos (módulo $112{,}5$) limitam a amplitude de
 entrada. Acima de cerca de \SI{120}{\milli\volt} de pico em $v_{in1}$ ou
 $v_{in6}$ a saída satura no limite da alimentação. Todos os ensaios respeitaram

@@ -1,7 +1,8 @@
 * RS2 resposta individual vin2 (21101175)
 .include lm741_level1.lib
 RA1 in1 suma2 11.1111k
-RA2 in2 suma2 35.7143k
+RA2 in2 suma2 33.3333k
+RAR vee suma2 7.5Meg
 RA3 va suma2 100k
 XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
 RAF2 suma2 vout1 100k
@@ -36,8 +37,14 @@ RL out 0 10k
 VCC vcc 0 15
 VEE vee 0 -15
 .tran 0 5m 0 5u
-.meas TRAN g_out_vin2 FIND V(out)/50m AT=2.25m
-.meas TRAN g_vout1_vin2 FIND V(vout1)/50m AT=2.25m
-.meas TRAN g_vout2_vin2 FIND V(vout2)/50m AT=2.25m
-.meas TRAN vout_max MAX V(out)
+.meas TRAN vout_pk FIND V(out) AT=2.25m
+.meas TRAN vout_tr FIND V(out) AT=2.75m
+.meas TRAN g_out_vin2 PARAM (vout_pk-vout_tr)/0.1
+.meas TRAN v1_pk FIND V(vout1) AT=2.25m
+.meas TRAN v1_tr FIND V(vout1) AT=2.75m
+.meas TRAN g_vout1_vin2 PARAM (v1_pk-v1_tr)/0.1
+.meas TRAN v2_pk FIND V(vout2) AT=2.25m
+.meas TRAN v2_tr FIND V(vout2) AT=2.75m
+.meas TRAN g_vout2_vin2 PARAM (v2_pk-v2_tr)/0.1
+.meas TRAN vout_dc AVG V(out)
 .end

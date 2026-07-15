@@ -5,12 +5,13 @@
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="608" x2="624" y1="96" y2="96"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="608" x2="624" y1="256" y2="256"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="608" x2="624" y1="416" y2="416"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="624" y1="80" y2="416"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="688" y1="256" y2="256"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="736" x2="736" y1="160" y2="112"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="736" x2="736" y1="288" y2="336"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="608" x2="624" y1="576" y2="576"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="624" y1="80" y2="576"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="688" y1="336" y2="336"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="736" x2="736" y1="240" y2="192"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="736" x2="736" y1="368" y2="416"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="736" y1="80" y2="80"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="832" x2="832" y1="80" y2="224"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="832" x2="832" y1="80" y2="304"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="224" x2="240" y1="608" y2="608"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="240" x2="240" y1="432" y2="608"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="240" x2="304" y1="608" y2="608"/>
@@ -18,8 +19,8 @@
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="352" x2="352" y1="640" y2="688"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="240" x2="352" y1="432" y2="432"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="448" x2="448" y1="432" y2="576"/>
-  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="448" x2="448" y1="576" y2="416"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="448" x2="512" y1="416" y2="416"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="448" x2="512" y1="576" y2="576"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="64" x2="512" y1="96" y2="96"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="64" x2="512" y1="256" y2="256"/>
   <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="64" x2="128" y1="608" y2="608"/>
@@ -52,10 +53,25 @@
       <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="-32.5">RA2</text>
     </g>
     <g class="text-group">
-      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="31.5">35.7143k</text>
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="31.5">33.3333k</text>
     </g>
   </g>
   <g s:height="24" s:type="res" s:width="96" transform="translate(512,416)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="16" y1="0" y2="0"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="24" y1="0" y2="-12"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="24" x2="40" y1="-12" y2="12"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="40" x2="56" y1="12" y2="-12"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="56" x2="72" y1="-12" y2="12"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="72" x2="80" y1="12" y2="0"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="80" x2="96" y1="0" y2="0"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="-32.5">RAR</text>
+    </g>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="31.5">7.5Meg</text>
+    </g>
+  </g>
+  <g s:height="24" s:type="res" s:width="96" transform="translate(512,576)">
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="16" y1="0" y2="0"/>
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="24" y1="0" y2="-12"/>
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="24" x2="40" y1="-12" y2="12"/>
@@ -70,7 +86,7 @@
       <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="48" y="31.5">100k</text>
     </g>
   </g>
-  <g s:height="128" s:type="opamp2" s:width="144" transform="translate(688,160)">
+  <g s:height="128" s:type="opamp2" s:width="144" transform="translate(688,240)">
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="24" y1="32" y2="32"/>
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="24" y1="96" y2="96"/>
     <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="48" x2="48" y1="0" y2="24"/>
@@ -233,7 +249,7 @@
     </g>
   </g>
   <g class="text-group">
-    <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="64" y="821.6">.include models/lm741_level1.lib</text>
+    <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="64" y="821.6">.include lm741_level1.lib</text>
   </g>
   <g class="text-group">
     <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="64" y="853.6">.tran 0 20m 0 10u</text>
@@ -242,21 +258,21 @@
     <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="64" y="885.6">.meas TRAN vout1_max MAX V(vout1)</text>
   </g>
   <g class="ground-flag">
-    <g transform="translate(688,192) rotate(0)">
+    <g transform="translate(688,272) rotate(0)">
       <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="16" y1="0" y2="0"/>
       <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="0" y1="0" y2="16"/>
       <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="0" y1="0" y2="16"/>
     </g>
   </g>
-  <g transform="rotate(-90, 736, 112)">
+  <g transform="rotate(-90, 736, 192)">
     <g class="text-group">
-      <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="start" x="736" y="120.4">vcc</text>
+      <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="start" x="736" y="200.4">vcc</text>
     </g>
   </g>
   <g class="net-label"/>
-  <g transform="rotate(-90, 736, 336)">
+  <g transform="rotate(-90, 736, 416)">
     <g class="text-group">
-      <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="end" x="736" y="344.4">vee</text>
+      <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="end" x="736" y="424.4">vee</text>
     </g>
   </g>
   <g class="net-label"/>
@@ -277,6 +293,10 @@
     <g class="text-group">
       <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="end" x="352" y="696.4">vee</text>
     </g>
+  </g>
+  <g class="net-label"/>
+  <g class="text-group">
+    <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="end" x="448" y="424.4">vee</text>
   </g>
   <g class="net-label"/>
   <g class="ground-flag">

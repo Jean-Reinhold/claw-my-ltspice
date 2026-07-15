@@ -2,11 +2,14 @@
 
 Matricula 21101175 -> A7..A0 = 2,1,1,0,1,1,7,5
 
-Bloco A: vout1 = -9*vin1 - 2.8*vin2 + 2.5*vin3   (somente somadores inversores)
-Bloco B: vout2 =  2*vin4 + 4*vin5  - 9*vin6      (somadores inversores)
-Bloco C: vout  = 12.5*(vout2 - vout1)            (amp. de instrumentacao, G=25)
+Bloco A: vout1 = -9*vin1 + 0.2 - 3*vin2 + 2.5*vin3  (somente somadores; o termo
+         constante A2/5 = 0.2 V vem de uma entrada de referencia ligada ao
+         trilho de -15 V por 7.5 Meg no somador final)
+Bloco B: vout2 =  2*vin4 + 4*vin5 - 9*vin6           (somadores inversores)
+Bloco C: vout  = 12.5*(vout2 - vout1)                (amp. de instrumentacao, G=25)
 
-Global: vout = 112.5*vin1 + 35*vin2 - 31.25*vin3 + 25*vin4 + 50*vin5 - 112.5*vin6
+Global: vout = 112.5*vin1 + 37.5*vin2 - 31.25*vin3 + 25*vin4 + 50*vin5
+             - 112.5*vin6 - 2.5
 """
 
 from __future__ import annotations
@@ -24,9 +27,9 @@ INCLUDE_VENDOR = "lm741_vendor.lib"
 ROW = 160  # vertical pitch between summer input rows (clears source value labels)
 
 IDEAL_GLOBAL = (
-    "112.5*V(in1)+35*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)"
+    "112.5*V(in1)+37.5*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)-2.5"
 )
-IDEAL_BLOCK_A = "-9*V(in1)-2.8*V(in2)+2.5*V(in3)"
+IDEAL_BLOCK_A = "-9*V(in1)-3*V(in2)+2.5*V(in3)+0.2"
 IDEAL_BLOCK_B = "2*V(in4)+4*V(in5)-9*V(in6)"
 
 GLOBAL_SRC = {
@@ -48,9 +51,9 @@ def _draw_summer(circuit, bx, by, inputs, rf_value, rf_ref, op_ref, sum_node, ou
     output pin junction.
     """
     n = len(inputs)
-    y_inn = by + {1: 0, 2: 80, 3: ROW}[n]
+    y_inn = by + {1: 0, 2: 80, 3: ROW, 4: 240}[n]
     rail_x = bx + 112
-    fy = y_inn - 176
+    fy = min(y_inn - 176, by - 16)
     for i, (node, value, ref) in enumerate(inputs):
         yi = by + ROW * i
         circuit.resistor(ref, node, sum_node, value, at=(bx, yi))
@@ -90,7 +93,12 @@ def _draw_block_a(circuit, ox, oy, subckt, sources):
         circuit,
         ox + 448,
         oy,
-        [("in1", "11.1111k", "RA1"), ("in2", "35.7143k", "RA2"), ("va", "100k", "RA3")],
+        [
+            ("in1", "11.1111k", "RA1"),
+            ("in2", "33.3333k", "RA2"),
+            ("vee", "7.5Meg", "RAR"),
+            ("va", "100k", "RA3"),
+        ],
         "100k",
         "RAF2",
         "XA2",
@@ -110,9 +118,11 @@ def _draw_block_a(circuit, ox, oy, subckt, sources):
         "va",
         subckt,
     )
-    # va: saida de A1 sobe ate a linha de entrada 3 de A2
-    circuit.wire(ox + 384, oy + 480, ox + 384, oy + 320)
+    # referencia DC: o trilho de -15 V entra na terceira linha do somador
     circuit.wire(ox + 384, oy + 320, ox + 448, oy + 320)
+    circuit.flag(ox + 384, oy + 320, "vee")
+    # va: saida de A1 segue reto para a quarta linha de A2
+    circuit.wire(ox + 384, oy + 480, ox + 448, oy + 480)
     _draw_source(circuit, "VIN1", "in1", sources.get("in1", "0"), ox, oy, ox + 448)
     _draw_source(circuit, "VIN2", "in2", sources.get("in2", "0"), ox, oy + 160, ox + 448)
     _draw_source(circuit, "VIN3", "in3", sources.get("in3", "0"), ox, oy + 512, ox + 64)
@@ -294,11 +304,20 @@ def _per_input_netlist(n, subckt=SUBCKT_IDEAL, include=INCLUDE_IDEAL):
     circuit.title = f"RS2 resposta individual vin{n} (21101175)"
     circuit.directives = [d for d in circuit.directives if not d.startswith(".tran")]
     circuit.tran("0", "5m", "0", "5u")
-    # seno atinge o pico positivo em t = 2.25 ms -> FIND da o ganho COM sinal
-    circuit.meas("TRAN", f"g_out_vin{n}", "FIND V(out)/50m AT=2.25m")
-    circuit.meas("TRAN", f"g_vout1_vin{n}", "FIND V(vout1)/50m AT=2.25m")
-    circuit.meas("TRAN", f"g_vout2_vin{n}", "FIND V(vout2)/50m AT=2.25m")
-    circuit.meas("TRAN", "vout_max", "MAX V(out)")
+    # pico do seno em 2.25 ms e vale em 2.75 ms; a diferenca elimina o nivel
+    # DC (-2.5 V na saida, vindo do termo constante do bloco A) e da o ganho
+    # com sinal: g = (pico - vale) / (2 * 50 mV)
+    circuit.meas("TRAN", "vout_pk", "FIND V(out) AT=2.25m")
+    circuit.meas("TRAN", "vout_tr", "FIND V(out) AT=2.75m")
+    circuit.meas("TRAN", f"g_out_vin{n}", "PARAM (vout_pk-vout_tr)/0.1")
+    circuit.meas("TRAN", "v1_pk", "FIND V(vout1) AT=2.25m")
+    circuit.meas("TRAN", "v1_tr", "FIND V(vout1) AT=2.75m")
+    circuit.meas("TRAN", f"g_vout1_vin{n}", "PARAM (v1_pk-v1_tr)/0.1")
+    circuit.meas("TRAN", "v2_pk", "FIND V(vout2) AT=2.25m")
+    circuit.meas("TRAN", "v2_tr", "FIND V(vout2) AT=2.75m")
+    circuit.meas("TRAN", f"g_vout2_vin{n}", "PARAM (v2_pk-v2_tr)/0.1")
+    # media sobre ciclos inteiros: sobra so o nivel DC da saida
+    circuit.meas("TRAN", "vout_dc", "AVG V(out)")
     return circuit
 
 

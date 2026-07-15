@@ -9,17 +9,19 @@ matrícula 21101175 temos $A_7{=}2$, $A_6{=}1$, $A_5{=}1$, $A_4{=}0$,
 $A_3{=}1$, $A_2{=}1$, $A_1{=}7$ e $A_0{=}5$. Substituindo os dígitos,
 as funções que cada bloco deve implementar ficam:
 %
-\[ v_{out1} = (5-2A_1)v_{in1} + (A_2/5 - 3)v_{in2} + \frac{6-A_3}{2}v_{in3}
-            = -9v_{in1} - 2{,}8v_{in2} + 2{,}5v_{in3} \]
+\[ v_{out1} = (5-2A_1)v_{in1} + \frac{A_2}{5} - 3v_{in2} + \frac{6-A_3}{2}v_{in3}
+            = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3} \]
 \[ v_{out2} = (A_4+2)v_{in4} + A_5[4v_{in5} - (10-A_6)v_{in6}]
             = 2v_{in4} + 4v_{in5} - 9v_{in6} \]
 \[ v_{out} = \frac{G}{2}(v_{out2}-v_{out1}) = 12{,}5\,(v_{out2}-v_{out1}),
    \qquad G = 10A_7+A_0 = 25 \]
 %
-A função global que resulta da composição dos três blocos é
+O termo $A_2/5 = 0{,}2$~V do bloco A é uma constante, ou seja, um nível
+DC somado ao sinal. A função global que resulta da composição dos três
+blocos é
 %
-\[ v_{out} = 112{,}5v_{in1} + 35v_{in2} - 31{,}25v_{in3}
-           + 25v_{in4} + 50v_{in5} - 112{,}5v_{in6}. \]
+\[ v_{out} = 112{,}5v_{in1} + 37{,}5v_{in2} - 31{,}25v_{in3}
+           + 25v_{in4} + 50v_{in5} - 112{,}5v_{in6} - 2{,}5. \]
 
 O amplificador operacional usado é o LM741 em modelo
 ideal nível 1, com alimentação simétrica de $\pm$\SI{15}{\volt}. O

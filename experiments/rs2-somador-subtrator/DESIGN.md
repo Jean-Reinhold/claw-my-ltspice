@@ -7,13 +7,13 @@ A7=2, A6=1, A5=1, A4=0, A3=1, A2=1, A1=7, A0=5.
 
 | Bloco | Função com dígitos substituídos |
 |-------|----------------------------------|
-| A | vout1 = (5−2·7)vin1 + (1/5−3)vin2 + ((6−1)/2)vin3 = **−9·vin1 − 2.8·vin2 + 2.5·vin3** |
+| A | vout1 = (5−2·7)vin1 + 1/5 − 3·vin2 + ((6−1)/2)vin3 = **−9·vin1 + 0.2 − 3·vin2 + 2.5·vin3** (A2/5 é termo constante: sem parênteses no roteiro) |
 | B | vout2 = (0+2)vin4 + 1·[4vin5 − (10−1)vin6] = **2·vin4 + 4·vin5 − 9·vin6** |
 | C | G = 10·2+5 = 25 → vout = **12.5·(vout2 − vout1)** |
 
 Função global resultante:
 
-vout = 112.5·vin1 + 35·vin2 − 31.25·vin3 + 25·vin4 + 50·vin5 − 112.5·vin6
+vout = 112.5·vin1 + 37.5·vin2 − 31.25·vin3 + 25·vin4 + 50·vin5 − 112.5·vin6 − 2.5
 
 ## Bloco A — somente somadores/subtratores (2 × LM741)
 
@@ -21,10 +21,11 @@ Cascata de dois somadores inversores; vin3 sofre duas inversões (sinal +),
 vin1/vin2 apenas uma (sinal −):
 
 - **A1** (inversor, ganho −2.5): vA = −2.5·vin3 — R=10k, Rf=25k
-- **A2** (somador inversor de 3 entradas, Rf=100k):
-  vout1 = −(9·vin1 + 2.8·vin2 + 1·vA)
+- **A2** (somador inversor de 4 entradas, Rf=100k):
+  vout1 = −(9·vin1 + 3·vin2 + (1/75)·(−15V) + 1·vA)
   - R(vin1) = 100k/9 = 11.1111k
-  - R(vin2) = 100k/2.8 = 35.7143k
+  - R(vin2) = 100k/3 = 33.3333k
+  - R(ref)  = 7.5Meg do trilho −15 V (contribui +0.2 V constante)
   - R(vA) = 100k
 
 ## Bloco B — topologia livre (2 × LM741)

@@ -3,23 +3,29 @@
 
 \subsection{Bloco A, somente somadores}
 
-A função do bloco A tem dois coeficientes negativos ($-9$ e $-2{,}8$)
-e um positivo ($+2{,}5$), mas o roteiro só permite somadores e
-subtratores neste bloco. A solução adotada foi uma cascata de dois
-somadores inversores: $v_{in3}$ passa pelos dois estágios e sofre duas
-inversões, então chega com sinal positivo, enquanto $v_{in1}$ e
-$v_{in2}$ entram só no segundo estágio e ficam com sinal negativo:
+A função do bloco A tem dois coeficientes negativos ($-9$ e $-3$), um
+positivo ($+2{,}5$) e um termo constante de $+0{,}2$~V, e o roteiro só
+permite somadores e subtratores neste bloco. A solução adotada foi uma
+cascata de dois somadores inversores: $v_{in3}$ passa pelos dois
+estágios e sofre duas inversões, então chega com sinal positivo,
+enquanto $v_{in1}$ e $v_{in2}$ entram só no segundo estágio e ficam com
+sinal negativo:
 %
 \[ v_A = -2{,}5\,v_{in3}, \qquad
-   v_{out1} = -(9v_{in1} + 2{,}8v_{in2} + v_A)
-            = -9v_{in1} - 2{,}8v_{in2} + 2{,}5v_{in3}. \]
+   v_{out1} = -\left(9v_{in1} + 3v_{in2} + v_A
+              + (1/75)\cdot(-15)\right)
+            = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3}. \]
 %
-Em cada entrada o ganho vale $R_f/R_i$. Os valores escolhidos estão na
+O termo constante é somado como mais uma entrada do somador final,
+ligada ao trilho de $-15$~V que já existe no circuito: com
+$R_f = 100$~k e $R = 7{,}5$~M, a contribuição é
+$-(100\text{k}/7{,}5\text{M})\cdot(-15) = +0{,}2$~V. Em cada entrada
+o ganho vale $R_f/R_i$. Os valores escolhidos estão na
 Tabela~\ref{tab:componentes} e ficam na faixa de dezenas de
 \si{\kilo\ohm}. Como a validação é por simulação, usamos os valores
-exatos ($100/9$ e $100/2{,}8$ \si{\kilo\ohm}). Numa montagem real
-esses valores seriam obtidos com associações de resistores da série
-E96, como comentado na Seção~\ref{sec:discussao}.
+exatos ($100/9$ e $100/3$ \si{\kilo\ohm}). Numa montagem real esses
+valores seriam obtidos com associações de resistores da série E96,
+como comentado na Seção~\ref{sec:discussao}.
 
 \begin{figure}[htb]
   \centering
@@ -82,7 +88,8 @@ verificado na Seção~\ref{sec:res-blocos}.
     \midrule
     A & RA4 / RAF1 & 10k / 25k & inversor de $v_{in3}$: $-2{,}5$ \\
     A & RA1 & 11{,}1111k & $v_{in1}$: $-100/11{,}1111 = -9$ \\
-    A & RA2 & 35{,}7143k & $v_{in2}$: $-100/35{,}7143 = -2{,}8$ \\
+    A & RA2 & 33{,}3333k & $v_{in2}$: $-100/33{,}3333 = -3$ \\
+    A & RAR & 7{,}5M & referência DC do trilho $-15$~V: $+0{,}2$~V \\
     A & RA3 / RAF2 & 100k / 100k & $v_A$: $-1$ \\
     \midrule
     B & RB1, RB2 / RBF1 & 20k, 10k / 40k & $v_{in4}$: $-2$; $v_{in5}$: $-4$ \\
@@ -169,10 +176,13 @@ simulação rodando em um contêiner Docker separado, em paralelo:
         \texttt{rs2\_vin6.cir}): apenas uma entrada recebe um seno de
         \SI{50}{\milli\volt} e \SI{1}{\kilo\hertz}, com as outras
         aterradas. O seno tem pico positivo em
-        $t=\SI{2.25}{\milli\second}$, então a medida
-        \texttt{.meas FIND V(out)/50m AT=2.25m} devolve o ganho com
-        sinal daquela entrada até a saída (e também até $v_{out1}$ e
-        $v_{out2}$).
+        $t=\SI{2.25}{\milli\second}$ e vale em
+        \SI{2.75}{\milli\second}; a diferença entre os dois pontos,
+        dividida por \SI{100}{\milli\volt}, dá o ganho com sinal
+        daquela entrada até a saída (e também até $v_{out1}$ e
+        $v_{out2}$), eliminando o nível DC. A média da saída sobre
+        ciclos inteiros mede o próprio nível DC, que deve valer
+        $-12{,}5 \times 0{,}2 = -2{,}5$~V.
   \item \textbf{Função global} (\texttt{rs2\_completo.cir}): as seis
         entradas recebem senos de \SI{20}{\milli\volt} em frequências
         diferentes (500 a \SI{1500}{\hertz}). Uma fonte auxiliar do

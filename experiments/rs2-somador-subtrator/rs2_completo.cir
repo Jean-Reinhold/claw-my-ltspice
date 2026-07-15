@@ -1,7 +1,8 @@
 * RS2 completo (21101175, modelo LM741_LEVEL1)
 .include lm741_level1.lib
 RA1 in1 suma2 11.1111k
-RA2 in2 suma2 35.7143k
+RA2 in2 suma2 33.3333k
+RAR vee suma2 7.5Meg
 RA3 va suma2 100k
 XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
 RAF2 suma2 vout1 100k
@@ -35,7 +36,7 @@ RC6 np 0 25k
 RL out 0 10k
 VCC vcc 0 15
 VEE vee 0 -15
-BIDEAL ideal 0 V=112.5*V(in1)+35*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)
+BIDEAL ideal 0 V=112.5*V(in1)+37.5*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)-2.5
 .tran 0 20m 0 10u
 .meas TRAN err_max MAX abs(V(out)-V(ideal))
 .meas TRAN err_rms RMS (V(out)-V(ideal))
