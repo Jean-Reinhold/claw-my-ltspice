@@ -1,0 +1,22 @@
+\section{Introdução e objetivos}
+\label{sec:objetivos}
+
+Um amplificador operacional real se comporta de forma um pouco diferente
+do modelo ideal. Entram pequenas correntes contínuas
+pelos terminais de entrada (as correntes de polarização $I_{B+}$ e
+$I_{B-}$, cuja diferença é a corrente de offset $I_{OS}$). Existe uma
+tensão de offset de entrada $V_{OS}$. O ganho diferencial $A_{vd}$ é
+grande, mas finito. Sinais aplicados igualmente nas duas entradas (modo
+comum) não são totalmente rejeitados, o que é medido pela CMRR. Além
+disso, a saída não consegue variar mais rápido que um certo limite,
+chamado de slew rate. No OP07, que é um amplificador de precisão, esses efeitos são muito pequenos, então cada um
+precisa de um circuito de teste próprio para virar uma medida possível.
+
+O roteiro usa o Micro-Cap. Aqui as simulações foram feitas no LTspice, rodando em containers Docker do repositório
+\texttt{claw-spice}, com um container independente para cada simulação.
+Os objetivos, seguindo os itens do roteiro, são:
+medir $I_{B+}$ e $I_{B-}$ e calcular $I_{OS}$; levantar a curva de
+transferência em malha aberta e identificar $V_{OS}$; medir $A_{vd}$ e
+$A_{cm}$ pela derivada das curvas e calcular a CMRR; extrair o slew rate
+da resposta ao degrau; e comparar todos os valores com a folha de dados
+do fabricante e com o amplificador ideal.

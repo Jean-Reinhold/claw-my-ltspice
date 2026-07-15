@@ -17,6 +17,14 @@ redistributable = true
 notes = "Small educational diode model embedded in the precision rectifier example; not vendor accurate."
 
 [[models]]
+name = "OP07"
+kind = "opamp"
+source = "ltspice-built-in"
+license = "provided-by-ltspice-install"
+redistributable = false
+notes = "ADI OP07 precision op-amp macromodel shipped inside the LTspice 26 install (lib/sub/LTC.lib, grades OP07/OP07A/OP07C/OP07E). Netlists reference it with `.lib LTC.lib`; LTspice resolves its own library path inside the container. Documentation copies can be extracted with scripts/models/extract-op07.sh into experiments/<slug>/models/ (gitignored). Do not commit extracted copies. Used by experiments/rs1-nao-idealidades-op07 (RS1 roteiro)."
+
+[[models]]
 name = "2N3904"
 kind = "bjt"
 source = "ltspice-built-in"
@@ -27,10 +35,21 @@ notes = "Use LTspice installed standard transistor libraries when present."
 [[models]]
 name = "LM741"
 kind = "opamp"
-source = "vendor-or-user-installed"
-license = "vendor"
+source = "vendor-downloaded"
+license = "NSC free-support notice: may be copied and distributed, resale prohibited"
 redistributable = false
-notes = "Classic op-amp target. Do not vendor until redistribution terms are explicit."
+path = "models/vendor/lm741.lib"
+url = "https://www.ti.com/lit/zip/snom211"
+notes = "National Semiconductor (TI) Boyle macromodel, extracted from snom211.zip. Kept unversioned (models/vendor/ is gitignored) because the no-resale clause conflicts with the repo MIT license. Re-fetch: curl -L -o snom211.zip <url> && unzip. Subckt LM741, pins: +in -in V+ V- out."
+
+[[models]]
+name = "LM741_LEVEL1"
+kind = "opamp"
+source = "repo-owned"
+path = "models/lm741_level1.lib"
+license = "MIT"
+redistributable = true
+notes = "Micro-Cap 'Level 1 ideal model' equivalent for the LM741: Aol=200k, Rin=2Meg, Rout=75, rail-clipped output, no poles. Used by experiments/rs2-somador-subtrator."
 
 [[models]]
 name = "TL072"

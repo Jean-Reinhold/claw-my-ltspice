@@ -1,0 +1,12 @@
+* RS1/S1 item 3 - Fig. 1(b): tensao de offset de entrada VOS (malha aberta)
+* Vin DC no pino nao inversor, pino inversor aterrado, sem realimentacao.
+* Varredura DC de -5 mV a +5 mV com passo de 1 uV (10001 pontos).
+* VOS = valor de Vin para o qual V(out) cruza 0 V na curva V(out) x Vin.
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+XU1 vin 0 vcc vee out OP07
+.dc VIN -5m 5m 1u
+.meas DC vos FIND V(vin) WHEN V(out)=0 CROSS=1
+.end

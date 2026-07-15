@@ -1,0 +1,13 @@
+* RS1/S1 item 2 - Fig. 1(a) com RF=1Meg: correntes IB- e de offset Ios
+* Mesma topologia do item 1, agora com RF=1Meg na realimentacao.
+* IB- = I(RF) (corrente que entra no pino inversor vinda da saida atraves de RF).
+* V(out) = RF*IB- - RI*IB+  =>  com RI=RF=1Meg, V(out) ~ -Ios*1Meg.
+* Ios = |IB+ - IB-| (corrente de offset de entrada).
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+RI inp 0 1Meg
+RF out inn 1Meg
+XU1 inp inn vcc vee out OP07
+.op
+.end

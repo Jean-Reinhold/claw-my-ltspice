@@ -1,0 +1,107 @@
+\section{Circuitos de teste}
+\label{sec:circuitos}
+
+As Figuras \ref{fig:circ-bias} a \ref{fig:circ-slew} mostram os
+circuitos simulados. Todos usam alimentação simétrica de
+$\pm$\SI{15}{\volt}, declarada explicitamente nas netlists, já que o
+LTspice não a inclui automaticamente como o Micro-Cap faz.
+
+\begin{itemize}
+  \item \textbf{Itens 1 e 2} (Figura \ref{fig:circ-bias}): seguidor com
+        $R_I$ = \SI{1}{\mega\ohm} na entrada não inversora. Primeiro com
+        $R_F = 0$ e depois com $R_F$ = \SI{1}{\mega\ohm}, medindo o
+        ponto de operação (\texttt{.op}). As correntes são medidas nos
+        próprios resistores: $I_{B+} = -I(R_I)$ e $I_{B-} = I(R_F)$.
+        Com $R_F = 0$ a saída vale $-I_{B+}R_I$. Com $R_F$ =
+        \SI{1}{\mega\ohm} os dois efeitos quase se cancelam e a saída
+        mede a corrente de offset. Como o LTspice 26 não aceita
+        resistência zero em netlist, o $R_F = 0$ foi implementado como
+        \SI{1}{\micro\ohm}, que tem efeito desprezível.
+  \item \textbf{Item 3} (Figura \ref{fig:circ-vos}): malha aberta, com
+        varredura DC de $v_{in}$ de \SI{-5}{\milli\volt} a
+        \SI{+5}{\milli\volt} em passos de \SI{1}{\micro\volt}. O
+        $V_{OS}$ é o valor de $v_{in}$ em que a saída cruza zero,
+        extraído com uma diretiva \texttt{.meas}.
+  \item \textbf{Item 4} (Figura \ref{fig:circ-ganhos}): a fonte
+        \texttt{VOS} em série com a entrada não inversora cancela o
+        offset medido no item 3 (arquivo \texttt{vos\_comp.inc}, gerado
+        pelo pipeline). Sem essa compensação, o ganho alto saturaria a
+        saída com poucos microvolts de entrada. Para o ganho
+        diferencial, repete-se a varredura do item 3. Para o ganho de
+        modo comum, as duas entradas varrem juntas de \SI{-3}{\volt} a
+        \SI{+3}{\volt} em passos de \SI{1}{\milli\volt}.
+  \item \textbf{Item 6} (Figura \ref{fig:circ-slew}): seguidor unitário
+        com degrau de \SI{-15}{\volt} para \SI{+15}{\volt} e tempo de
+        subida de \SI{1}{\pico\second}, simulado em transiente de
+        \SI{200}{\micro\second} com passo máximo de
+        \SI{100}{\nano\second}.
+\end{itemize}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.49\textwidth]{item1_bias_circuito.png}
+  \includegraphics[width=0.49\textwidth]{item2_ios_circuito.png}
+  \caption{Itens 1 e 2 (Figura 1(a) do roteiro): medição de $I_{B+}$ com
+  $R_F = 0$ (esquerda) e de $I_{B-}$ e $I_{OS}$ com $R_F$ =
+  \SI{1}{\mega\ohm} (direita).}
+  \label{fig:circ-bias}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.49\textwidth]{item3_vos_circuito.png}
+  \caption{Item 3 (Figura 1(b) do roteiro): malha aberta para levantar o
+  $V_{OS}$.}
+  \label{fig:circ-vos}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.49\textwidth]{item4_avd_circuito.png}
+  \includegraphics[width=0.49\textwidth]{item5_acm_circuito.png}
+  \caption{Item 4 (Figuras 1(c) e 1(d) do roteiro): ganho diferencial
+  com a compensação de offset em série (esquerda) e ganho de modo comum
+  com as duas entradas juntas (direita).}
+  \label{fig:circ-ganhos}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.49\textwidth]{item6_slew_circuito.png}
+  \caption{Item 6 (Figura 1(e) do roteiro): seguidor unitário com
+  degrau na entrada para medir o slew rate.}
+  \label{fig:circ-slew}
+\end{figure}
+
+\subsection{Modelo do OP07}
+\label{sec:modelo}
+
+O amplificador usado é o macromodelo \texttt{OP07} que vem junto com o
+LTspice 26, na biblioteca \texttt{LTC.lib}, carregado nas netlists com
+\texttt{.lib LTC.lib}. É o macromodelo da Analog Devices: um par
+diferencial de entrada com transistores de parâmetros levemente
+diferentes (o que reproduz $V_{OS}$, $I_{B+}$, $I_{B-}$ e $I_{OS}$), uma
+fonte de transcondutância de modo comum (que reproduz a CMRR finita) e
+uma limitação de corrente interna (que reproduz o slew rate). A licença
+do modelo não permite redistribuição, então o arquivo não é versionado
+no repositório. A origem está registrada em
+\texttt{models/manifest.toml} e uma cópia local para consulta pode ser
+extraída da imagem Docker com \texttt{scripts/models/extract-op07.sh}.
+
+\section{Procedimento de simulação}
+\label{sec:procedimento}
+
+O pipeline (\texttt{run\_all.sh} do experimento) roda em dois lotes de
+containers paralelos e independentes. Primeiro os itens 1 a 3, que não
+dependem um do outro. Depois o $V_{OS}$ medido no item 3 é gravado em
+\texttt{vos\_comp.inc}. Por fim rodam os itens 4 a 6, que usam essa
+compensação. O roteiro sugere o comando \texttt{dd(u)} do Micro-Cap para
+as derivadas. O LTspice em modo batch não tem esse recurso, então as
+derivadas $dv_{out}/dv_{in}$ (ganhos) e $dv_{out}/dt$ (slew rate,
+equivalente ao \texttt{ddt(u)}) foram calculadas numericamente por
+diferenças centrais sobre os dados dos arquivos \texttt{.raw}, com o
+script \texttt{analyze.py} do experimento, que também gera os gráficos.
+As medidas pontuais (cruzamento por zero e tempos de subida) usam
+diretivas \texttt{.meas} do próprio LTspice. As netlists completas estão
+no Apêndice \ref{ap:netlist} e os passos para reproduzir tudo estão no
+Apêndice \ref{ap:reproducao}.

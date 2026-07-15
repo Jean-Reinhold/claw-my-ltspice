@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:s="https://github.com/nturley/netlistsvg" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" height="100%" version="1.1" viewBox="-139.2 -219.2 1094.4 790.4" width="100%">
+  <title>item5_acm.svg</title>
+  <defs/>
+  <rect data-claw-background="true" fill="white" height="790.4" width="1094.4" x="-139.2" y="-219.2"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="352" x2="480" y1="96" y2="96"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="480" x2="480" y1="96" y2="192"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="352" x2="416" y1="192" y2="192"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="416" x2="416" y1="192" y2="256"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="416" x2="480" y1="256" y2="256"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="624" x2="704" y1="224" y2="224"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="528" x2="528" y1="160" y2="128"/>
+  <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="528" x2="528" y1="288" y2="320"/>
+  <g s:height="96" s:type="voltage" s:width="48" transform="translate(352,96)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="0" y2="24"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="72" y2="96"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="40" y2="40"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="30" y2="50"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="56" y2="56"/>
+    <circle cx="0.0" cy="48.0" fill="none" r="24.0" stroke="black" stroke-width="2.0"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="21.5">VOS</text>
+    </g>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="47.5">{VOSC}</text>
+    </g>
+  </g>
+  <g s:height="96" s:type="voltage" s:width="48" transform="translate(352,192)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="0" y2="24"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="72" y2="96"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="40" y2="40"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="30" y2="50"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="56" y2="56"/>
+    <circle cx="0.0" cy="48.0" fill="none" r="24.0" stroke="black" stroke-width="2.0"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="21.5">VIN</text>
+    </g>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="63.5">0</text>
+    </g>
+  </g>
+  <g s:height="96" s:type="voltage" s:width="48" transform="translate(144,64)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="0" y2="24"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="72" y2="96"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="40" y2="40"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="30" y2="50"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="56" y2="56"/>
+    <circle cx="0.0" cy="48.0" fill="none" r="24.0" stroke="black" stroke-width="2.0"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="21.5">VCC</text>
+    </g>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="0" y="125.5">15</text>
+    </g>
+  </g>
+  <g s:height="96" s:type="voltage" s:width="48" transform="translate(144,224)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="0" y2="24"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="72" y2="96"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="40" y2="40"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="30" y2="50"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-10" x2="10" y1="56" y2="56"/>
+    <circle cx="0.0" cy="48.0" fill="none" r="24.0" stroke="black" stroke-width="2.0"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="start" x="40" y="21.5">VEE</text>
+    </g>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="0" y="125.5">-15</text>
+    </g>
+  </g>
+  <g s:height="128" s:type="opamp2" s:width="144" transform="translate(480,160)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="24" y1="32" y2="32"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="24" y1="96" y2="96"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="48" x2="48" y1="0" y2="24"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="48" x2="48" y1="104" y2="128"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="24" x2="24" y1="0" y2="128"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="24" x2="128" y1="0" y2="64"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="128" x2="24" y1="64" y2="128"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="128" x2="144" y1="64" y2="64"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="30" x2="44" y1="32" y2="32"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="37" x2="37" y1="25" y2="39"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="30" x2="44" y1="96" y2="96"/>
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="10.0px" text-anchor="middle" x="72" y="21.5">XU1</text>
+    </g>
+  </g>
+  <g class="text-group">
+    <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="144" y="405.6">.lib LTC.lib</text>
+  </g>
+  <g class="text-group">
+    <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="144" y="437.6">.include vos_comp.inc</text>
+  </g>
+  <g class="text-group">
+    <text fill="black" font-family="Arial" font-size="16.0px" text-anchor="start" x="144" y="469.6">.dc VIN -3 3 1m</text>
+  </g>
+  <g class="ground-flag">
+    <g transform="translate(352,288) rotate(0)">
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="16" y1="0" y2="0"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="0" y1="0" y2="16"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="0" y1="0" y2="16"/>
+    </g>
+  </g>
+  <g transform="rotate(-90, 144, 64)">
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="12.0px" text-anchor="middle" x="144" y="59.2">VCC</text>
+    </g>
+  </g>
+  <g class="net-label"/>
+  <g class="ground-flag">
+    <g transform="translate(144,160) rotate(0)">
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="16" y1="0" y2="0"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="0" y1="0" y2="16"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="0" y1="0" y2="16"/>
+    </g>
+  </g>
+  <g transform="rotate(-90, 144, 224)">
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="12.0px" text-anchor="middle" x="144" y="219.2">VEE</text>
+    </g>
+  </g>
+  <g class="net-label"/>
+  <g class="ground-flag">
+    <g transform="translate(144,320) rotate(0)">
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="16" y1="0" y2="0"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="0" y1="0" y2="16"/>
+      <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="0" y1="0" y2="16"/>
+    </g>
+  </g>
+  <g transform="rotate(-90, 528, 128)">
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="12.0px" text-anchor="start" x="528" y="136.4">VCC</text>
+    </g>
+  </g>
+  <g class="net-label"/>
+  <g transform="rotate(-90, 528, 320)">
+    <g class="text-group">
+      <text fill="black" font-family="Arial" font-size="12.0px" text-anchor="end" x="528" y="328.4">VEE</text>
+    </g>
+  </g>
+  <g class="net-label"/>
+  <g class="text-group">
+    <text fill="black" font-family="Arial" font-size="24.0px" text-anchor="start" x="756" y="232.4">out</text>
+  </g>
+  <g class="io-pin" transform="translate(704,224) rotate(270)">
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="0" y1="32" y2="48"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="16" y1="16" y2="32"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="16" x2="-16" y1="16" y2="16"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="-16" x2="-16" y1="32" y2="16"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="16" y1="48" y2="32"/>
+    <line stroke="black" stroke-linecap="round" stroke-width="2.0" x1="0" x2="0" y1="16" y2="0"/>
+  </g>
+</svg>

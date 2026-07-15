@@ -1,0 +1,17 @@
+* RS1/S1 item 5 - Fig. 1(d): ganho DC de modo comum Acm
+* Os dois pinos de entrada sao excitados juntos por Vin (modo comum); a fonte
+* VOSC em serie com o pino nao inversor cancela o offset para evitar saturacao.
+* Varredura de -3 V a +3 V (passo 1 mV). Acm = max |d V(out) / d Vin|.
+* CMRR = 20*log10(Avd/|Acm|) e calculada em analyze.py com o Avd do item 4.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+VOS inp vin {VOSC}
+XU1 inp vin vcc vee out OP07
+.dc VIN -3 3 1m
+.meas DC v_m1 FIND V(out) AT=-1
+.meas DC v_p1 FIND V(out) AT=1
+.meas DC acm_sec PARAM (v_p1-v_m1)/2
+.end

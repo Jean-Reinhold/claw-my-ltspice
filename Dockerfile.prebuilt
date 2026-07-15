@@ -31,5 +31,10 @@ COPY docker/ltspice /usr/local/bin/ltspice
 RUN chmod +x /usr/local/bin/claw-spice-entrypoint /usr/local/bin/ltspice
 
 USER wineuser
-ENTRYPOINT ["/usr/local/bin/claw-spice-entrypoint"]
+# Chain the base image's entrypoint first: it materialises the WINEPREFIX and
+# primes Wine's first-run service init against a dead display BEFORE any X
+# server exists (LTspice batch mode hangs forever without this), then execs
+# our entrypoint, which finds DISPLAY/WINEPREFIX already set and only fills in
+# claw-spice specifics (HOME, XDG dirs).
+ENTRYPOINT ["/usr/local/bin/entrypoint", "/usr/local/bin/claw-spice-entrypoint"]
 CMD ["claw-spice", "doctor"]

@@ -34,3 +34,16 @@ examples/transient/*/*.svg
 
 # MCP/runtime sidecars
 .ltspice-mcp/
+
+# Experiment datasets (re-downloaded by the trainer)
+experiments/*/data/
+
+# Vendor SPICE models extracted for documentation (never commit)
+experiments/**/models/*.lib
+
+# LM741 lib copies staged next to RS2 netlists (canonical: models/)
+experiments/*/lm741_*.lib
+
+# Vendor datasheets (fetched, never committed)
+experiments/**/datasheet/
+reports/**/imagens/datasheet-*.pdf

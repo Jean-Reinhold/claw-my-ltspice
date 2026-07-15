@@ -1,0 +1,18 @@
+* RS1/S1 item 4 - Fig. 1(c): ganho DC diferencial Avd
+* Fonte VOSC em serie com o pino nao inversor cancela o offset medido no item 3,
+* mantendo o amplificador na regiao linear em torno de Vin=0.
+* Avd = max |d V(out) / d Vin| (derivada numerica calculada em analyze.py,
+* equivalente ao comando dd(u) do Micro-Cap). As .meas abaixo dao uma
+* estimativa por secante em +/-10 uV.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+VOS inp vin {VOSC}
+XU1 inp 0 vcc vee out OP07
+.dc VIN -5m 5m 1u
+.meas DC v_m10u FIND V(out) AT=-10u
+.meas DC v_p10u FIND V(out) AT=10u
+.meas DC avd_sec PARAM (v_p10u-v_m10u)/20u
+.end

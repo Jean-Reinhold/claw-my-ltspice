@@ -2,6 +2,24 @@
 set -euo pipefail
 
 LTSPICE_EXE="${LTSPICE_EXE:-$WINEPREFIX/drive_c/Program Files/ADI/LTspice/LTspice.exe}"
+
+# Prime Wine once per container, against a guaranteed-non-existent display.
+# The first wine invocation triggers internal service init (services.exe,
+# winedevice, plugplay). If an X server is available at that moment, those
+# services try to create windows and can block forever, hanging LTspice in
+# batch mode. Pointing DISPLAY at a display that does not exist makes the X
+# connection fail fast so the services finish their non-GUI init cleanly.
+# (Same approach as the docker-ltspice base image entrypoint. Done here, not
+# in the container entrypoint, so non-LTspice commands skip the cost.)
+PRIME_STAMP="${WINEPREFIX}/.claw-wine-primed"
+if [ ! -f "$PRIME_STAMP" ]; then
+  echo "[ltspice] Priming Wine services (first LTspice run in this container)..." >&2
+  DISPLAY=":98" timeout 240 wine "$LTSPICE_EXE" -b 2>/dev/null || true
+  DISPLAY=":98" timeout 60 wineserver --wait 2>/dev/null || true
+  touch "$PRIME_STAMP"
+  echo "[ltspice] Wine primed." >&2
+fi
+
 set +e
 wine "$LTSPICE_EXE" "$@"
 status=$?

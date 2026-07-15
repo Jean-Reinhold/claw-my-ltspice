@@ -1,0 +1,200 @@
+\appendix
+
+\section{Netlists dos circuitos}
+\label{ap:netlist}
+
+Netlists exatamente como foram simuladas (LTspice 26 em Docker,
+\texttt{./claw-spice sim run}). O arquivo \texttt{vos\_comp.inc} é
+gerado pelo pipeline com o $V_{OS}$ medido no item 3 e define o
+parâmetro \texttt{VOSC} usado nos itens 4 a 6.
+
+\subsection*{Item 1: \texttt{item1\_bias.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 1 - Fig. 1(a): corrente de polarizacao de entrada IB+ (RI=1Meg, RF=0)
+* OP07 da biblioteca embarcada do LTspice (LTC.lib). Alimentacao simetrica +/-15 V
+* explicita (o Micro-Cap a inclui automaticamente; no LTspice ela deve ser declarada).
+* Com RF=0 o amplificador e um seguidor: V(out) = V(inp) = -IB+ * RI.
+* IB+ = -I(RI) (corrente que entra no pino nao inversor vinda do terra atraves de RI).
+* O LTspice 26 nao aceita resistencia zero em netlist; RF=1uOhm implementa o
+* curto do roteiro com erro desprezivel (IB- * 1uOhm ~ 1e-15 V).
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+RI inp 0 1Meg
+RF out inn 1u
+XU1 inp inn vcc vee out OP07
+.op
+.end
+\end{verbatim}
+}
+
+\subsection*{Item 2: \texttt{item2\_ios.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 2 - Fig. 1(a) com RF=1Meg: correntes IB- e de offset Ios
+* Mesma topologia do item 1, agora com RF=1Meg na realimentacao.
+* IB- = I(RF) (corrente que entra no pino inversor vinda da saida atraves de RF).
+* V(out) = RF*IB- - RI*IB+  =>  com RI=RF=1Meg, V(out) ~ -Ios*1Meg.
+* Ios = |IB+ - IB-| (corrente de offset de entrada).
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+RI inp 0 1Meg
+RF out inn 1Meg
+XU1 inp inn vcc vee out OP07
+.op
+.end
+\end{verbatim}
+}
+
+\subsection*{Item 3: \texttt{item3\_vos.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 3 - Fig. 1(b): tensao de offset de entrada VOS (malha aberta)
+* Vin DC no pino nao inversor, pino inversor aterrado, sem realimentacao.
+* Varredura DC de -5 mV a +5 mV com passo de 1 uV (10001 pontos).
+* VOS = valor de Vin para o qual V(out) cruza 0 V na curva V(out) x Vin.
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+XU1 vin 0 vcc vee out OP07
+.dc VIN -5m 5m 1u
+.meas DC vos FIND V(vin) WHEN V(out)=0 CROSS=1
+.end
+\end{verbatim}
+}
+
+\subsection*{Item 4: \texttt{item4\_avd.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 4 - Fig. 1(c): ganho DC diferencial Avd
+* Fonte VOSC em serie com o pino nao inversor cancela o offset medido no item 3,
+* mantendo o amplificador na regiao linear em torno de Vin=0.
+* Avd = max |d V(out) / d Vin| (derivada numerica calculada em analyze.py,
+* equivalente ao comando dd(u) do Micro-Cap). As .meas abaixo dao uma
+* estimativa por secante em +/-10 uV.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+VOS inp vin {VOSC}
+XU1 inp 0 vcc vee out OP07
+.dc VIN -5m 5m 1u
+.meas DC v_m10u FIND V(out) AT=-10u
+.meas DC v_p10u FIND V(out) AT=10u
+.meas DC avd_sec PARAM (v_p10u-v_m10u)/20u
+.end
+\end{verbatim}
+}
+
+\subsection*{Item 4, segundo caso: \texttt{item5\_acm.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 5 - Fig. 1(d): ganho DC de modo comum Acm
+* Os dois pinos de entrada sao excitados juntos por Vin (modo comum); a fonte
+* VOSC em serie com o pino nao inversor cancela o offset para evitar saturacao.
+* Varredura de -3 V a +3 V (passo 1 mV). Acm = max |d V(out) / d Vin|.
+* CMRR = 20*log10(Avd/|Acm|) e calculada em analyze.py com o Avd do item 4.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 0
+VOS inp vin {VOSC}
+XU1 inp vin vcc vee out OP07
+.dc VIN -3 3 1m
+.meas DC v_m1 FIND V(out) AT=-1
+.meas DC v_p1 FIND V(out) AT=1
+.meas DC acm_sec PARAM (v_p1-v_m1)/2
+.end
+\end{verbatim}
+}
+
+\subsection*{Item 6: \texttt{item6\_slew.cir}}
+{\small
+\begin{verbatim}
+* RS1/S1 item 6 - Fig. 1(e): taxa de inflexao (slew rate)
+* Seguidor unitario (saida ligada ao pino inversor) com degrau abrupto de
+* Vin: -15 V -> +15 V em t=20 us com trise=1 ps (aprox. 0 ps do roteiro).
+* SR = max |d V(out)/dt| no flanco de subida (ddt numerico em analyze.py).
+* As .meas abaixo dao a estimativa classica de datasheet entre -10 V e +10 V.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 PULSE(-15 15 20u 1p 1p 460u 1m 1)
+VOS inp vin {VOSC}
+XU1 inp out vcc vee out OP07
+.tran 0 200u 0 100n
+.meas TRAN t_lo WHEN V(out)=-10 RISE=1
+.meas TRAN t_hi WHEN V(out)=10 RISE=1
+.meas TRAN sr_avg PARAM (20/(t_hi-t_lo))/1e6
+.end
+\end{verbatim}
+}
+
+\subsection*{Compensação de offset: \texttt{vos\_comp.inc}}
+{\small
+\begin{verbatim}
+* GERADO por analyze.py --phase vos: compensacao com o VOS medido no item 3.
+.param VOSC=-3.035132649e-05
+\end{verbatim}
+}
+
+\section{Folha de dados do OP07 (páginas de especificações)}
+\label{ap:datasheet}
+
+Reprodução das páginas de especificações elétricas da folha de dados do
+OP07 (Analog Devices, Rev. G), usadas como referência na
+Tabela \ref{tab:medidas}: características do OP07E (página 3),
+desempenho dinâmico do OP07E e características do OP07C (página 4) e
+desempenho dinâmico do OP07C (página 5).
+
+\begin{figure}[p]
+  \centering
+  \fbox{\includegraphics[page=3,width=0.9\textwidth]{datasheet-op07.pdf}}
+  \caption{Folha de dados do OP07 (Rev. G), página 3: características
+  elétricas do OP07E ($V_{OS}$, $I_{OS}$, $I_B$, CMRR, $A_{VO}$).}
+  \label{fig:ds-p3}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \fbox{\includegraphics[page=4,width=0.9\textwidth]{datasheet-op07.pdf}}
+  \caption{Folha de dados do OP07 (Rev. G), página 4: desempenho
+  dinâmico do OP07E (slew rate) e características elétricas do OP07C.}
+  \label{fig:ds-p4}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \fbox{\includegraphics[page=5,width=0.9\textwidth]{datasheet-op07.pdf}}
+  \caption{Folha de dados do OP07 (Rev. G), página 5: características de
+  saída e desempenho dinâmico do OP07C.}
+  \label{fig:ds-p5}
+\end{figure}
+
+\section{Reprodução do experimento}
+\label{ap:reproducao}
+
+\begin{verbatim}
+# imagem Docker com LTspice (uma vez)
+./claw-spice build-prebuilt
+
+# folha de dados (analog.com bloqueia clientes nao-navegador;
+# o script usa o espelho do Internet Archive)
+scripts/models/fetch-op07-datasheet.sh
+
+# pipeline: lotes paralelos de containers + medidas + graficos
+experiments/rs1-nao-idealidades-op07/run_all.sh
+
+# relatorio
+./claw-spice report rs1-nao-idealidades-op07
+\end{verbatim}
+
+O pós-processamento (derivadas por diferenças centrais, extração de
+medidas e geração dos gráficos) está no script \texttt{analyze.py} do
+experimento. Os resultados numéricos ficam em \texttt{results.json}.

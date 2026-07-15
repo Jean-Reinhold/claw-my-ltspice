@@ -1,0 +1,17 @@
+* RS1/S1 item 6 - Fig. 1(e): taxa de inflexao (slew rate)
+* Seguidor unitario (saida ligada ao pino inversor) com degrau abrupto de
+* Vin: -15 V -> +15 V em t=20 us com trise=1 ps (aprox. 0 ps do roteiro).
+* SR = max |d V(out)/dt| no flanco de subida (ddt numerico em analyze.py).
+* As .meas abaixo dao a estimativa classica de datasheet entre -10 V e +10 V.
+.lib LTC.lib
+.include vos_comp.inc
+VCC vcc 0 15
+VEE vee 0 -15
+VIN vin 0 PULSE(-15 15 20u 1p 1p 460u 1m 1)
+VOS inp vin {VOSC}
+XU1 inp out vcc vee out OP07
+.tran 0 200u 0 100n
+.meas TRAN t_lo WHEN V(out)=-10 RISE=1
+.meas TRAN t_hi WHEN V(out)=10 RISE=1
+.meas TRAN sr_avg PARAM (20/(t_hi-t_lo))/1e6
+.end

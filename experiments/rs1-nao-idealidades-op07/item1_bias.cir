@@ -1,0 +1,15 @@
+* RS1/S1 item 1 - Fig. 1(a): corrente de polarizacao de entrada IB+ (RI=1Meg, RF=0)
+* OP07 da biblioteca embarcada do LTspice (LTC.lib). Alimentacao simetrica +/-15 V
+* explicita (o Micro-Cap a inclui automaticamente; no LTspice ela deve ser declarada).
+* Com RF=0 o amplificador e um seguidor: V(out) = V(inp) = -IB+ * RI.
+* IB+ = -I(RI) (corrente que entra no pino nao inversor vinda do terra atraves de RI).
+* O LTspice 26 nao aceita resistencia zero em netlist; RF=1uOhm implementa o
+* curto do roteiro com erro desprezivel (IB- * 1uOhm ~ 1e-15 V).
+.lib LTC.lib
+VCC vcc 0 15
+VEE vee 0 -15
+RI inp 0 1Meg
+RF out inn 1u
+XU1 inp inn vcc vee out OP07
+.op
+.end
