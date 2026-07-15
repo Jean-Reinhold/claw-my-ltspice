@@ -1,0 +1,15 @@
+* claw-spice LM741 "Level 1" ideal macromodel
+* Repo-owned (MIT). Equivalent in spirit to Micro-Cap's opamp LEVEL=1
+* ("ideal model") parameterized with LM741 datasheet DC values:
+*   Aol = 200k (datasheet Avol typ 200 V/mV), Rin = 2Meg, Rout = 75
+* No poles, no slew limiting: level 1 = ideal linear gain block with
+* output clipped near the supply rails (headroom ~1 V, datasheet output
+* swing +-14 V at +-15 V supplies).
+* Port order matches CLAW_IDEAL_OPAMP: INP INN VCC VEE OUT
+
+.subckt LM741_LEVEL1 INP INN VCC VEE OUT params: Aol=200k Rin=2Meg Rout=75 Vhr=1
+RIN INP INN {Rin}
+BGAIN NDRV 0 V=limit({Aol}*(V(INP)-V(INN)), V(VEE)+{Vhr}, V(VCC)-{Vhr})
+ROUT NDRV OUT {Rout}
+COUT OUT 0 1p
+.ends LM741_LEVEL1

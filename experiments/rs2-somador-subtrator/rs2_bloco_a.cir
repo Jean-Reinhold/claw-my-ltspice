@@ -1,0 +1,21 @@
+* RS2 bloco A: vout1 = -9*vin1 - 2.8*vin2 + 2.5*vin3 (21101175)
+.include lm741_level1.lib
+RA1 in1 suma2 11.1111k
+RA2 in2 suma2 35.7143k
+RA3 va suma2 100k
+XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
+RAF2 suma2 vout1 100k
+RA4 in3 suma1 10k
+XA1 0 suma1 vcc vee va LM741_LEVEL1
+RAF1 suma1 va 25k
+VIN1 in1 0 SINE(0 0.1 300)
+VIN2 in2 0 SINE(0 0.2 700)
+VIN3 in3 0 SINE(0 0.4 1300)
+RL vout1 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL1 ideal1 0 V=-9*V(in1)-2.8*V(in2)+2.5*V(in3)
+.tran 0 20m 0 10u
+.meas TRAN vout1_max MAX V(vout1)
+.meas TRAN err1_max MAX abs(V(vout1)-V(ideal1))
+.end

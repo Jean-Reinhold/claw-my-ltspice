@@ -1,0 +1,22 @@
+\section{Conclusão}
+\label{sec:conclusao}
+
+Os três blocos foram projetados e justificados: cascata de somadores
+inversores nos blocos A e B e amplificador de instrumentação com ganho
+$12{,}5$ no bloco C. O circuito completo, com sete LM741 alimentados
+em $\pm$\SI{15}{\volt}, implementa a função global derivada da
+matrícula 21101175.
+
+A simulação confirmou o projeto em três níveis. Os ganhos individuais
+de cada entrada bateram com os coeficientes teóricos. Cada bloco
+isolado reproduziu a sua função. E a resposta global acompanhou a
+referência ideal com erro relativo muito pequeno. Com o macromodelo
+comercial do LM741 o erro subiu para menos de 5\% da excursão, efeito
+esperado da queda do ganho de malha aberta com a frequência e do
+offset de entrada do componente real, sem mudar o comportamento
+projetado.
+
+Como próximos passos, seria interessante subir a frequência dos
+estímulos até aparecer a limitação de banda e de slew rate do LM741
+real, e avaliar o efeito da tolerância dos resistores numa montagem
+física.

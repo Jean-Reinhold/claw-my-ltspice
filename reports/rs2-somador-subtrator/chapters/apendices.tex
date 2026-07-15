@@ -1,0 +1,197 @@
+\appendix
+
+\section{Netlist do circuito completo}
+\label{ap:netlist}
+
+Netlist \texttt{rs2\_completo.cir} exatamente como foi simulada
+(ensaio global com a referência comportamental ideal):
+
+{\small
+\begin{verbatim}
+* RS2 completo (21101175, modelo LM741_LEVEL1)
+.include lm741_level1.lib
+RA1 in1 suma2 11.1111k
+RA2 in2 suma2 35.7143k
+RA3 va suma2 100k
+XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
+RAF2 suma2 vout1 100k
+RA4 in3 suma1 10k
+XA1 0 suma1 vcc vee va LM741_LEVEL1
+RAF1 suma1 va 25k
+VIN1 in1 0 SINE(0 20m 500)
+VIN2 in2 0 SINE(0 20m 700)
+VIN3 in3 0 SINE(0 20m 900)
+RB3 in6 sumb2 10k
+RB4 vb sumb2 90k
+XB2 0 sumb2 vcc vee vout2 LM741_LEVEL1
+RBF2 sumb2 vout2 90k
+RB1 in4 sumb1 20k
+RB2 in5 sumb1 10k
+XB1 0 sumb1 vcc vee vb LM741_LEVEL1
+RBF1 sumb1 vb 40k
+VIN6 in6 0 SINE(0 20m 1500)
+VIN4 in4 0 SINE(0 20m 1100)
+VIN5 in5 0 SINE(0 20m 1300)
+XC1 vout1 ng1 vcc vee na LM741_LEVEL1
+XC2 vout2 ng2 vcc vee nb LM741_LEVEL1
+XC3 np nn vcc vee out LM741_LEVEL1
+RC1 ng1 na 10k
+RCG ng1 ng2 5k
+RC2 ng2 nb 10k
+RC3 na nn 10k
+RC4 nb np 10k
+RC5 nn out 25k
+RC6 np 0 25k
+RL out 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL ideal 0 V=112.5*V(in1)+35*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)
+.tran 0 20m 0 10u
+.meas TRAN err_max MAX abs(V(out)-V(ideal))
+.meas TRAN err_rms RMS (V(out)-V(ideal))
+.meas TRAN vout_max MAX V(out)
+.meas TRAN vout_min MIN V(out)
+.end
+\end{verbatim}
+}
+
+\section{Netlists dos blocos isolados}
+\label{ap:blocos}
+
+Bloco A (\texttt{rs2\_bloco\_a.cir}):
+
+{\small
+\begin{verbatim}
+* RS2 bloco A: vout1 = -9*vin1 - 2.8*vin2 + 2.5*vin3 (21101175)
+.include lm741_level1.lib
+RA1 in1 suma2 11.1111k
+RA2 in2 suma2 35.7143k
+RA3 va suma2 100k
+XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
+RAF2 suma2 vout1 100k
+RA4 in3 suma1 10k
+XA1 0 suma1 vcc vee va LM741_LEVEL1
+RAF1 suma1 va 25k
+VIN1 in1 0 SINE(0 0.1 300)
+VIN2 in2 0 SINE(0 0.2 700)
+VIN3 in3 0 SINE(0 0.4 1300)
+RL vout1 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL1 ideal1 0 V=-9*V(in1)-2.8*V(in2)+2.5*V(in3)
+.tran 0 20m 0 10u
+.meas TRAN vout1_max MAX V(vout1)
+.meas TRAN err1_max MAX abs(V(vout1)-V(ideal1))
+.end
+\end{verbatim}
+}
+
+Bloco B (\texttt{rs2\_bloco\_b.cir}):
+
+{\small
+\begin{verbatim}
+* RS2 bloco B: vout2 = 2*vin4 + 4*vin5 - 9*vin6 (21101175)
+.include lm741_level1.lib
+RB3 in6 sumb2 10k
+RB4 vb sumb2 90k
+XB2 0 sumb2 vcc vee vout2 LM741_LEVEL1
+RBF2 sumb2 vout2 90k
+RB1 in4 sumb1 20k
+RB2 in5 sumb1 10k
+XB1 0 sumb1 vcc vee vb LM741_LEVEL1
+RBF1 sumb1 vb 40k
+VIN6 in6 0 SINE(0 0.1 1300)
+VIN4 in4 0 SINE(0 0.2 300)
+VIN5 in5 0 SINE(0 0.2 700)
+RL vout2 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL2 ideal2 0 V=2*V(in4)+4*V(in5)-9*V(in6)
+.tran 0 20m 0 10u
+.meas TRAN vout2_max MAX V(vout2)
+.meas TRAN err2_max MAX abs(V(vout2)-V(ideal2))
+.end
+\end{verbatim}
+}
+
+Bloco C (\texttt{rs2\_bloco\_c.cir}):
+
+{\small
+\begin{verbatim}
+* RS2 bloco C: vout = 12.5*(vout2 - vout1), G=25 (21101175)
+.include lm741_level1.lib
+XC1 vout1 ng1 vcc vee na LM741_LEVEL1
+XC2 vout2 ng2 vcc vee nb LM741_LEVEL1
+XC3 np nn vcc vee out LM741_LEVEL1
+RC1 ng1 na 10k
+RCG ng1 ng2 5k
+RC2 ng2 nb 10k
+RC3 na nn 10k
+RC4 nb np 10k
+RC5 nn out 25k
+RC6 np 0 25k
+VN vout1 0 1
+VP vout2 0 SINE(1 0.4 1k)
+RL out 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+.tran 0 5m 0 5u
+.meas TRAN gain_diff FIND V(out)/0.4 AT=2.25m
+.meas TRAN vout_avg AVG V(out)
+.end
+\end{verbatim}
+}
+
+\section{Variantes de ensaio}
+\label{ap:variantes}
+
+As seis netlists de resposta individual usam o mesmo circuito completo
+do Apêndice~A, trocando só as fontes e as medidas. Exemplo para
+$v_{in1}$ (\texttt{rs2\_vin1.cir}); nas demais muda apenas qual
+entrada recebe o seno:
+
+{\small
+\begin{verbatim}
+VIN1 in1 0 SINE(0 50m 1k)
+VIN2 in2 0 0
+VIN3 in3 0 0
+VIN4 in4 0 0
+VIN5 in5 0 0
+VIN6 in6 0 0
+.tran 0 5m 0 5u
+.meas TRAN g_out_vin1 FIND V(out)/50m AT=2.25m
+.meas TRAN g_vout1_vin1 FIND V(vout1)/50m AT=2.25m
+.meas TRAN g_vout2_vin1 FIND V(vout2)/50m AT=2.25m
+.meas TRAN vout_max MAX V(out)
+\end{verbatim}
+}
+
+A variante com o macromodelo comercial
+(\texttt{rs2\_completo\_vendor.cir}) também usa o circuito do
+Apêndice~A, com estas diferenças:
+
+{\small
+\begin{verbatim}
+.include lm741_vendor.lib          (macromodelo de Boyle da TI)
+XA1 ... XC3 usam o subcircuito LM741 no lugar de LM741_LEVEL1
+.options method=Gear
+.options cshunt=10p abstol=1e-9 vntol=10u
+.tran 0 10m 0 10u
+\end{verbatim}
+}
+
+O integrador Gear e as opções de convergência foram necessários porque
+o macromodelo de Boyle oscila numericamente com o integrador
+trapezoidal padrão; 10 ms cobrem um período completo do estímulo
+multi-tom (fundamental de \SI{100}{\hertz}).
+
+\section{Código gerador}
+\label{ap:codigo}
+
+Esquemáticos e netlists são gerados por
+\texttt{experiments/rs2-somador-subtrator/rs2\_somador\_subtrator.py}
+(no repositório), executado com \texttt{./claw-spice code build}. As
+simulações rodam uma por contêiner:
+\texttt{./claw-spice sim run <netlist> -{}-timeout 900}, em paralelo.
+O modelo \texttt{LM741\_LEVEL1} usado em todas as netlists está na
+Seção~\ref{sec:modelo}.
