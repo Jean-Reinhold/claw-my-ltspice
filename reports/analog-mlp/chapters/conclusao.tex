@@ -25,9 +25,12 @@ diferente para cada dígito, tudo medido em tensões.
 O teste com o LT1810 também confirmou o que a calibração sugeria: com
 saída que chega até os trilhos, a folga medida na bancada cai para
 milivolts e os neurônios passam a rodar com \SI{4,8}{\volt} e o
-próprio terra. O mesmo teste deixou uma lição de simulação: o modelo
-de \SI{325}{\mega\hertz} torna a rede completa impraticável de
-simular, e a caracterização teve de ser feita por bancadas menores.
+próprio terra. O mesmo teste deixou uma lição dupla: na simulação, o modelo de
+\SI{325}{\mega\hertz} torna a rede completa impraticável e a
+caracterização teve de ser feita por bancadas menores; no circuito, a
+velocidade cobra as duas correções que o 741 dispensava, a compensação
+de \SI{2}{\pico\farad} e o equilíbrio de polarização de
+\SI{49,9}{\kilo\ohm}.
 Como próximos passos, seria interessante rodar Monte Carlo com
 tolerância de \SI{1}{\percent} nos resistores e offset real dos
 amplificadores para estimar o rendimento de uma montagem física, e

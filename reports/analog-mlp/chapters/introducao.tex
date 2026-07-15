@@ -21,9 +21,13 @@ com 260 amplificadores e 5451 resistores de peso. Na saída não tem
 cálculo extra nem processador: cada dígito tem um comparador, e a
 resposta da rede é o único comparador que acende.
 
-A validação foi feita no LTspice em duas rodadas, uma com um modelo
-ideal de AmpOp e outra com o macromodelo comercial do LM741, usando
-trilhos de alimentação calibrados para compensar a saturação do 741.
+A validação foi feita no LTspice em duas rodadas da rede completa, uma
+com um modelo ideal de AmpOp e outra com o macromodelo comercial do
+LM741, usando trilhos calibrados para compensar a saturação do 741. Um
+terceiro amplificador, o LT1810, moderno e rápido, foi caracterizado em
+bancadas menores e serve de contraponto ao 741 ao longo do relatório:
+satura a milivolts dos trilhos, decide 25 vezes mais rápido e cobra o
+preço em compensação e equilíbrio de polarização.
 Todo o fluxo roda em Docker com o ferramental claw-spice do
 repositório, cada simulação em um contêiner separado.
 

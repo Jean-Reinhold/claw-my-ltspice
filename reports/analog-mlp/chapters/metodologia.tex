@@ -159,6 +159,39 @@ correções que a Seção~\ref{sec:tempo-custo} explica). A mesma cadeia com o L
 (\texttt{bench\_chain\_741.cir}) valida a metodologia contra a
 latência medida na rede completa.
 
+A Tabela~\ref{tab:ampops} resume os três amplificadores e o
+computador, misturando o que vem da folha de dados com o que foi medido
+nas bancadas, nas simulações e no benchmark deste experimento. Em lote
+de \num{10000} imagens o Mac sobe para 12,5 milhões de imagens por
+segundo; a coluna mostra o caso de uma imagem por vez, que é o
+comparável com os circuitos.
+
+\begin{table}[htb]
+  \centering
+  \caption{Comparação dos três AmpOps e do computador. Folga de
+  saturação e trilhos vêm das bancadas de calibração; erro, latência e
+  taxa de imagens, das simulações e do benchmark no hospedeiro.}
+  \label{tab:ampops}
+  {\small
+  \begin{tabular}{lcccc}
+    \toprule
+     & Ideal (modelo) & LM741 & LT1810 & Mac (numpy) \\
+    \midrule
+    Origem & educacional & bipolar, 1968 & bipolar rápido & software \\
+    Banda (GBW) & sem polo & \SI{1}{\mega\hertz} & \SI{325}{\mega\hertz} & -- \\
+    Slew rate & ilimitado & \SI{0,5}{\volt\per\micro\second} & \SI{350}{\volt\per\micro\second} & -- \\
+    Corrente de polarização & zero & $\approx$\SI{80}{\nano\ampere} & $\approx$\SI{1,5}{\micro\ampere} & -- \\
+    Folga de saturação (medida) & \SI{0,2}{\volt} & 0,99 / \SI{0,97}{\volt} & 2,4 / \SI{1,2}{\milli\volt} & -- \\
+    Trilhos dos neurônios & 5 / \SI{-0,2}{\volt} & 5,8 / \SI{-0,97}{\volt} & 4,8 / \SI{0}{\volt} & -- \\
+    Erro médio vs.\ modelo & \SI{1,3}{\milli\volt} & \SI{157}{\milli\volt} & (bancadas) & é o modelo \\
+    Latência de decisão & \SI{8,9}{\micro\second} (rede) & \SI{48,4}{\micro\second} (rede) & \SI{1,9}{\micro\second} (cadeia) & \SI{9}{\micro\second} (avulsa) \\
+    Imagens por segundo & 111 853 & 20 681 & 532 146 & 111 111 \\
+    Cuidados no uso & nenhum & Gear na simulação & 2 pF + \SI{49,9}{\kilo\ohm} & -- \\
+    \bottomrule
+  \end{tabular}
+  }
+\end{table}
+
 Na simulação, vinte dígitos do conjunto de teste (dois por classe)
 entram em sequência, um a cada \SI{250}{\micro\second}, por 64 fontes
 do tipo PWL (valor definido por trechos no tempo). Diretivas
