@@ -152,7 +152,10 @@ um nanosegundo, e a rede completa com 260 desses modelos levaria dias
 de CPU. Por isso o LT1810 foi caracterizado em duas bancadas: a de
 saturação e uma cadeia de cinco somadores mais o comparador
 (\texttt{bench\_chain\_moderno.cir}), que reproduz o caminho crítico
-da rede e mede a latência de decisão. A mesma cadeia com o LM741
+da rede e mede a latência de decisão (com capacitores de compensação de
+\SI{2}{\pico\farad} em paralelo com cada $R_f$ e resistores de
+equilíbrio de \SI{49,9}{\kilo\ohm} nas entradas não inversoras,
+correções que a Seção~\ref{sec:tempo-custo} explica). A mesma cadeia com o LM741
 (\texttt{bench\_chain\_741.cir}) valida a metodologia contra a
 latência medida na rede completa.
 

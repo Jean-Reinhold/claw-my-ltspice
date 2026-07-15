@@ -8,7 +8,7 @@ VCC vcc 0 5.8
 VEE vee 0 -5.8
 VEER veer 0 -0.97
 VTH vth 0 2.65
-VIN in 0 PWL(0 3 5u 3 5.01u -3 300u -3)
+VIN in 0 PWL(0 3 30u 3 30.01u -3 330u -3)
 R1 in s1 100k
 RF1 a1 s1 100k
 X1 0 s1 vcc vee a1 LM741
@@ -28,7 +28,7 @@ XC z vth vcc veer outc LM741
 RL outc 0 100k
 .options method=Gear
 .options cshunt=100f trtol=7 reltol=2e-3 vntol=1e-5 abstol=1e-9 itl4=100 gmin=1e-10
-.tran 0 300u 0 100n startup
+.tran 0 330u 0 100n startup
 .meas TRAN t_dec WHEN V(outc)=2.4 RISE=1
-.meas TRAN lat_us PARAM (t_dec-5.01u)/1e-6
+.meas TRAN lat_us PARAM (t_dec-30.01u)/1e-6
 .end

@@ -60,10 +60,14 @@ def main() -> None:
     print(f"amortized in a {BATCH}-image batch: {t_batch_us:.3f} us/image")
     print(f"multiply-accumulate ops per image: {ops // 2}")
 
-    single = f"{t_single_us:.0f}"
-    batch = f"{t_batch_us:.2f}".replace(".", ",")
-    fps_single = f"{1e6 / t_single_us:,.0f}".replace(",", " ")
-    fps_batch = f"{1e6 / t_batch_us:,.0f}".replace(",", " ")
+    # fps calculado sobre os valores ja arredondados, para a tabela e o
+    # grafico do relatorio contarem a mesma historia
+    t_single_r = round(t_single_us)
+    t_batch_r = round(t_batch_us, 2)
+    single = f"{t_single_r:.0f}"
+    batch = f"{t_batch_r:.2f}".replace(".", ",")
+    fps_single = f"{1e6 / t_single_r:,.0f}".replace(",", " ")
+    fps_batch = f"{1e6 / t_batch_r:,.0f}".replace(",", " ")
     out = exp.parents[1] / "reports" / "analog-mlp" / "gerado"
     out.mkdir(parents=True, exist_ok=True)
     (out / "valores_host.tex").write_text(

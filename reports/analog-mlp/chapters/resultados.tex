@@ -162,11 +162,31 @@ série. Com o LM741 ela decide em
 \vLatenciaCadeiaLm~\si{\micro\second}, abaixo dos
 \vLatenciaLmMax~\si{\micro\second} medidos na rede completa: o tempo
 do 741 é dominado pelo slew rate, e as excursões da bancada (\SI{3}{\volt}
-por estágio) são menores que as da rede. Com o LT1810 a mesma cadeia
-decide em \vLatenciaCadeiaMod~\si{\micro\second}; como o tempo dele
-quase não depende da excursão (o slew de
-\SI{350}{\volt\per\micro\second} cruza a faixa toda em nanossegundos),
-esse valor é uma estimativa razoável para a rede completa.
+por estágio) são menores que as da rede. O LT1810 trouxe duas lições de bancada antes do número. Primeira: com
+\SI{100}{\kilo\ohm} de realimentação, a capacitância de entrada do
+amplificador de \SI{325}{\mega\hertz} cria um polo dentro da banda e
+cada estágio oscila; a correção clássica é um capacitor de
+\SI{2}{\pico\farad} em paralelo com cada $R_f$, que estabiliza a
+malha e define a banda de cada estágio em uns \SI{800}{\kilo\hertz}.
+Segunda: a corrente de polarização do LT1810, bipolar, é de uns
+\SI{1,5}{\micro\ampere}, mil vezes a do 741, e sobre \SI{100}{\kilo\ohm}
+desloca cada estágio em \SI{0,15}{\volt}; sem o resistor de equilíbrio
+de \SI{49,9}{\kilo\ohm} na entrada não inversora, o deslocamento
+acumulado impedia o comparador de disparar. Com as duas correções, que
+uma montagem real da rede inteira também precisaria, a cadeia decide em
+\vLatenciaCadeiaMod~\si{\micro\second}: a latência é limitada pelo RC
+da compensação, e não pelo slew rate do amplificador.
+A Figura~\ref{fig:cadeia} mostra as duas cadeias respondendo ao mesmo
+degrau, cada uma na sua escala de tempo.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{cadeia_critica.png}
+  \caption{Bancada do caminho crítico: os cinco estágios e o comparador
+  respondendo ao degrau de entrada, com o LM741 (esquerda) e com o
+  LT1810 (direita). A linha tracejada é o trilho $V_{TH}$.}
+  \label{fig:cadeia}
+\end{figure}
 
 \begin{figure}[htb]
   \centering
@@ -203,6 +223,14 @@ folga.
     \bottomrule
   \end{tabular}
 \end{table}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{tempo_por_imagem.png}
+  \caption{Tempo por imagem de cada implementação, em escala
+  logarítmica.}
+  \label{fig:tempos}
+\end{figure}
 
 Sobre custo, em ordens de grandeza. Montar esta rede com componentes
 discretos (260 LM741, quase 6000 resistores de precisão e as placas

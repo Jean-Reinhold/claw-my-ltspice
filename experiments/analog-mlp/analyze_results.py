@@ -357,6 +357,83 @@ def fig_transition(raws, vectors, theta, out_png: Path, window=SAMPLE_WINDOW) ->
     plt.close(fig)
 
 
+def fig_chain_waveforms(exp: Path, out_png: Path) -> None:
+    """Step response of the five-stage critical-path chains: LM741 and
+    LT1810 side by side, each with its own time scale."""
+    specs = [
+        ("bench_chain_741", "LM741", -3.0, 40.0),
+        ("bench_chain_moderno", "LT1810", -0.5, 8.0),
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.6))
+    step_us = 30.01
+    for ax, (stem, name, t_lo, t_hi) in zip(axes, specs, strict=False):
+        raw_file = exp / f"{stem}.raw"
+        if not raw_file.exists():
+            continue
+        time_ms, trace = load_raw(raw_file)
+        t_rel = time_ms * 1000.0 - step_us
+        mask = (t_rel >= t_lo) & (t_rel <= t_hi)
+        ax.plot(t_rel[mask], trace("V(z)")[mask], color=C_BLUE, linewidth=1.8,
+                label="$V(z)$ (5 estágios)")
+        ax.plot(t_rel[mask], trace("V(outc)")[mask], color=C_AQUA, linewidth=1.8,
+                label="$V(outc)$ (comparador)")
+        ax.axhline(2.65, color=C_RED, linewidth=1, linestyle="--")
+        ax.axvline(0, color=GRID, linewidth=1)
+        ax.set_title(f"Cadeia com {name}", fontsize=10, color=INK)
+        ax.set_xlabel("Tempo desde o degrau (us)", color=INK)
+        style_axis(ax)
+    axes[0].set_ylabel("Tensão (V)", color=INK)
+    axes[0].legend(frameon=False, fontsize=9, labelcolor=INK, loc="lower right")
+    fig.suptitle(
+        "Caminho crítico de cinco estágios: degrau na entrada, decisão no comparador",
+        fontsize=10, color=INK,
+    )
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=200, facecolor="white")
+    plt.close(fig)
+
+
+def fig_time_per_image(timing, chain, host_tex: Path, out_png: Path) -> None:
+    """Dot plot (log scale) of the time per image of each implementation."""
+    entries = []
+    if timing.get("741"):
+        entries.append(("Rede com LM741 (pior caso)", max(timing["741"])))
+    if chain.get("moderno") is not None:
+        entries.append(("Rede com LT1810 (caminho crítico)", chain["moderno"]))
+    if host_tex.exists():
+        text = host_tex.read_text()
+        m1 = re.search(r"vMacUmaImagem}{([\d,\.]+)}", text)
+        m2 = re.search(r"vMacLote}{([\d,\.]+)}", text)
+        if m1:
+            entries.append(("Mac, uma imagem por vez", float(m1.group(1).replace(",", "."))))
+        if m2:
+            entries.append(("Mac, lote de 10 000", float(m2.group(1).replace(",", "."))))
+    if not entries:
+        return
+    entries = entries[::-1]
+    names = [name for name, _ in entries]
+    values = [value for _, value in entries]
+    fig, ax = plt.subplots(figsize=(8.6, 2.9))
+    y = np.arange(len(entries))
+    ax.hlines(y, 1e-2, values, color=GRID, linewidth=1.2)
+    ax.plot(values, y, "o", color=C_BLUE, markersize=9, markeredgecolor="white")
+    for yi, value in zip(y, values, strict=False):
+        label = f"{value:.2f} us".replace(".", ",") if value < 1 else f"{value:.1f} us".replace(".", ",")
+        fps = f"{1e6 / value:,.0f}".replace(",", " ")
+        ax.annotate(f"{label}  ({fps} imagens/s)", (value * 1.35, yi), va="center",
+                    fontsize=9, color=INK)
+    ax.set_xscale("log")
+    ax.set_xlim(1e-2, 3e4)
+    ax.set_yticks(y)
+    ax.set_yticklabels(names, fontsize=9, color=INK)
+    ax.set_xlabel("Tempo por imagem (us, escala log)", color=INK)
+    ax.set_title("Tempo por imagem de cada implementação", fontsize=10, color=INK)
+    style_axis(ax)
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=200, facecolor="white")
+    plt.close(fig)
+
+
 # ------------------------------------------------------------- timing
 
 
@@ -549,6 +626,9 @@ def build(output_dir: str | Path) -> dict[str, object]:
         "741": chain_latency_us(exp / "bench_chain_741.log"),
     }
     latex_values(numpy_z, runs, timing, chain, tables / "valores_sim.tex")
+    fig_chain_waveforms(exp, images / "cadeia_critica.png")
+    fig_time_per_image(timing, chain, tables / "valores_host.tex",
+                       images / "tempo_por_imagem.png")
 
     summary = {
         "variants": {
