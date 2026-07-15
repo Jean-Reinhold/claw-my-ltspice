@@ -25,7 +25,7 @@ LTspice não a inclui automaticamente como o Micro-Cap faz.
   \item \textbf{Item 4} (Figura \ref{fig:circ-ganhos}): a fonte
         \texttt{VOS} em série com a entrada não inversora cancela o
         offset medido no item 3 (arquivo \texttt{vos\_comp.inc}, gerado
-        pelo pipeline). Sem essa compensação, o ganho alto saturaria a
+        automaticamente com o valor medido). Sem essa compensação, o ganho alto saturaria a
         saída com poucos microvolts de entrada. Para o ganho
         diferencial, repete-se a varredura do item 3. Para o ganho de
         modo comum, as duas entradas varrem juntas de \SI{-3}{\volt} a
@@ -76,31 +76,31 @@ LTspice não a inclui automaticamente como o Micro-Cap faz.
 \subsection{Modelo do OP07}
 \label{sec:modelo}
 
-O amplificador usado é o macromodelo \texttt{OP07} que vem junto com o
-LTspice 26, na biblioteca \texttt{LTC.lib}, carregado nas netlists com
-\texttt{.lib LTC.lib}. É o macromodelo da Analog Devices: um par
-diferencial de entrada com transistores de parâmetros levemente
-diferentes (o que reproduz $V_{OS}$, $I_{B+}$, $I_{B-}$ e $I_{OS}$), uma
-fonte de transcondutância de modo comum (que reproduz a CMRR finita) e
-uma limitação de corrente interna (que reproduz o slew rate). A licença
-do modelo não permite redistribuição, então o arquivo não é versionado
-no repositório. A origem está registrada em
-\texttt{models/manifest.toml} e uma cópia local para consulta pode ser
-extraída da imagem Docker com \texttt{scripts/models/extract-op07.sh}.
+O amplificador usado é o modelo \texttt{OP07} que vem instalado com o
+próprio LTspice 26, na biblioteca \texttt{LTC.lib}, carregado nas
+netlists com \texttt{.lib LTC.lib}; não foi preciso baixar nem instalar
+nada além do simulador. É o modelo da Analog Devices, e ele reproduz as
+não idealidades de propósito: o par de transistores da entrada tem
+parâmetros levemente diferentes entre si (o que gera $V_{OS}$, $I_{B+}$,
+$I_{B-}$ e $I_{OS}$), uma fonte interna deixa passar uma fração muito
+pequena do sinal de modo comum para a saída (o que gera a CMRR finita) e
+a corrente disponível para o estágio interno é limitada (o que gera o
+slew rate).
 
 \section{Procedimento de simulação}
 \label{sec:procedimento}
 
-O pipeline (\texttt{run\_all.sh} do experimento) roda em dois lotes de
-containers paralelos e independentes. Primeiro os itens 1 a 3, que não
-dependem um do outro. Depois o $V_{OS}$ medido no item 3 é gravado em
-\texttt{vos\_comp.inc}. Por fim rodam os itens 4 a 6, que usam essa
-compensação. O roteiro sugere o comando \texttt{dd(u)} do Micro-Cap para
-as derivadas. O LTspice em modo batch não tem esse recurso, então as
+Um script (\texttt{run\_all.sh}) executa tudo em duas etapas. Primeiro
+rodam os itens 1 a 3, que não dependem um do outro. Depois o $V_{OS}$
+medido no item 3 é gravado no arquivo \texttt{vos\_comp.inc}. Por fim
+rodam os itens 4 a 6, que usam essa compensação. O roteiro sugere o comando \texttt{dd(u)} do Micro-Cap para
+as derivadas. O LTspice não tem esse recurso quando roda de forma automatizada,
+então as
 derivadas $dv_{out}/dv_{in}$ (ganhos) e $dv_{out}/dt$ (slew rate,
-equivalente ao \texttt{ddt(u)}) foram calculadas numericamente por
-diferenças centrais sobre os dados dos arquivos \texttt{.raw}, com o
-script \texttt{analyze.py} do experimento, que também gera os gráficos.
+equivalente ao \texttt{ddt(u)}) foram calculadas numericamente a partir dos pontos exportados pela
+simulação, usando a diferença entre pontos vizinhos (o método de
+diferenças centrais), com o script \texttt{analyze.py}, que também gera
+os gráficos.
 As medidas pontuais (cruzamento por zero e tempos de subida) usam
 diretivas \texttt{.meas} do próprio LTspice. As netlists completas estão
 no Apêndice \ref{ap:netlist} e os passos para reproduzir tudo estão no

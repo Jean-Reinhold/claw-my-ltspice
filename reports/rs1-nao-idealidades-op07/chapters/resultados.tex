@@ -11,7 +11,7 @@ a medida deu $I_{B-}$ = \SI{1.182}{\nano\ampere} e $v_{out}$ =
   I_{OS} = |I_{B+} - I_{B-}| = |0{,}783 - 1{,}182| = \SI{0.399}{\nano\ampere}.
 \]
 
-As duas saídas fecham a conta quando se inclui o $V_{OS}$ =
+As duas saídas conferem com o esperado quando se inclui o $V_{OS}$ =
 \SI{-30.4}{\micro\volt} medido no item 3. No primeiro caso a saída
 esperada é
 \[
@@ -67,16 +67,17 @@ curva fica centrada na origem e a derivada numérica $dv_{out}/dv_{in}$
   A_{vd} = 499\,888 \approx \SI{500}{\volt\per\milli\volt}
   \qquad (20\log_{10} 499\,888 = \SI{114.0}{\decibel}).
 \]
-Uma estimativa independente por secante, feita com \texttt{.meas} entre
-$v_{in}$ = \SI{-10}{\micro\volt} e \SI{+10}{\micro\volt}, dá o mesmo
-valor (499\,888), o que confirma a derivada. O resultado fica um pouco
+Uma segunda estimativa, feita de outra forma (a inclinação da reta
+entre os pontos $v_{in}$ = \SI{-10}{\micro\volt} e
+\SI{+10}{\micro\volt}, medida com \texttt{.meas}), dá o mesmo valor (499\,888), o que confirma a derivada. O resultado fica um pouco
 acima do típico do OP07C (\SI{400}{\volt\per\milli\volt}, mínimo
 \SI{120}{\volt\per\milli\volt}) e coincide com o típico do OP07E
 (\SI{500}{\volt\per\milli\volt}).
 
 No caso de modo comum (Figura \ref{fig:item5}), a saída varia pouco em
 toda a varredura de $\pm$\SI{3}{\volt} e a derivada dá $A_{cm}$ =
-0,2494. A secante entre $\pm$\SI{1}{\volt} (\texttt{.meas}) dá 0,2493,
+0,2494. A inclinação medida entre $\pm$\SI{1}{\volt} com \texttt{.meas} dá
+0,2493,
 praticamente o mesmo. No amplificador ideal o ganho diferencial seria
 infinito e o de modo comum seria zero.
 
@@ -133,9 +134,8 @@ O patamar da derivada no tempo (mediana na rampa) dá o mesmo valor,
 \SI{0.260}{\volt\per\micro\second}. Os dois são compatíveis com o típico
 de \SI{0.3}{\volt\per\micro\second} da folha de dados (mínimo
 \SI{0.1}{\volt\per\micro\second}) e também com a estrutura interna do
-macromodelo, que carrega a capacitância de compensação de
-\SI{30}{\pico\farad} com a corrente de \SI{7.5}{\micro\ampere} do par de
-entrada: $7{,}5\,\mu\mathrm{A}/30\,\mathrm{pF}$ =
+modelo, em que uma corrente de \SI{7.5}{\micro\ampere} carrega a
+capacitância interna de \SI{30}{\pico\farad}: $7{,}5\,\mu\mathrm{A}/30\,\mathrm{pF}$ =
 \SI{0.25}{\volt\per\micro\second}. No amplificador ideal a saída
 acompanharia o degrau sem atraso.
 
@@ -153,7 +153,7 @@ acompanharia o degrau sem atraso.
 \label{sec:derivadas}
 
 Como os ganhos e o slew rate vêm de derivadas calculadas numericamente
-(diferenças centrais sobre os pontos do \texttt{.raw}), três problemas
+(diferença entre pontos vizinhos dos dados da simulação), três problemas
 potenciais foram verificados:
 
 \begin{enumerate}
@@ -178,17 +178,18 @@ potenciais foram verificados:
         ponto da varredura vem de uma solução independente do
         simulador, então a derivada ponto a ponto poderia amplificar o
         ruído numérico; além disso o primeiro e o último ponto usam
-        diferença unilateral, menos precisa, e por isso ficam fora da
-        busca do máximo. A verificação mostrou que o efeito é pequeno:
-        no item 4 o máximo da derivada e a secante por \texttt{.meas}
-        dão o mesmo 499\,888; no item 5 a derivada varia só de 0,2492 a
-        0,2494 ao longo de toda a varredura (0,06\% de espalhamento) e
-        a secante dá 0,2493. Recalcular a derivada com bases maiores (5,
-        25 e 100 pontos) muda o resultado em menos de 0,05\%.
+        diferença unilateral, menos precisa, e por isso não entram na
+        procura do máximo. A verificação mostrou que o efeito é pequeno:
+        no item 4 o máximo da derivada e a inclinação medida com
+        \texttt{.meas} dão o mesmo 499\,888; no item 5 a derivada varia só de 0,2492 a
+        0,2494 ao longo de toda a varredura (variação de 0,06\%) e a
+        inclinação medida dá 0,2493. Recalcular a derivada usando pontos
+        mais espaçados (5, 25 e 100 passos de distância) muda o
+        resultado em menos de 0,05\%.
 \end{enumerate}
 
-Em resumo, cada valor derivado ($A_{vd}$, $A_{cm}$ e SR) foi confirmado
-por um segundo estimador independente.
+Em resumo, cada valor obtido por derivada ($A_{vd}$, $A_{cm}$ e SR) foi
+confirmado por uma segunda medida, feita de outra forma.
 
 \subsection{Síntese e discussão}
 
@@ -215,7 +216,7 @@ por um segundo estimador independente.
 \end{table}
 
 Todos os parâmetros ficaram dentro das faixas do fabricante, o que era
-esperado, já que o macromodelo da Analog Devices é ajustado para
+esperado, já que o modelo da Analog Devices é ajustado para
 reproduzir os valores típicos da folha de dados (as páginas de
 especificações estão no Apêndice \ref{ap:datasheet}). As diferenças que
 sobram têm duas causas principais. Primeiro, o modelo representa um

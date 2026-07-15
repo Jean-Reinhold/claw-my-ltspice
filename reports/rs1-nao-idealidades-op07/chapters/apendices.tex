@@ -5,7 +5,7 @@
 
 Netlists exatamente como foram simuladas (LTspice 26 em Docker,
 \texttt{./claw-spice sim run}). O arquivo \texttt{vos\_comp.inc} é
-gerado pelo pipeline com o $V_{OS}$ medido no item 3 e define o
+gerado automaticamente com o $V_{OS}$ medido no item 3 e define o
 parâmetro \texttt{VOSC} usado nos itens 4 a 6.
 
 \subsection*{Item 1: \texttt{item1\_bias.cir}}
@@ -74,7 +74,7 @@ XU1 vin 0 vcc vee out OP07
 * mantendo o amplificador na regiao linear em torno de Vin=0.
 * Avd = max |d V(out) / d Vin| (derivada numerica calculada em analyze.py,
 * equivalente ao comando dd(u) do Micro-Cap). As .meas abaixo dao uma
-* estimativa por secante em +/-10 uV.
+* estimativa pela inclinacao entre -10 uV e +10 uV.
 .lib LTC.lib
 .include vos_comp.inc
 VCC vcc 0 15
@@ -188,13 +188,12 @@ desempenho dinâmico do OP07C (página 5).
 # o script usa o espelho do Internet Archive)
 scripts/models/fetch-op07-datasheet.sh
 
-# pipeline: lotes paralelos de containers + medidas + graficos
+# simulacoes + medidas + graficos
 experiments/rs1-nao-idealidades-op07/run_all.sh
 
 # relatorio
 ./claw-spice report rs1-nao-idealidades-op07
 \end{verbatim}
 
-O pós-processamento (derivadas por diferenças centrais, extração de
-medidas e geração dos gráficos) está no script \texttt{analyze.py} do
-experimento. Os resultados numéricos ficam em \texttt{results.json}.
+O cálculo das derivadas, a extração das medidas e a geração dos
+gráficos estão no script \texttt{analyze.py} do experimento. Os resultados numéricos ficam em \texttt{results.json}.

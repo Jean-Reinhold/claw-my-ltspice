@@ -3,7 +3,7 @@
 * mantendo o amplificador na regiao linear em torno de Vin=0.
 * Avd = max |d V(out) / d Vin| (derivada numerica calculada em analyze.py,
 * equivalente ao comando dd(u) do Micro-Cap). As .meas abaixo dao uma
-* estimativa por secante em +/-10 uV.
+* estimativa pela inclinacao entre -10 uV e +10 uV.
 .lib LTC.lib
 .include vos_comp.inc
 VCC vcc 0 15
