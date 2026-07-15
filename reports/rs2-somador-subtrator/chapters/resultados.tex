@@ -57,8 +57,9 @@ em fase (coeficiente positivo) e $v_{in3}$ sai invertida.
   \includegraphics[width=0.49\textwidth]{rs2_vin3_out.png}\\
   \includegraphics[width=0.49\textwidth]{rs2_vin4_out.png}
   \includegraphics[width=0.49\textwidth]{rs2_vin5_out.png}
-  \caption{Saída com somente $v_{in2}$ (esq. acima), $v_{in3}$ (dir.
-  acima), $v_{in4}$ (esq. abaixo) e $v_{in5}$ (dir. abaixo) ativas.}
+  \caption{Saída com somente $v_{in2}$ (acima, à esquerda), $v_{in3}$
+  (acima, à direita), $v_{in4}$ (abaixo, à esquerda) e $v_{in5}$
+  (abaixo, à direita) ativas.}
   \label{fig:individual-resto}
 \end{figure}
 
@@ -66,7 +67,7 @@ em fase (coeficiente positivo) e $v_{in3}$ sai invertida.
 \label{sec:res-blocos}
 
 Nos ensaios por bloco, a saída de cada bloco foi comparada ponto a
-ponto com a sua função calculada por uma fonte comportamental. O erro
+ponto com a sua função, calculada em paralelo pelo simulador. O erro
 máximo foi $1{,}89\times10^{-4}$~V no bloco A e $1{,}59\times10^{-4}$~V no bloco B. Esses
 valores são pequenos e correspondem ao erro esperado para um ganho de
 malha aberta finito de 200 mil. No bloco C o ganho diferencial medido
@@ -80,8 +81,8 @@ Figura~\ref{fig:blocoab} mostra as formas de onda dos blocos A e B.
   \centering
   \includegraphics[width=0.49\textwidth]{rs2_bloco_a_vout1.png}
   \includegraphics[width=0.49\textwidth]{rs2_bloco_b_vout2.png}
-  \caption{Saída do bloco A (esquerda) e do bloco B (direita) com
-  estímulo multi-tom.}
+  \caption{Saída do bloco A (esquerda) e do bloco B (direita) no teste
+  com vários senos somados.}
   \label{fig:blocoab}
 \end{figure}
 
@@ -95,8 +96,8 @@ $2{,}71\times10^{-4}$~V, para uma excursão de $-5{,}71$ a $+5{,}71$~V
 comercial do LM741, o erro máximo subiu para $0{,}275$~V (RMS de
 $0{,}123$~V), abaixo de 5\% da excursão. A causa dominante é o polo
 do LM741 real em \SI{5}{\hertz}: nas frequências do ensaio o ganho de
-malha aberta cai para perto de mil, então cada estágio regula um pouco
-pior que no modelo ideal. Soma-se a isso o offset de entrada de
+malha aberta cai para perto de mil, então o erro de cada estágio
+aumenta em relação ao modelo ideal. Soma-se a isso o offset de entrada de
 \SI{1}{\milli\volt}, multiplicado pelos ganhos até a saída. O
 comportamento continua o projetado, como mostra a
 Figura~\ref{fig:vendor}.
@@ -123,14 +124,14 @@ A cascata de somadores inversores resolve a restrição do bloco A sem
 precisar de divisores na entrada não inversora: o sinal positivo de
 $v_{in3}$ vem da dupla inversão e cada ganho depende de uma única
 razão de resistores. O amplificador de instrumentação junta os dois
-blocos sem carregá-los, porque os buffers têm alta impedância de
-entrada.
+blocos sem carregá-los, porque o seu estágio de entrada tem alta
+impedância.
 
-Ficam duas observações práticas. Primeira: os resistores de $100/9$ e
+Duas observações práticas. Primeira: os resistores de $100/9$ e
 $100/2{,}8$ \si{\kilo\ohm} não existem na série E96. Numa montagem
 real seriam usadas associações (por exemplo 11k mais 110, e 35,7k, que
 é valor de série), com erro da ordem da tolerância dos componentes.
 Segunda: os ganhos altos (módulo $112{,}5$) limitam a amplitude de
-entrada. Acima de uns \SI{120}{\milli\volt} de pico em $v_{in1}$ ou
-$v_{in6}$ a saída satura nos trilhos. Todos os ensaios respeitaram
+entrada. Acima de cerca de \SI{120}{\milli\volt} de pico em $v_{in1}$ ou
+$v_{in6}$ a saída satura no limite da alimentação. Todos os ensaios respeitaram
 esse limite.

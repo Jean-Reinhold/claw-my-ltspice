@@ -4,7 +4,7 @@
 \label{ap:netlist}
 
 Netlist \texttt{rs2\_completo.cir} exatamente como foi simulada
-(ensaio global com a referência comportamental ideal):
+(teste global com a referência ideal calculada pelo simulador):
 
 {\small
 \begin{verbatim}
@@ -172,7 +172,7 @@ Apêndice~A, com estas diferenças:
 
 {\small
 \begin{verbatim}
-.include lm741_vendor.lib          (macromodelo de Boyle da TI)
+.include lm741_vendor.lib          (macromodelo comercial da TI)
 XA1 ... XC3 usam o subcircuito LM741 no lugar de LM741_LEVEL1
 .options method=Gear
 .options cshunt=10p abstol=1e-9 vntol=10u
@@ -180,10 +180,10 @@ XA1 ... XC3 usam o subcircuito LM741 no lugar de LM741_LEVEL1
 \end{verbatim}
 }
 
-O integrador Gear e as opções de convergência foram necessários porque
-o macromodelo de Boyle oscila numericamente com o integrador
-trapezoidal padrão; 10 ms cobrem um período completo do estímulo
-multi-tom (fundamental de \SI{100}{\hertz}).
+Essas opções numéricas foram necessárias porque o macromodelo
+comercial tem dificuldade de convergência com a configuração padrão do
+simulador; 10 ms cobrem um período completo do teste (as frequências
+são múltiplas de \SI{100}{\hertz}).
 
 \section{Código gerador}
 \label{ap:codigo}

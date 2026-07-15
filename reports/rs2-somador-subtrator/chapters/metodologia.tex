@@ -24,8 +24,8 @@ E96, como comentado na Seção~\ref{sec:discussao}.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{rs2_bloco_a.png}
-  \caption{Bloco A: somadores inversores XA1 e XA2, com as fontes do
-  ensaio multi-tom.}
+  \caption{Bloco A: somadores inversores XA1 e XA2, com as fontes de teste
+  (senos de frequências diferentes).}
   \label{fig:esq-bloco-a}
 \end{figure}
 
@@ -49,7 +49,7 @@ $v_{in6}$ de sinal negativo (uma inversão):
 \subsection{Bloco C, amplificador de instrumentação}
 
 O bloco C é o amplificador de instrumentação clássico de três
-amplificadores operacionais: dois buffers de entrada com ganho
+amplificadores operacionais: dois amplificadores de entrada com ganho
 diferencial $1+2R/R_g$ e um subtrator de ganho $R_5/R_3$. O ganho
 total pedido é $G/2 = 12{,}5$. Ele foi dividido em $5\times2{,}5$ para
 que todos os resistores tivessem valores redondos:
@@ -60,7 +60,8 @@ que todos os resistores tivessem valores redondos:
 A saída $v_{out2}$ entra pelo caminho não inversor e $v_{out1}$ pelo
 inversor, o que dá $v_{out}=12{,}5(v_{out2}-v_{out1})$. Além do ganho,
 o amplificador de instrumentação tem alta impedância de entrada, então
-não carrega os blocos A e B, e rejeita o modo comum, o que é
+não carrega os blocos A e B, e cancela sinais iguais aplicados às
+duas entradas (modo comum), o que é
 verificado na Seção~\ref{sec:res-blocos}.
 
 \begin{figure}[htb]
@@ -87,7 +88,7 @@ verificado na Seção~\ref{sec:res-blocos}.
     B & RB1, RB2 / RBF1 & 20k, 10k / 40k & $v_{in4}$: $-2$; $v_{in5}$: $-4$ \\
     B & RB3, RB4 / RBF2 & 10k, 90k / 90k & $v_{in6}$: $-9$; $v_B$: $-1$ \\
     \midrule
-    C & RC1, RC2 & 10k & realimentação dos buffers \\
+    C & RC1, RC2 & 10k & realimentação do estágio de entrada \\
     C & RCG & 5k & $R_g$ (ganho de entrada 5) \\
     C & RC3, RC4 & 10k & entradas do subtrator \\
     C & RC5, RC6 & 25k & subtrator com ganho 2{,}5 \\
@@ -102,8 +103,9 @@ O roteiro pede o modelo LM741 Level 1 (modelo ideal) do Micro-Cap.
 Como o LTspice não tem esse modelo, implementamos um equivalente
 chamado \texttt{LM741\_LEVEL1}: ganho de malha aberta de 200 mil,
 resistência de entrada de \SI{2}{\mega\ohm}, resistência de saída de
-\SI{75}{\ohm} e saída limitada aos trilhos de alimentação, sem polos e
-sem limite de slew rate, já que nível 1 significa modelo ideal. Esses
+\SI{75}{\ohm} e saída limitada pela tensão de alimentação, sem polos e sem limite de
+velocidade de resposta (slew rate), já que nível 1 significa modelo
+ideal. Esses
 são os valores típicos da folha de dados do LM741 da Texas Instruments
 (documento SNOSC25D), reproduzida na
 Figura~\ref{fig:datasheet-eletricas}.
@@ -121,7 +123,7 @@ A alimentação de $\pm$\SI{15}{\volt}, que o Micro-Cap adiciona
 sozinho, foi incluída explicitamente com as fontes VCC e VEE. Para
 conferir se o modelo ideal não esconde nenhum efeito importante, o
 circuito completo também foi simulado com o macromodelo comercial do
-LM741 da Texas Instruments, que inclui polos, offset e slew rate de
+LM741 da Texas Instruments, que inclui polos, tensão de offset e slew rate de
 \SI{0.5}{\volt\per\micro\second}. Nas frequências e amplitudes usadas
 no ensaio, a maior taxa de variação exigida é de cerca de
 \SI{0.07}{\volt\per\micro\second} e a menor largura de banda de malha
@@ -149,8 +151,8 @@ bloco A acima, bloco B abaixo e bloco C à direita, ligados pelos nós
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{rs2_completo.png}
-  \caption{Circuito completo (blocos A, B e C) com as fontes do ensaio
-  global multi-tom.}
+  \caption{Circuito completo (blocos A, B e C) com as fontes do teste
+  global.}
   \label{fig:esquematico}
 \end{figure}
 
@@ -159,8 +161,8 @@ bloco A acima, bloco B abaixo e bloco C à direita, ligados pelos nós
 
 As netlists e os esquemáticos são gerados pelo mesmo script Python
 (Apêndice~B), o que garante que o circuito desenhado é o mesmo que foi
-simulado. Foram feitas três famílias de análises transientes, cada uma
-rodando em um contêiner Docker separado, em paralelo:
+simulado. Foram feitos três grupos de simulações no tempo, cada
+simulação rodando em um contêiner Docker separado, em paralelo:
 
 \begin{enumerate}
   \item \textbf{Resposta individual} (\texttt{rs2\_vin1.cir} a
@@ -173,15 +175,15 @@ rodando em um contêiner Docker separado, em paralelo:
         $v_{out2}$).
   \item \textbf{Função global} (\texttt{rs2\_completo.cir}): as seis
         entradas recebem senos de \SI{20}{\milli\volt} em frequências
-        diferentes (500 a \SI{1500}{\hertz}). Uma fonte comportamental
-        calcula a função ideal em paralelo e mede-se o erro máximo e o
-        erro RMS entre o circuito e o ideal. As amplitudes foram
+        diferentes (500 a \SI{1500}{\hertz}). Uma fonte auxiliar do
+        simulador calcula a função ideal em paralelo e mede-se o erro
+        máximo e o erro RMS entre o circuito e o ideal. As amplitudes foram
         escolhidas para o pior caso ficar perto de \SI{7.3}{\volt},
         abaixo dos \SI{14}{\volt} de excursão máxima, sem saturação.
   \item \textbf{Validação por bloco}
         (\texttt{rs2\_bloco\_a.cir}, \texttt{b}, \texttt{c}): cada
-        bloco isolado com estímulo multi-tom, comparado com a sua
-        função. No bloco C aplica-se \SI{1}{\volt} de modo comum mais
+        bloco isolado recebe senos de frequências diferentes e a saída
+        é comparada com a sua função. No bloco C aplica-se \SI{1}{\volt} de modo comum mais
         um diferencial senoidal de \SI{0.4}{\volt}, medindo o ganho
         diferencial e a rejeição de modo comum.
 \end{enumerate}
