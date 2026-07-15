@@ -1,0 +1,29 @@
+\section{Conclusão}
+\label{sec:conclusao}
+
+Deu para construir. A rede treinada sob as regras do circuito passou de
+\SI{97}{\percent} de acurácia no MNIST reduzido, e a tradução para
+hardware é literal: cada um dos 5451 pesos é um resistor E96 em um
+somador inversor, a ReLU é a saturação do próprio AmpOp em trilhos
+assimétricos e a decisão final é um comparador por dígito. No LTspice,
+tanto com o AmpOp ideal quanto com o LM741, o circuito reproduziu o
+modelo nas saídas que decidem (milivolts de erro no ideal, dezenas de
+milivolts no 741) e acendeu o comparador certo, e somente ele, nas
+vinte imagens da bateria de teste.
+
+A comparação com software ficou equilibrada para uma imagem sozinha: o
+circuito com 741 decide em dezenas de microssegundos, na mesma ordem de
+grandeza da inferência avulsa em numpy neste Mac. O computador ganha
+com folga quando processa em lote, e o custo de levar o formato a um
+chip só se justifica com requisitos fortes de latência e consumo. O
+valor do experimento está no que ele deixa visível: neurônios saturando
+no trilho, o terra virtual segurando o nó de soma e um padrão interno
+diferente para cada dígito, tudo medido em tensões.
+
+Como próximos passos, seria interessante rodar Monte Carlo com
+tolerância de \SI{1}{\percent} nos resistores e offset real dos
+amplificadores para estimar o rendimento de uma montagem física;
+repetir a rodada com um AmpOp moderno que chega até os trilhos
+(rail-to-rail), o que dispensaria a
+calibração de trilhos exigida pelo 741; e podar a rede com foco em
+custo de hardware até caber em uma montagem discreta de bancada.

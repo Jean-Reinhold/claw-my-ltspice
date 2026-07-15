@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "ideal": {
+      "logit_err_mean_mv": 1.265808153389924,
+      "logit_err_max_mv": 5.451412289999347,
+      "fire_latency_us_median": 6.007725125580343,
+      "fire_latency_us_max": 8.940266442360844
+    },
+    "741": {
+      "logit_err_mean_mv": 156.90824714895123,
+      "logit_err_max_mv": 1362.3731232100004,
+      "fire_latency_us_median": 38.637282165279615,
+      "fire_latency_us_max": 48.35442327567851
+    }
+  }
+}

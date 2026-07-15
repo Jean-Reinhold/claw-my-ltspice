@@ -1,0 +1,193 @@
+\section{Resultados}
+\label{sec:resultados}
+
+\subsection{Um dígito atravessando a rede}
+
+A Figura~\ref{fig:amostra-saidas} resume o experimento em uma imagem.
+Um dígito 3 do conjunto de teste entra como 64 tensões e a camada de
+saída inteira é medida. A saída $z_3$ é a única acima do trilho
+$V_{TH}=\SI{2,65}{\volt}$, então só o comparador do 3 satura no nível
+alto. Os outros nove ficam em \SI{0}{\volt}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{amostra_saidas.png}
+  \caption{Uma amostra, todas as saídas: as dez tensões $V(z_k)$ e os
+  dez comparadores $V(out_k)$ medidos no LTspice (variante LM741) para
+  um dígito 3 do conjunto de teste.}
+  \label{fig:amostra-saidas}
+\end{figure}
+
+Na sequência completa, com um dígito novo a cada
+\SI{250}{\micro\second}, o comportamento se repete janela após janela
+(Figura~\ref{fig:ondas}): quando a imagem troca, a saída $z$ do novo
+dígito cruza $V_{TH}$ e o comparador correspondente dispara. A
+Figura~\ref{fig:heatmap} mostra as vinte janelas de uma vez. A diagonal
+de células escuras sobre os contornos vermelhos é a rede acertando as
+vinte imagens.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{formas_de_onda.png}
+  \caption{Dez janelas de \SI{250}{\micro\second}: as dez saídas $z$ (acima) e o
+  comparador do dígito correto (abaixo).}
+  \label{fig:ondas}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{comparadores_heatmap.png}
+  \caption{As vinte janelas de teste: tensão dos dez comparadores em
+  cada janela; o contorno vermelho marca o dígito apresentado.}
+  \label{fig:heatmap}
+\end{figure}
+
+\subsection{Estados internos}
+
+O arquivo \texttt{.raw} da variante com AmpOp ideal guarda os 120
+neurônios ocultos, então dá para ver o que o circuito está fazendo por
+dentro. É aqui que o experimento
+vira eletrônica de verdade: cada fenômeno da rede neural corresponde a
+um comportamento clássico de AmpOp, medível com o cursor em cima da
+forma de onda. A Figura~\ref{fig:estados} mostra as quatro camadas
+ocultas no instante em que o dígito 3 está na entrada: a maior parte
+dos neurônios está desligada (\SI{0}{\volt}, AmpOp saturado no trilho
+de baixo), alguns operam na região linear e uns poucos encostam no teto
+de \SI{4,8}{\volt}. A ReLU do modelo é literalmente o estágio de saída
+do amplificador batendo no trilho.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{estados_internos.png}
+  \caption{Estados internos com o dígito 3 na entrada: tensão de saída
+  de cada neurônio oculto, camada por camada.}
+  \label{fig:estados}
+\end{figure}
+
+A Figura~\ref{fig:atividade} acompanha a última camada oculta (16
+neurônios) ao longo das vinte janelas: cada dígito acende uma
+combinação própria de neurônios, e é esse padrão que a camada de saída
+converte em um único comparador aceso. A Figura~\ref{fig:terra} mostra
+os dois regimes do somador no mesmo gráfico. Enquanto o amplificador
+está na região linear, o nó de soma fica parado no terra virtual, e é
+isso que garante que a soma dos pesos seja só uma soma de correntes em
+resistores. Quando a saída satura em \SI{0}{\volt} (a ReLU cortando o
+neurônio), a realimentação abre e o nó de soma foge algumas centenas de
+milivolts do zero. A saturação que faz a ativação e a perda do terra
+virtual são o mesmo evento, visto de dois nós diferentes.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{atividade_oculta.png}
+  \caption{Última camada oculta ao longo das vinte janelas: o padrão
+  interno de cada dígito.}
+  \label{fig:atividade}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{terra_virtual.png}
+  \caption{Saída do neurônio $a^{(4)}_7$ (acima) e o seu nó de soma em
+  escala de milivolts (abaixo): terra virtual na região linear; quando
+  a saída satura, a malha abre e o nó se afasta do zero.}
+  \label{fig:terra}
+\end{figure}
+
+\subsection{Modelo ideal, LM741 e software}
+\label{sec:medidas}
+
+A Tabela~\ref{tab:medidas} compara, para as dez primeiras janelas, a
+saída $z$ do dígito correto no modelo em software e nas duas simulações. A
+Figura~\ref{fig:scatter} estende a comparação às 200 medidas de $z$
+de cada variante. Com o AmpOp ideal o erro fica em
+\vErrIdealMedio~\si{\milli\volt} na média. Com o LM741 o erro médio
+sobe para \vErrLmMedio~\si{\milli\volt}, mas ele se concentra na
+região bem negativa, dos dígitos rejeitados, onde offset, ganho finito
+e a saturação real do 741 se acumulam sem afetar nada: essas saídas
+ficam volts abaixo do trilho de comparação. Nas saídas que importam,
+as que cruzam $V_{TH}$, a diferença para o modelo é de uns
+\SI{17}{\milli\volt}, que é só a folga entre a saturação calibrada do
+741 (\SI{4,82}{\volt}) e o teto de \SI{4,8}{\volt} do modelo. A coluna
+``maior errada'' da tabela mostra a folga: nas vinte janelas, a maior
+saída errada nunca passou de \SI{0,29}{\volt}, mais de \SI{2,3}{\volt}
+abaixo do trilho de comparação. Por isso a decisão não muda:
+\vDisparosLm~das 20 janelas terminaram com disparo único e correto.
+
+\begin{table}[htb]
+  \centering
+  \caption{Saída $z$ do dígito correto em cada janela: modelo em software,
+  circuito com AmpOp ideal e circuito com LM741. Disparo indica que
+  apenas o comparador certo acendeu (variante LM741).}
+  \label{tab:medidas}
+  \input{gerado/tabela_medidas}
+\end{table}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.66\textwidth]{logits_spice_vs_numpy.png}
+  \caption{Saídas $z$ medidas contra o modelo: AmpOp ideal e LM741.}
+  \label{fig:scatter}
+\end{figure}
+
+No conjunto de teste completo (\num{10000} imagens), o modelo com os
+valores E96 acerta \SI{97,15}{\percent} quando a resposta é o neurônio
+de maior saída. Em
+\SI{96,44}{\percent} das imagens o critério do comparador funciona de
+forma limpa (só o neurônio certo acima de $V_{TH}$), em
+\SI{0,86}{\percent} nenhum comparador acende e em \SI{0,51}{\percent}
+mais de um acende. A matriz de confusão está na
+Figura~\ref{fig:confusao}; os erros se concentram nos pares esperados
+em baixa resolução, como 4 com 9 e 5 com 3.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.68\textwidth]{matriz_confusao.png}
+  \caption{Matriz de confusão no conjunto de teste (resposta pelo
+  neurônio de maior saída).}
+  \label{fig:confusao}
+\end{figure}
+
+\subsection{Tempo de inferência e custo}
+\label{sec:tempo-custo}
+
+No circuito, a inferência é o tempo de acomodação: da troca da imagem
+na entrada até o comparador correto cruzar o nível de decisão. A
+Figura~\ref{fig:transicao} amplia uma dessas trocas e compara as duas
+variantes. Com o AmpOp ideal a saída acompanha a entrada quase
+instantaneamente; com o LM741 dá para ver a rampa do slew rate de uns
+\SI{0,5}{\volt\per\micro\second} atravessando os cinco estágios até o
+comparador virar. Medindo nas formas de onda do LM741, a mediana da
+latência fica em \vLatenciaLmMediana~\si{\micro\second} e o pior caso
+em \vLatenciaLmMax~\si{\micro\second}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{transicao_janela.png}
+  \caption{Uma troca de imagem ampliada: saída $z$ do dígito correto
+  (acima) e comparador (abaixo), com o AmpOp ideal e com o LM741.}
+  \label{fig:transicao}
+\end{figure}
+
+No computador (este Mac, numpy nativo), o mesmo modelo responde em
+\SI{\vMacUmaImagem}{\micro\second} para uma imagem avulsa, e em
+\SI{\vMacLote}{\micro\second} por imagem quando processa \num{10000} de
+uma vez. Para uma imagem sozinha, a rede de AmpOps de 1968 fica na
+mesma ordem de grandeza do processador; o computador ganha longe quando
+trabalha em lote. Com AmpOps modernos, de slew rate cem vezes maior, a
+latência do circuito cairia para menos de um microssegundo.
+
+Sobre custo, em ordens de grandeza. Montar esta rede com componentes
+discretos (260 LM741, quase 6000 resistores de precisão e as placas
+para tudo isso) fica na casa de poucos milhares de reais, e o resultado
+ocupa uma bandeja inteira. Integrar a mesma topologia em um chip
+analógico configurável, com AmpOps pequenos e resistores programáveis
+guardando os pesos em um processo maduro de \SI{180}{\nano\metre},
+daria um chip de algumas dezenas de \si{\milli\metre\squared}: o custo
+por chip em volume é de poucos dólares, mas o custo fixo de projeto e
+máscaras fica na casa das centenas de milhares de dólares. Enquanto
+isso, um microcontrolador de poucos reais roda o mesmo modelo em
+software em alguns milissegundos. A conclusão honesta é que o formato
+analógico só compensa quando latência de microssegundos e consumo muito
+baixo são requisitos de verdade. Como ferramenta didática, porém, ele
+tem um valor difícil de bater: cada peso da rede é um resistor que dá
+para apontar no esquemático.

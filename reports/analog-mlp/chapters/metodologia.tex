@@ -1,0 +1,157 @@
+\section{Projeto}
+\label{sec:projeto}
+
+\subsection{O neurônio com amplificadores operacionais}
+\label{sec:neuronio}
+
+O bloco básico é o somador inversor com realimentação
+$R_f = \SI{100}{\kilo\ohm}$. A saída é a soma das entradas, cada uma
+com ganho $R_f/R_i$:
+%
+\[ v_{\mathrm{out}} = -R_f\left(\frac{v_1}{R_1} + \frac{v_2}{R_2} +
+   \dots\right). \]
+%
+Um peso $w$ da rede vira um resistor $R_i = R_f/|w|$. Um peso de
+$0{,}77$, por exemplo, vira \SI{130}{\kilo\ohm}; um peso de $0{,}1$
+vira \SI{1}{\mega\ohm}.
+
+Faltam três detalhes, e todos se resolvem com mais AmpOps. Primeiro, o
+sinal do peso: o somador inverte tudo, então cada neurônio publica
+também uma cópia negada da sua saída, feita com um inversor de ganho 1
+(dois resistores de \SI{100}{\kilo\ohm}). Peso positivo entra pelo
+trilho negado e peso negativo pelo trilho direto. Assim todos os
+resistores são positivos e a soma sai com o sinal certo. O termo de
+polarização de cada neurônio usa o mesmo truque, com trilhos fixos de
+$\pm\SI{1}{\volt}$.
+
+Segundo, a ativação. Aqui não entra circuito nenhum. O somador dos
+neurônios ocultos é alimentado com $+\SI{5}{\volt}$ e
+$-\SI{0,2}{\volt}$, e o AmpOp satura a \SI{0,2}{\volt} dos trilhos.
+A saída então só existe entre \SI{0}{\volt} e \SI{4,8}{\volt}, que é
+uma ReLU com teto. O próprio AmpOp é a função de ativação. Os
+somadores da camada de saída usam alimentação simétrica e ficam
+lineares.
+
+Terceiro, a decisão. A saída de cada um dos dez somadores finais, a
+tensão $z_k$ do dígito $k$, entra em um AmpOp
+em malha aberta, comparando com um trilho comum de
+$V_{TH} = \SI{2,65}{\volt}$. Saída acima do trilho satura o comparador
+no nível alto; abaixo, no nível baixo. Para cada imagem, um único
+comparador deve acender.
+
+A Figura~\ref{fig:esq-neuronio} mostra um neurônio oculto real da rede
+treinada, com os valores E96 dos resistores. A
+Figura~\ref{fig:esq-saida} mostra a cadeia completa de um dígito, do
+somador da saída $z_3$ ao comparador.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{neuronio_oculto.png}
+  \caption{Neurônio oculto $a^{(4)}_7$ como está no netlist. À
+  esquerda, o somador inversor alimentado com \SI{5}{\volt} e
+  \SI{-0,2}{\volt} (a saturação em \SI{0}{\volt} faz a ReLU). À
+  direita, o inversor que gera o trilho negado para a camada seguinte.}
+  \label{fig:esq-neuronio}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{neuronio_saida.png}
+  \caption{Cadeia de saída do dígito 3: somador da saída $z_3$ e
+  comparador contra o trilho $V_{TH}=\SI{2,65}{\volt}$, com carga de
+  \SI{100}{\kilo\ohm}.}
+  \label{fig:esq-saida}
+\end{figure}
+
+\subsection{Treinamento com as regras do circuito}
+\label{sec:treinamento}
+
+Cada imagem do MNIST ($28\times 28$) é recortada para $24\times 24$ e
+reduzida por média em blocos de $3\times 3$, virando 64 tensões entre
+\SI{0}{\volt} e \SI{1}{\volt} (Figura~\ref{fig:amostras}). Com as 784
+entradas originais o circuito precisaria de dezenas de milhares de
+resistores; com 64 ele fica em um tamanho construível.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{amostras_digitos.png}
+  \caption{Dígitos do conjunto de teste como o MNIST fornece
+  ($28\times 28$, acima) e como a rede recebe ($8\times 8$, abaixo).}
+  \label{fig:amostras}
+\end{figure}
+
+O treinamento foi implementado em numpy, com o procedimento usual de
+redes neurais (retropropagação), usando a mesma matemática do circuito. A ativação dos
+neurônios ocultos é o recorte entre \SI{0}{\volt} e \SI{4,8}{\volt}, a
+mesma saturação do somador. A perda trata cada neurônio de saída como
+uma decisão independente: a saída $z$ do dígito certo é empurrada para
+cima de $V_{TH}$ e os outros para baixo. É isso que faz um único
+comparador acender por imagem.
+
+Depois de 40 épocas, os pesos menores que $0{,}04$ são removidos (um
+peso desses precisaria de um resistor acima de \SI{2,5}{\mega\ohm} para
+quase não contribuir) e a rede treina mais 12 épocas sem eles. No fim,
+cada peso é arredondado para o valor E96 mais próximo. O modelo final
+avaliado em software usa exatamente os mesmos números que os resistores
+do netlist. A Figura~\ref{fig:treinamento} mostra a evolução do
+treinamento; a linha tracejada marca a poda. Dos \num{6050} pesos,
+\num{5451} sobrevivem.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{curvas_treinamento.png}
+  \caption{Perda de treinamento e acurácias de validação. Disparo exato
+  quer dizer que só o comparador do dígito correto acendeu.}
+  \label{fig:treinamento}
+\end{figure}
+
+\subsection{A rede completa e as simulações}
+\label{sec:rede}
+
+O gerador lê os pesos treinados e escreve o netlist da rede inteira:
+130 somadores, 120 inversores de trilho e 10 comparadores, num total de
+260 AmpOps e 5831 resistores. A Figura~\ref{fig:topologia} mostra a
+topologia que sobrou depois da poda e a Figura~\ref{fig:resistores}
+mostra a distribuição dos resistores, todos entre uns
+\SI{56}{\kilo\ohm} e \SI{5}{\mega\ohm}, valores comuns de prateleira.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{rede_topologia.png}
+  \caption{A rede treinada: cada linha é um resistor de entrada de um
+  somador (azul: peso positivo, pelo trilho negado; laranja: peso
+  negativo, pelo trilho direto).}
+  \label{fig:topologia}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{histograma_resistores.png}
+  \caption{Os \num{5451} resistores de peso ($R_i = R_f/|w|$, série
+  E96).}
+  \label{fig:resistores}
+\end{figure}
+
+Foram geradas duas versões do mesmo circuito. A primeira usa um modelo
+ideal de AmpOp (ganho $10^5$, saturação a \SI{0,2}{\volt} dos trilhos).
+A segunda usa o macromodelo comercial do LM741. Como o 741 não chega
+perto dos trilhos, as alimentações dessa versão foram calibradas em uma
+bancada separada (\texttt{bench\_741\_sat.cir}): mede-se onde o 741
+satura de verdade para cada par de trilhos e escolhe-se o par que
+coloca a saturação dos neurônios ocultos em \SI{0}{\volt} e
+\SI{4,8}{\volt}, os mesmos limites usados no treino.
+
+Na simulação, vinte dígitos do conjunto de teste (dois por classe)
+entram em sequência, um a cada \SI{250}{\micro\second}, por 64 fontes
+do tipo PWL (valor definido por trechos no tempo). Diretivas
+\texttt{.meas} registram as dez saídas $z_k$ e os dez
+comparadores em cada janela, e o arquivo \texttt{.raw} guarda também os
+120 neurônios ocultos, de onde saem as figuras de estado interno da
+Seção~\ref{sec:resultados}:
+
+\begin{verbatim}
+./claw-spice sim run experiments/analog-mlp/analog_mlp.cir --timeout 2400
+./claw-spice sim run experiments/analog-mlp/analog_mlp_741.cir --timeout 2400
+./claw-spice code build experiments/analog-mlp/analyze_results.py \
+    --output-dir experiments/analog-mlp
+\end{verbatim}

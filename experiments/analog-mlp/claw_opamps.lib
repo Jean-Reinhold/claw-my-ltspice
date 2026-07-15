@@ -1,0 +1,9 @@
+* claw-spice generic op-amp macromodels
+* Repo-owned educational models for topology and workflow validation.
+* These are not vendor-accurate replacements for real LM741/TL072/LM358 models.
+
+.subckt CLAW_IDEAL_OPAMP INP INN VCC VEE OUT params: Aol=100k Rout=10 Cload=1p
+BGAIN NDRV 0 V=limit({Aol}*(V(INP)-V(INN)), V(VEE)+0.2, V(VCC)-0.2)
+ROUT NDRV OUT {Rout}
+COUT OUT 0 {Cload}
+.ends CLAW_IDEAL_OPAMP

@@ -1,0 +1,31 @@
+{
+  "layer_sizes": [
+    64,
+    48,
+    32,
+    24,
+    16,
+    10
+  ],
+  "vsat": 4.8,
+  "threshold": 2.6500000000000017,
+  "rf_ohms": 100000.0,
+  "prune_threshold": 0.04,
+  "seed": 7,
+  "epochs_dense": 40,
+  "epochs_finetune": 12,
+  "val_metrics": {
+    "argmax_acc": 0.9704,
+    "exact_fire": 0.963,
+    "no_fire": 0.0098,
+    "multi_fire": 0.0056
+  },
+  "test_metrics": {
+    "argmax_acc": 0.9715,
+    "exact_fire": 0.9644,
+    "no_fire": 0.0086,
+    "multi_fire": 0.0051
+  },
+  "parameters_total": 6050,
+  "parameters_nonzero": 5451
+}

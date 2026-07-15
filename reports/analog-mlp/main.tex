@@ -1,0 +1,49 @@
+% Relatório do experimento analog-mlp, no mesmo formato do RS2.
+% Compile via: ./claw-spice report analog-mlp (Docker; nenhum TeX no host).
+% Os números medidos entram por macros geradas em gerado/*.tex.
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage[hidelinks]{hyperref}
+
+\sisetup{input-decimal-markers={.,}, output-decimal-marker={,}}
+
+\graphicspath{{imagens/}{imagens/generated/}}
+
+% Valores medidos, gerados pelos scripts do experimento.
+\input{gerado/valores_sim}
+\input{gerado/valores_host}
+
+\begin{document}
+
+\begin{center}
+  {\large \textbf{Universidade Federal de Pelotas}}\\
+  Centro de Desenvolvimento Tecnológico\\
+  Curso de Engenharia de Computação\\
+  Disciplina: 22000271 -- Eletrônica Básica II (Turma 2025/1)\\
+  Professor: Alan Rossetto\\[3ex]
+  {\LARGE\bfseries Experimento Analog MLP}\\[0.6ex]
+  {\large Uma rede neural de amplificadores operacionais que
+  reconhece dígitos do MNIST}\\[2ex]
+  Aluno: Jean Paul Reinhold (matrícula 21101175)\\
+  \today
+\end{center}
+
+\vspace{1ex}
+\hrule
+\vspace{2ex}
+
+\input{chapters/introducao}
+\input{chapters/metodologia}
+\input{chapters/resultados}
+\input{chapters/conclusao}
+
+\input{chapters/apendices}
+
+\end{document}

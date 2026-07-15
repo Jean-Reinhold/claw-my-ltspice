@@ -1,0 +1,19 @@
+* LM741 saturation calibration bench for the analog MLP
+* Inverting summer (Rf = Rin = 100k) driven past both rails; DC sweep
+* records the real output clip levels for candidate supply pairs.
+* Goal: pick (VCP, VEM) so the hidden-neuron clip is ~[0 V, 4.8 V].
+.include models/lm741.lib
+.param vcp=6.5 vem=-1.5
+VCC vcc 0 {vcp}
+VEE vee 0 {vem}
+VIN vin 0 0
+RIN vin sum 100k
+RF out sum 100k
+X1 0 sum vcc vee out LM741
+RL out 0 100k
+.dc VIN -7 7 0.02
+.meas DC vhigh MAX V(out)
+.meas DC vlow MIN V(out)
+.step param vcp list 5.5 6 6.3 6.5 7
+.step param vem list -0.8 -1 -1.2 -1.5 -2
+.end

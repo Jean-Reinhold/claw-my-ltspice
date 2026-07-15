@@ -1,0 +1,35 @@
+\section{Introdução e objetivos}
+\label{sec:objetivos}
+
+Um neurônio artificial faz duas coisas: soma entradas multiplicadas por
+pesos e passa o resultado por uma função não linear. O amplificador
+operacional faz as duas. O somador inversor soma sinais com ganhos
+definidos por razões de resistores, então cada peso da rede pode virar
+um resistor. E quando a saída do amplificador encosta no trilho de
+alimentação, ela satura. Essa saturação é a função não linear. A
+pergunta do experimento é simples: dá para treinar uma rede neural de
+verdade e construir ela inteira com AmpOps e resistores?
+
+Para responder, treinamos uma rede de cinco estágios
+($64\!-\!48\!-\!32\!-\!24\!-\!16\!-\!10$) que reconhece os dígitos do
+MNIST reduzidos para $8\times 8$ pixels, ou seja, 64 tensões de entrada
+entre \SI{0}{\volt} e \SI{1}{\volt}. O treinamento acontece em software,
+mas já usando as regras do circuito: a ativação é a saturação real do
+somador e cada peso precisa existir como resistor comercial da série
+E96. Depois do treino, um script converte os pesos em netlist SPICE,
+com 260 amplificadores e 5451 resistores de peso. Na saída não tem
+cálculo extra nem processador: cada dígito tem um comparador, e a
+resposta da rede é o único comparador que acende.
+
+A validação foi feita no LTspice em duas rodadas, uma com um modelo
+ideal de AmpOp e outra com o macromodelo comercial do LM741, usando
+trilhos de alimentação calibrados para compensar a saturação do 741.
+Todo o fluxo roda em Docker com o ferramental claw-spice do
+repositório, cada simulação em um contêiner separado.
+
+Os objetivos do experimento são: treinar a rede sob as restrições do
+circuito e passar de \SI{97}{\percent} de acurácia no teste do MNIST;
+construir a rede só com somadores inversores, inversores de trilho e um
+comparador por dígito, e conferir no LTspice que o circuito reproduz o
+modelo; e medir o tempo de resposta do circuito, comparando com a
+inferência em software e com uma estimativa de custo de um chip.
