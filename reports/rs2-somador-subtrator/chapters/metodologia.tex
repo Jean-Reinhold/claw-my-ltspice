@@ -1,31 +1,82 @@
 \section{Projeto}
 \label{sec:projeto}
 
+\subsection{Função de transferência do somador inversor}
+\label{sec:somador-prova}
+
+Os blocos A e B são construídos com somadores inversores, portanto a
+função de transferência dessa topologia é deduzida antes do projeto.
+Considere um amplificador operacional ideal com realimentação negativa
+por $R_f$, entradas $v_1,\dots,v_n$ ligadas ao nó inversor por
+$R_1,\dots,R_n$ e entrada não inversora aterrada. Com ganho de malha
+aberta infinito, a realimentação impõe $v^- = v^+ = 0$ (terra virtual)
+e as correntes de entrada do amplificador são nulas.
+A lei das correntes de Kirchhoff no nó inversor fornece
+%
+\begin{equation}
+  \sum_{i=1}^{n}\frac{v_i - 0}{R_i} + \frac{v_{out} - 0}{R_f} = 0
+  \quad\Longrightarrow\quad
+  v_{out} = -R_f\sum_{i=1}^{n}\frac{v_i}{R_i}.
+  \label{eq:somador}
+\end{equation}
+%
+Cada entrada contribui com ganho $-R_f/R_i$, ajustável de forma
+independente pela escolha de $R_i$. Coeficientes positivos são obtidos
+com dois estágios em cascata, pois duas inversões restauram o sinal.
+
 \subsection{Bloco A, somente somadores}
 
-A função do bloco A tem dois coeficientes negativos ($-9$ e $-3$), um
-positivo ($+2{,}5$) e um termo constante de $+0{,}2$~V, e o roteiro só
-permite somadores e subtratores neste bloco. A solução adotada foi uma
-cascata de dois somadores inversores: $v_{in3}$ passa pelos dois
-estágios e sofre duas inversões, então chega com sinal positivo,
-enquanto $v_{in1}$ e $v_{in2}$ entram só no segundo estágio e ficam com
-sinal negativo:
+A função exigida,
+$v_{out1} = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3}$, tem dois
+coeficientes negativos ($-9$ e $-3$), um positivo ($+2{,}5$) e um termo
+constante de $+0{,}2$~V, e o roteiro restringe este bloco a somadores e
+subtratores. A solução adotada foi uma cascata de dois somadores
+inversores: $v_{in3}$ atravessa os dois estágios e sofre duas
+inversões, chegando à saída com sinal positivo, enquanto $v_{in1}$ e
+$v_{in2}$ entram apenas no segundo estágio e recebem sinal negativo.
+
+O projeto seguiu as etapas abaixo, aplicando a
+Eq.~\eqref{eq:somador} a cada estágio.
+
+\begin{enumerate}
+  \item \textbf{Primeiro estágio (XA1).} Ganho $-2{,}5$ para
+        $v_{in3}$: com $R_{AF1}=25$~k e $R_{A4}=10$~k,
+        $v_A = -(25/10)\,v_{in3} = -2{,}5\,v_{in3}$.
+  \item \textbf{Segundo estágio (XA2).} Fixado
+        $R_{AF2}=100$~k, os resistores de entrada resultam de
+        $R_i = R_f/|c_i|$: $R_{A1} = 100/9 \approx 11{,}1111$~k para o
+        coeficiente $-9$ e $R_{A2} = 100/3 \approx 33{,}3333$~k para o
+        $-3$. A saída do primeiro estágio entra por
+        $R_{A3}=100$~k (ganho $-1$), o que restaura o sinal positivo
+        de $v_{in3}$.
+  \item \textbf{Termo constante.} A constante $+0{,}2$~V foi
+        implementada como uma entrada adicional do somador final ligada
+        ao trilho de $-15$~V, já presente no circuito, evitando uma
+        fonte adicional. O valor do resistor é obtido da própria
+        Eq.~\eqref{eq:somador}: exige-se
+        $-(R_f/R_{AR})(-15) = +0{,}2$~V, logo
+        $R_{AR} = 15 R_f/0{,}2 = 75 R_f = 7{,}5$~M$\Omega$.
+\end{enumerate}
+
+A composição dos dois estágios comprova a função projetada:
 %
-\[ v_A = -2{,}5\,v_{in3}, \qquad
-   v_{out1} = -\left(9v_{in1} + 3v_{in2} + v_A
-              + (1/75)\cdot(-15)\right)
-            = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3}. \]
+\begin{align*}
+  v_{out1} &= -\Bigl(\tfrac{100}{11{,}1111}v_{in1}
+              + \tfrac{100}{33{,}3333}v_{in2}
+              + \tfrac{100}{7500}(-15)
+              + \tfrac{100}{100}v_A\Bigr)\\
+           &= -\bigl(9v_{in1} + 3v_{in2} - 0{,}2 - 2{,}5v_{in3}\bigr)
+            = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3}.
+\end{align*}
 %
-O termo constante é somado como mais uma entrada do somador final,
-ligada ao trilho de $-15$~V que já existe no circuito: com
-$R_f = 100$~k e $R = 7{,}5$~M, a contribuição é
-$-(100\text{k}/7{,}5\text{M})\cdot(-15) = +0{,}2$~V. Em cada entrada
-o ganho vale $R_f/R_i$. Os valores escolhidos estão na
-Tabela~\ref{tab:componentes} e ficam na faixa de dezenas de
-\si{\kilo\ohm}. Como a validação é por simulação, usamos os valores
-exatos ($100/9$ e $100/3$ \si{\kilo\ohm}). Numa montagem real esses
-valores seriam obtidos com associações de resistores da série E96,
-como comentado na Seção~\ref{sec:discussao}.
+Os valores escolhidos estão na Tabela~\ref{tab:componentes} e
+situam-se na faixa de dezenas de \si{\kilo\ohm}, suficientemente alta
+para não carregar as fontes e suficientemente baixa para tornar
+desprezíveis os efeitos das correntes de polarização. Como a
+validação é por simulação,
+foram usados os valores exatos ($100/9$ e $100/3$~\si{\kilo\ohm});
+em uma montagem física esses valores seriam aproximados por associações
+da série E96, como discutido na Seção~\ref{sec:discussao}.
 
 \begin{figure}[htb]
   \centering
@@ -37,13 +88,18 @@ como comentado na Seção~\ref{sec:discussao}.
 
 \subsection{Bloco B, topologia livre}
 
-Para o bloco B a topologia é livre, e mantivemos a mesma cascata de
-somadores inversores usada no bloco A, pela simetria do projeto:
-$v_{in4}$ e $v_{in5}$ precisam de sinal positivo (duas inversões) e
-$v_{in6}$ de sinal negativo (uma inversão):
+Para o bloco B a topologia é livre. Foi mantida a mesma cascata de
+somadores inversores do bloco A, por uniformidade de projeto e porque a
+estrutura de sinais é análoga: $v_{in4}$ e $v_{in5}$ exigem coeficiente
+positivo (duas inversões) e $v_{in6}$ exige coeficiente negativo (uma
+inversão). Aplicando a Eq.~\eqref{eq:somador} aos dois estágios:
 %
-\[ v_B = -(2v_{in4} + 4v_{in5}), \qquad
-   v_{out2} = -(v_B + 9v_{in6}) = 2v_{in4} + 4v_{in5} - 9v_{in6}. \]
+\begin{align*}
+  v_B &= -\Bigl(\tfrac{40}{20}v_{in4} + \tfrac{40}{10}v_{in5}\Bigr)
+       = -(2v_{in4} + 4v_{in5}),\\
+  v_{out2} &= -\Bigl(\tfrac{90}{10}v_{in6} + \tfrac{90}{90}v_B\Bigr)
+       = 2v_{in4} + 4v_{in5} - 9v_{in6}.
+\end{align*}
 
 \begin{figure}[htb]
   \centering
@@ -53,22 +109,53 @@ $v_{in6}$ de sinal negativo (uma inversão):
 \end{figure}
 
 \subsection{Bloco C, amplificador de instrumentação}
+\label{sec:bloco-c}
 
-O bloco C é o amplificador de instrumentação clássico de três
-amplificadores operacionais: dois amplificadores de entrada com ganho
-diferencial $1+2R/R_g$ e um subtrator de ganho $R_5/R_3$. O ganho
-total pedido é $G/2 = 12{,}5$. Ele foi dividido em $5\times2{,}5$ para
-que todos os resistores tivessem valores redondos:
+O bloco C utiliza o amplificador de instrumentação clássico de três
+amplificadores operacionais: dois
+amplificadores de entrada (XC1, XC2) acoplados pelo resistor de ganho
+$R_g$ e um subtrator de saída (XC3). A dedução do ganho usa as mesmas
+hipóteses de amplificador ideal (curto virtual e correntes de entrada
+nulas), com a notação de nós do esquemático
+(Figura~\ref{fig:esq-bloco-c}).
+
+\emph{Primeiro estágio.} O curto virtual impõe
+$v_{ng1} = v_{out1}$ e $v_{ng2} = v_{out2}$, logo a corrente em $R_g$
+vale $i = (v_{out1}-v_{out2})/R_g$. Como as entradas dos amplificadores
+não drenam corrente, $i$ percorre também os dois resistores de
+realimentação $R$ (RC1 e RC2):
 %
-\[ \left(1+\frac{2\cdot 10\,\text{k}}{5\,\text{k}}\right)\cdot
-   \frac{25\,\text{k}}{10\,\text{k}} = 5 \cdot 2{,}5 = 12{,}5. \]
+\begin{align*}
+  v_{na} &= v_{out1} + R\,i, \qquad v_{nb} = v_{out2} - R\,i,\\
+  v_{na} - v_{nb} &= \Bigl(1 + \frac{2R}{R_g}\Bigr)(v_{out1}-v_{out2})
+    = \Bigl(1 + \frac{2\cdot10\,\text{k}}{5\,\text{k}}\Bigr)
+      (v_{out1}-v_{out2}) = 5\,(v_{out1}-v_{out2}).
+\end{align*}
+
+\emph{Segundo estágio.} No subtrator, o divisor $R_4$--$R_6$ fornece
+$v_{np} = v_{nb}\,R_6/(R_4+R_6)$ e o curto virtual impõe
+$v_{nn}=v_{np}$. A lei das correntes de Kirchhoff no nó inversor,
+$(v_{na}-v_{nn})/R_3 = (v_{nn}-v_{out})/R_5$, resolve para
 %
-A saída $v_{out2}$ entra pelo caminho não inversor e $v_{out1}$ pelo
-inversor, o que dá $v_{out}=12{,}5(v_{out2}-v_{out1})$. Além do ganho,
-o amplificador de instrumentação tem alta impedância de entrada, então
-não carrega os blocos A e B, e cancela sinais iguais aplicados às
-duas entradas (modo comum), o que é
-verificado na Seção~\ref{sec:res-blocos}.
+\[ v_{out} = \Bigl(1+\frac{R_5}{R_3}\Bigr)v_{nn}
+             - \frac{R_5}{R_3}v_{na}
+           = \frac{R_5}{R_3}\,(v_{nb} - v_{na})
+           = 2{,}5\,(v_{nb}-v_{na}), \]
+%
+com $R_3=R_4=10$~k e $R_5=R_6=25$~k. Compondo os dois estágios:
+%
+\[ v_{out} = 2{,}5\cdot\bigl[-5(v_{out1}-v_{out2})\bigr]
+           = 12{,}5\,(v_{out2}-v_{out1}), \]
+%
+que corresponde ao ganho especificado $G/2 = 25/2 = 12{,}5$. O ganho
+foi fatorado em
+$5\times2{,}5$ para que todos os resistores assumissem valores
+comerciais exatos. Além do ganho, o amplificador de instrumentação
+apresenta impedância de entrada elevada, não carregando os blocos A e
+B, e rejeita sinais de modo comum, propriedade verificada na
+Seção~\ref{sec:res-blocos}. A entrada $v_{out2}$ liga-se ao caminho não
+inversor e $v_{out1}$ ao inversor, preservando o sinal de
+$(v_{out2}-v_{out1})$.
 
 \begin{figure}[htb]
   \centering
@@ -77,6 +164,19 @@ verificado na Seção~\ref{sec:res-blocos}.
   as fontes do ensaio de ganho diferencial e modo comum.}
   \label{fig:esq-bloco-c}
 \end{figure}
+
+\subsection{Composição global}
+\label{sec:composicao}
+
+Substituindo as funções dos blocos A e B na do bloco C obtém-se a
+função global implementada, que serve de referência para a validação:
+%
+\begin{align*}
+  v_{out} &= 12{,}5\bigl[(2v_{in4}+4v_{in5}-9v_{in6})
+             -(-9v_{in1}+0{,}2-3v_{in2}+2{,}5v_{in3})\bigr]\\
+          &= 112{,}5v_{in1} + 37{,}5v_{in2} - 31{,}25v_{in3}
+           + 25v_{in4} + 50v_{in5} - 112{,}5v_{in6} - 2{,}5.
+\end{align*}
 
 \begin{table}[htb]
   \centering
@@ -106,15 +206,15 @@ verificado na Seção~\ref{sec:res-blocos}.
 \subsection{Modelo do LM741}
 \label{sec:modelo}
 
-O roteiro pede o modelo LM741 Level 1 (modelo ideal) do Micro-Cap.
-Como o LTspice não tem esse modelo, implementamos um equivalente
-chamado \texttt{LM741\_LEVEL1}: ganho de malha aberta de 200 mil,
-resistência de entrada de \SI{2}{\mega\ohm}, resistência de saída de
-\SI{75}{\ohm} e saída limitada pela tensão de alimentação, sem polos e sem limite de
-velocidade de resposta (slew rate), já que nível 1 significa modelo
-ideal. Esses
-são os valores típicos da folha de dados do LM741 da Texas Instruments
-(documento SNOSC25D), reproduzida na
+O roteiro especifica o modelo LM741 Level 1 (modelo ideal) do
+Micro-Cap. Como o LTspice não dispõe desse modelo, foi implementado um
+subcircuito equivalente, \texttt{LM741\_LEVEL1}, com ganho de malha
+aberta de $2\times10^5$, resistência de entrada de \SI{2}{\mega\ohm},
+resistência de saída de \SI{75}{\ohm} e saída limitada pelas tensões de
+alimentação, sem polos e sem limite de taxa de variação (\emph{slew
+rate}), consistente com a definição de modelo ideal de nível 1. Os
+parâmetros correspondem aos valores típicos da folha de dados do LM741
+da Texas Instruments (documento SNOSC25D), reproduzida na
 Figura~\ref{fig:datasheet-eletricas}.
 
 \begin{verbatim}
@@ -126,17 +226,14 @@ COUT OUT 0 1p
 .ends
 \end{verbatim}
 
-A alimentação de $\pm$\SI{15}{\volt}, que o Micro-Cap adiciona
-sozinho, foi incluída explicitamente com as fontes VCC e VEE. Para
-conferir se o modelo ideal não esconde nenhum efeito importante, o
+A alimentação de $\pm$\SI{15}{\volt}, inserida automaticamente pelo
+Micro-Cap, foi incluída de forma explícita com as fontes VCC e VEE.
+Para verificar se o modelo ideal não oculta efeitos relevantes, o
 circuito completo também foi simulado com o macromodelo comercial do
-LM741 da Texas Instruments, que inclui polos, tensão de offset e slew rate de
-\SI{0.5}{\volt\per\micro\second}. Nas frequências e amplitudes usadas
-no ensaio, a maior taxa de variação exigida é de cerca de
-\SI{0.07}{\volt\per\micro\second} e a menor largura de banda de malha
-fechada fica perto de \SI{90}{\kilo\hertz} (estágio B2), bem acima dos
-\SI{1.5}{\kilo\hertz} do estímulo. Por isso os dois modelos devem
-concordar.
+LM741, que inclui polos, tensão de offset e taxa de variação de
+\SI{0.5}{\volt\per\micro\second}. Como os estímulos do ensaio não
+passam de \SI{1.5}{\kilo\hertz}, esses limites não são atingidos e
+espera-se comportamento semelhante nos dois modelos.
 
 \begin{figure}[htb]
   \centering
@@ -167,37 +264,44 @@ bloco A acima, bloco B abaixo e bloco C à direita, ligados pelos nós
 \label{sec:simulacao}
 
 As netlists e os esquemáticos são gerados pelo mesmo script Python
-(Apêndice~B), o que garante que o circuito desenhado é o mesmo que foi
-simulado. Foram feitos três grupos de simulações no tempo, cada
-simulação rodando em um contêiner Docker separado, em paralelo:
+(Apêndice~\ref{ap:codigo}), o que garante que o circuito desenhado é o
+mesmo que foi simulado. As simulações no domínio do tempo foram
+organizadas em três grupos:
 
 \begin{enumerate}
   \item \textbf{Resposta individual} (\texttt{rs2\_vin1.cir} a
         \texttt{rs2\_vin6.cir}): apenas uma entrada recebe um seno de
-        \SI{50}{\milli\volt} e \SI{1}{\kilo\hertz}, com as outras
+        \SI{50}{\milli\volt} e \SI{1}{\kilo\hertz}, com as demais
         aterradas. O seno tem pico positivo em
         $t=\SI{2.25}{\milli\second}$ e vale em
         \SI{2.75}{\milli\second}; a diferença entre os dois pontos,
-        dividida por \SI{100}{\milli\volt}, dá o ganho com sinal
+        dividida por \SI{100}{\milli\volt}, fornece o ganho com sinal
         daquela entrada até a saída (e também até $v_{out1}$ e
         $v_{out2}$), eliminando o nível DC. A média da saída sobre
-        ciclos inteiros mede o próprio nível DC, que deve valer
+        ciclos inteiros mede o próprio nível DC, cujo valor teórico é
         $-12{,}5 \times 0{,}2 = -2{,}5$~V.
   \item \textbf{Função global} (\texttt{rs2\_completo.cir}): as seis
         entradas recebem senos de \SI{20}{\milli\volt} em frequências
-        diferentes (500 a \SI{1500}{\hertz}). Uma fonte auxiliar do
-        simulador calcula a função ideal em paralelo e mede-se o erro
-        máximo e o erro RMS entre o circuito e o ideal. As amplitudes foram
-        escolhidas para o pior caso ficar perto de \SI{7.3}{\volt},
-        abaixo dos \SI{14}{\volt} de excursão máxima, sem saturação.
+        distintas (500 a \SI{1500}{\hertz}). Uma fonte comportamental
+        calcula a função ideal em paralelo e mede-se o erro máximo e o
+        erro RMS entre o circuito e a referência. As amplitudes foram
+        escolhidas para que o pior caso ficasse em torno de
+        \SI{7.3}{\volt}, abaixo dos \SI{14}{\volt} de excursão máxima,
+        sem saturação.
   \item \textbf{Validação por bloco}
         (\texttt{rs2\_bloco\_a.cir}, \texttt{b}, \texttt{c}): cada
-        bloco isolado recebe senos de frequências diferentes e a saída
-        é comparada com a sua função. No bloco C aplica-se \SI{1}{\volt} de modo comum mais
-        um diferencial senoidal de \SI{0.4}{\volt}, medindo o ganho
-        diferencial e a rejeição de modo comum.
+        bloco isolado recebe senos de frequências distintas e a saída é
+        comparada com a respectiva função teórica. No bloco C
+        aplica-se \SI{1}{\volt} de modo comum mais um diferencial
+        senoidal de \SI{0.4}{\volt}, medindo-se o ganho diferencial e a
+        rejeição de modo comum.
 \end{enumerate}
 
-O ensaio global foi repetido com o macromodelo comercial
-(\texttt{rs2\_completo\_vendor.cir}). A netlist completa está no
-Apêndice~A.
+O ensaio global foi repetido com o macromodelo comercial do LM741 e,
+como verificação adicional, com um amplificador operacional moderno, o
+ADA4610, para quantificar quanto do erro observado se deve às
+limitações do LM741. As netlists correspondentes,
+\texttt{rs2\_completo\_vendor.cir} e
+\texttt{rs2\_completo\_moderno.cir}, e as demais estão reproduzidas
+integralmente nos Apêndices~\ref{ap:netlist}
+a~\ref{ap:variantes}.

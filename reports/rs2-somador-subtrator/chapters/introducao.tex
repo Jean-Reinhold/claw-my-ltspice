@@ -1,13 +1,14 @@
 \section{Introdução e objetivos}
 \label{sec:objetivos}
 
-Com realimentação negativa, o amplificador operacional permite somar e
-subtrair sinais com ganhos definidos apenas por razões de resistores.
-Este roteiro pede o projeto de uma rede desse tipo,
-com coeficientes definidos pelos dígitos da matrícula. Para a
-matrícula 21101175 temos $A_7{=}2$, $A_6{=}1$, $A_5{=}1$, $A_4{=}0$,
-$A_3{=}1$, $A_2{=}1$, $A_1{=}7$ e $A_0{=}5$. Substituindo os dígitos,
-as funções que cada bloco deve implementar ficam:
+Em um amplificador operacional com realimentação negativa, os ganhos
+de malha fechada são definidos por razões de resistores, o que permite
+somar e subtrair sinais com coeficientes
+arbitrários. O roteiro solicita o projeto de uma rede
+desse tipo, com coeficientes definidos pelos dígitos da matrícula.
+Para a matrícula 21101175 tem-se $A_7{=}2$, $A_6{=}1$, $A_5{=}1$,
+$A_4{=}0$, $A_3{=}1$, $A_2{=}1$, $A_1{=}7$ e $A_0{=}5$. Substituindo
+os dígitos, as funções que cada bloco deve implementar são:
 %
 \[ v_{out1} = (5-2A_1)v_{in1} + \frac{A_2}{5} - 3v_{in2} + \frac{6-A_3}{2}v_{in3}
             = -9v_{in1} + 0{,}2 - 3v_{in2} + 2{,}5v_{in3} \]
@@ -16,21 +17,25 @@ as funções que cada bloco deve implementar ficam:
 \[ v_{out} = \frac{G}{2}(v_{out2}-v_{out1}) = 12{,}5\,(v_{out2}-v_{out1}),
    \qquad G = 10A_7+A_0 = 25 \]
 %
-O termo $A_2/5 = 0{,}2$~V do bloco A é uma constante, ou seja, um nível
-DC somado ao sinal. A função global que resulta da composição dos três
-blocos é
+O termo $A_2/5 = 0{,}2$~V do bloco A é uma constante, ou seja, um
+nível DC somado ao sinal. A composição dos três blocos resulta na
+função global (deduzida na Seção~\ref{sec:composicao})
 %
 \[ v_{out} = 112{,}5v_{in1} + 37{,}5v_{in2} - 31{,}25v_{in3}
            + 25v_{in4} + 50v_{in5} - 112{,}5v_{in6} - 2{,}5. \]
 
-O amplificador operacional usado é o LM741 em modelo
-ideal nível 1, com alimentação simétrica de $\pm$\SI{15}{\volt}. O
-roteiro usa o Micro-Cap. Aqui a simulação foi feita no LTspice,
-com um fluxo automatizado que roda cada simulação em um contêiner
-Docker separado.
+O amplificador operacional adotado é o LM741 em modelo ideal nível 1,
+com alimentação simétrica de $\pm$\SI{15}{\volt}. O roteiro prevê o
+uso do Micro-Cap; neste trabalho as simulações foram realizadas no
+LTspice. A troca de simulador não altera o procedimento: o modelo
+nível 1 foi reproduzido no LTspice com os mesmos parâmetros
+(Seção~\ref{sec:modelo}) e a alimentação simétrica, que o Micro-Cap
+insere automaticamente, foi incluída de forma explícita.
 
-Os objetivos do experimento são: projetar o bloco A usando somente
-somadores e subtratores, o bloco B com topologia livre e o bloco C com
-um amplificador de instrumentação, justificando as escolhas; validar
-por simulação o efeito de cada entrada sobre a saída e a função
-global; e conferir o projeto com o macromodelo comercial do LM741.
+Os objetivos do experimento são: (i) projetar o bloco A utilizando
+somente somadores e subtratores, o bloco B com topologia livre e o
+bloco C com um amplificador de instrumentação, descrevendo e
+justificando as escolhas de projeto; (ii) validar por simulação o
+efeito individual de cada entrada sobre a saída e a implementação da
+função global; e (iii) comparar o resultado do modelo ideal com o
+macromodelo comercial do LM741.

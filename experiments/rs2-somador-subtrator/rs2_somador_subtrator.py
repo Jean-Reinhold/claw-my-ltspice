@@ -236,7 +236,7 @@ def _finish_output(circuit, x, y, label):
 
 
 def build_bloco_a(subckt=SUBCKT_IDEAL, include=INCLUDE_IDEAL):
-    circuit = Circuit("RS2 bloco A: vout1 = -9*vin1 - 2.8*vin2 + 2.5*vin3 (21101175)")
+    circuit = Circuit("RS2 bloco A: vout1 = -9*vin1 + 0.2 - 3*vin2 + 2.5*vin3 (21101175)")
     circuit.include(include)
     out_x, out_y = _draw_block_a(circuit, 64, 96, subckt, BLOCK_A_SRC)
     _finish_output(circuit, out_x, out_y, "vout1")

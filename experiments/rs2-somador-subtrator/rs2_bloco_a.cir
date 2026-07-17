@@ -1,4 +1,4 @@
-* RS2 bloco A: vout1 = -9*vin1 - 2.8*vin2 + 2.5*vin3 (21101175)
+* RS2 bloco A: vout1 = -9*vin1 + 0.2 - 3*vin2 + 2.5*vin3 (21101175)
 .include lm741_level1.lib
 RA1 in1 suma2 11.1111k
 RA2 in2 suma2 33.3333k

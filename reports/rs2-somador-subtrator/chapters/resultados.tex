@@ -3,13 +3,13 @@
 
 \subsection{Resposta individual de cada entrada}
 
-A Tabela~\ref{tab:medidas} resume as seis simulações individuais. Ela
-mostra o ganho com sinal de cada entrada até a saída, comparado com o
+A Tabela~\ref{tab:medidas} resume as seis simulações individuais,
+comparando o ganho medido de cada entrada até a saída com o
 coeficiente teórico da função global. Os ganhos parciais confirmam o
-caminho de cada sinal: as entradas 1 a 3 aparecem só em $v_{out1}$ e
-as entradas 4 a 6 só em $v_{out2}$. Além dos ganhos, o nível DC medido
-na saída foi $-2{,}50$~V, contra $-12{,}5\times0{,}2 = -2{,}5$~V
-teóricos do termo constante do bloco A.
+caminho de cada sinal: as entradas 1 a 3 aparecem somente em
+$v_{out1}$ e as entradas 4 a 6 somente em $v_{out2}$. Além dos ganhos,
+o nível DC medido na saída foi $-2{,}50$~V, em concordância com o valor
+teórico $-12{,}5\times0{,}2 = -2{,}5$~V do termo constante do bloco A.
 
 \begin{table}[htb]
   \centering
@@ -31,11 +31,11 @@ teóricos do termo constante do bloco A.
   \end{tabular}
 \end{table}
 
-A Figura~\ref{fig:individual} mostra os dois casos de maior ganho:
+A Figura~\ref{fig:individual} apresenta os dois casos de maior ganho:
 $v_{in1}$ (ganho $+112{,}5$) e $v_{in6}$ (ganho $-112{,}5$). A
 amplitude de \SI{5.625}{\volt}, as fases opostas e o nível DC de
-$-2{,}5$~V (as senoides oscilam em torno dele, não do zero) batem com
-o esperado.
+$-2{,}5$~V (as senoides oscilam em torno desse nível, não do zero)
+estão de acordo com os valores previstos.
 
 \begin{figure}[htb]
   \centering
@@ -47,12 +47,13 @@ o esperado.
   \label{fig:individual}
 \end{figure}
 
-A Figura~\ref{fig:individual-resto} mostra as outras quatro respostas
-individuais. Em cada uma, a amplitude da saída dividida pelos
-\SI{50}{\milli\volt} da entrada dá o ganho medido da
-Tabela~\ref{tab:medidas}, e a fase (em relação ao seno de entrada)
-mostra o sinal do coeficiente: $v_{in2}$, $v_{in4}$ e $v_{in5}$ saem
-em fase (coeficiente positivo) e $v_{in3}$ sai invertida.
+A Figura~\ref{fig:individual-resto} apresenta as outras quatro
+respostas individuais. Em cada uma, a amplitude da saída dividida
+pelos \SI{50}{\milli\volt} da entrada corresponde ao ganho medido da
+Tabela~\ref{tab:medidas}, e a fase em relação ao seno de entrada
+indica o sinal do coeficiente: $v_{in2}$, $v_{in4}$ e $v_{in5}$
+aparecem em fase (coeficiente positivo) e $v_{in3}$ em oposição de
+fase (coeficiente negativo).
 
 \begin{figure}[htb]
   \centering
@@ -70,15 +71,16 @@ em fase (coeficiente positivo) e $v_{in3}$ sai invertida.
 \label{sec:res-blocos}
 
 Nos ensaios por bloco, a saída de cada bloco foi comparada ponto a
-ponto com a sua função, calculada em paralelo pelo simulador. O erro
-máximo foi $2{,}07\times10^{-4}$~V no bloco A e $1{,}59\times10^{-4}$~V no bloco B. Esses
-valores são pequenos e correspondem ao erro esperado para um ganho de
-malha aberta finito de 200 mil. No bloco C o ganho diferencial medido
-foi $+12{,}50$ (o teórico é $12{,}5$) e, mesmo com \SI{1}{\volt} de
-modo comum aplicado nas duas entradas, a média da saída ficou em
-$2{,}81\times10^{-8}$~V. Ou seja, o modo comum foi rejeitado, como esperado com
-resistores perfeitamente casados na simulação. A
-Figura~\ref{fig:blocoab} mostra as formas de onda dos blocos A e B.
+ponto com a respectiva função teórica, calculada em paralelo por uma
+fonte comportamental. O erro máximo foi $2{,}07\times10^{-4}$~V no
+bloco A e $1{,}59\times10^{-4}$~V no bloco B, compatível com o erro
+residual esperado para um ganho de malha aberta finito de
+$2\times10^5$. No bloco C o ganho diferencial medido foi $+12{,}50$
+(teórico $12{,}5$) e, com \SI{1}{\volt} de modo comum aplicado às duas
+entradas, a média da saída ficou em $2{,}81\times10^{-8}$~V,
+confirmando a rejeição de modo comum esperada para resistores
+perfeitamente casados na simulação. A Figura~\ref{fig:blocoab}
+apresenta as formas de onda dos blocos A e B.
 
 \begin{figure}[htb]
   \centering
@@ -92,18 +94,19 @@ Figura~\ref{fig:blocoab} mostra as formas de onda dos blocos A e B.
 \subsection{Função global e macromodelo comercial}
 \label{sec:res-global}
 
-Com as seis entradas ativas ao mesmo tempo, a saída acompanhou a
+Com as seis entradas ativas simultaneamente, a saída acompanhou a
 referência ideal (que inclui o nível DC de $-2{,}5$~V) com erro máximo
-de $9{,}27\times10^{-4}$~V e erro RMS de $3{,}94\times10^{-4}$~V, para uma excursão de
-$-8{,}20$ a $+3{,}20$~V (Figura~\ref{fig:global}). Repetindo o ensaio
-com o macromodelo comercial do LM741, o erro máximo subiu para
-$0{,}27$~V (RMS de $0{,}13$~V), na casa de 5\% da excursão. A causa dominante é o polo
-do LM741 real em \SI{5}{\hertz}: nas frequências do ensaio o ganho de
-malha aberta cai para perto de mil, então o erro de cada estágio
-aumenta em relação ao modelo ideal. Soma-se a isso o offset de entrada de
-\SI{1}{\milli\volt}, multiplicado pelos ganhos até a saída. O
-comportamento continua o projetado, como mostra a
-Figura~\ref{fig:vendor}.
+de $9{,}27\times10^{-4}$~V e erro RMS de $3{,}94\times10^{-4}$~V, para
+uma excursão de $-8{,}20$ a $+3{,}20$~V
+(Figura~\ref{fig:global}). Repetindo o ensaio com o macromodelo
+comercial do LM741, o erro máximo subiu para $0{,}27$~V (RMS de
+$0{,}13$~V), cerca de 2{,}4\% da excursão total de \SI{11.4}{\volt}. A
+causa dominante é o polo do LM741 real em \SI{5}{\hertz}: nas
+frequências do ensaio o ganho de malha aberta cai para a ordem de
+$10^3$, aumentando o erro de cada estágio em relação ao modelo ideal.
+Soma-se a esse efeito o offset de entrada de \SI{1}{\milli\volt},
+multiplicado pelos ganhos até a saída. O circuito mantém o
+comportamento projetado, como mostra a Figura~\ref{fig:vendor}.
 
 \begin{figure}[htb]
   \centering
@@ -120,16 +123,17 @@ Figura~\ref{fig:vendor}.
   \label{fig:vendor}
 \end{figure}
 
-Como teste extra, o mesmo ensaio global rodou com um amplificador
-moderno, o ADA4610 (JFET, modelo embarcado no LTspice), nos mesmos
+Como verificação adicional, o mesmo ensaio global foi executado com um
+amplificador operacional moderno, o ADA4610 (entrada JFET, modelo
+embarcado no LTspice), com a mesma alimentação de
 $\pm$\SI{15}{\volt}. O erro máximo caiu de $0{,}27$~V para
-$8{,}7\times10^{-3}$~V (RMS de $3{,}4\times10^{-3}$~V), umas 30 vezes
-menor que o do LM741 e já na casa do por mil da excursão
-(Figura~\ref{fig:moderno}). A leitura é direta: com ganho de malha
-aberta alto até frequências bem maiores, o erro por estágio volta a ser
-dominado pelos resistores, como no modelo ideal. Para este circuito, a
-troca do LM741 por um amplificador moderno elimina na prática o desvio
-observado no ensaio anterior.
+$8{,}7\times10^{-3}$~V (RMS de $3{,}4\times10^{-3}$~V), cerca de 30
+vezes menor que o obtido com o LM741 e inferior a 0{,}1\% da excursão
+(Figura~\ref{fig:moderno}). Esse resultado confirma que, mantido o ganho de malha aberta elevado
+nas frequências do ensaio, o erro residual por estágio retorna ao
+nível obtido com o modelo ideal. Para este circuito, a substituição
+do LM741 por um amplificador moderno reduz o desvio observado no
+ensaio anterior a níveis desprezíveis.
 
 \begin{figure}[htb]
   \centering
@@ -141,18 +145,19 @@ observado no ensaio anterior.
 \subsection{Discussão}
 \label{sec:discussao}
 
-A cascata de somadores inversores resolve a restrição do bloco A sem
-precisar de divisores na entrada não inversora: o sinal positivo de
-$v_{in3}$ vem da dupla inversão e cada ganho depende de uma única
-razão de resistores. O amplificador de instrumentação junta os dois
-blocos sem carregá-los, porque o seu estágio de entrada tem alta
-impedância.
+A cascata de somadores inversores atende à restrição do bloco A sem
+divisores na entrada não inversora: o sinal positivo de $v_{in3}$
+resulta da dupla inversão e cada ganho depende de uma única razão de
+resistores. O amplificador de instrumentação conecta os dois blocos
+sem carregá-los, em razão da alta impedância do seu estágio de
+entrada.
 
-Duas observações práticas. Primeira: os resistores de $100/9$ e
-$100/3$ \si{\kilo\ohm} não existem na série E96. Numa montagem real
-seriam usadas associações (por exemplo 11k mais 110, e 33k mais 330),
-com erro da ordem da tolerância dos componentes.
-Segunda: os ganhos altos (módulo $112{,}5$) limitam a amplitude de
-entrada. Acima de cerca de \SI{120}{\milli\volt} de pico em $v_{in1}$ ou
-$v_{in6}$ a saída satura no limite da alimentação. Todos os ensaios respeitaram
-esse limite.
+Duas limitações práticas devem ser registradas. Os resistores de
+$100/9$ e $100/3$~\si{\kilo\ohm} não pertencem à série E96; em uma
+montagem física seriam necessárias associações (por exemplo, 11k em
+série com 110~$\Omega$, e 33k em série com 330~$\Omega$), com erro da
+ordem da tolerância dos componentes. Além disso, os ganhos elevados
+(módulo $112{,}5$) limitam a amplitude de entrada: acima de cerca de
+\SI{100}{\milli\volt} de pico em $v_{in1}$ ou $v_{in6}$ a saída
+satura no semiciclo negativo, pois o nível DC de $-2{,}5$~V reduz a
+margem nesse sentido. Todos os ensaios respeitaram esse limite.

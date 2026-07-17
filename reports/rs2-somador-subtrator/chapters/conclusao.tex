@@ -1,24 +1,28 @@
 \section{Conclusão}
 \label{sec:conclusao}
 
-Os três blocos foram projetados e justificados: cascata de somadores
-inversores nos blocos A e B e amplificador de instrumentação com ganho
-$12{,}5$ no bloco C. O circuito completo, com sete LM741 alimentados
-em $\pm$\SI{15}{\volt}, implementa a função global derivada da
-matrícula 21101175.
+Os três blocos foram projetados a partir das funções derivadas da
+matrícula 21101175, com as deduções apresentadas na
+Seção~\ref{sec:projeto}: cascata de somadores inversores nos blocos A
+e B e amplificador de instrumentação com ganho $12{,}5$ no bloco C. O
+circuito completo utiliza sete LM741 alimentados em
+$\pm$\SI{15}{\volt}.
 
 A simulação confirmou o projeto em três níveis. Os ganhos individuais
-de cada entrada bateram com os coeficientes teóricos. Cada bloco
-isolado reproduziu a sua função. E a resposta global acompanhou a
-referência ideal com erro relativo muito pequeno. Com o macromodelo
-comercial do LM741 o erro subiu para menos de 5\% da excursão, efeito
-esperado da queda do ganho de malha aberta com a frequência e do
-offset de entrada do componente real, sem mudar o comportamento
-projetado. Um teste extra com um amplificador moderno (ADA4610), nos
-mesmos trilhos, devolveu o erro para a casa do por mil da excursão,
-confirmando que o desvio era do amplificador e não da topologia.
+de cada entrada reproduziram os coeficientes teóricos com desvio
+inferior a $0{,}1\%$. Cada bloco isolado reproduziu a respectiva
+função com erro máximo abaixo de \SI{0.3}{\milli\volt}. A resposta
+global acompanhou a referência ideal com erro máximo de
+$9{,}3\times10^{-4}$~V em uma excursão de \SI{11.4}{\volt}. Com o
+macromodelo comercial do LM741 o erro máximo subiu para $0{,}27$~V
+(cerca de 2{,}4\% da excursão), efeito da queda do ganho de malha
+aberta com a frequência e do offset de entrada do componente real, sem
+alterar o comportamento projetado. O ensaio adicional com um
+amplificador moderno (ADA4610), na mesma alimentação, reduziu o erro
+para menos de 0{,}1\% da excursão, confirmando que o desvio se deve às
+limitações do LM741 e não à topologia.
 
-Como próximos passos, seria interessante subir a frequência dos
-estímulos até aparecer a limitação de banda e de velocidade de
-resposta do LM741 real, e avaliar o efeito da tolerância dos resistores numa montagem
-física.
+Como continuidade do trabalho, sugere-se elevar a frequência dos
+estímulos até evidenciar as limitações de banda e de taxa de variação
+(\emph{slew rate}) do LM741 real, e avaliar o efeito da tolerância dos
+resistores em uma montagem física.
