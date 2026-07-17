@@ -3,8 +3,8 @@
 
 As Figuras \ref{fig:circ-bias} a \ref{fig:circ-slew} mostram os
 circuitos simulados. Todos usam alimentação simétrica de
-$\pm$\SI{15}{\volt}, declarada explicitamente nas netlists, já que o
-LTspice não a inclui automaticamente como o Micro-Cap faz.
+$\pm$\SI{15}{\volt}, declarada explicitamente nas netlists, pois o
+LTspice, diferentemente do Micro-Cap, não a inclui automaticamente.
 
 \begin{itemize}
   \item \textbf{Itens 1 e 2} (Figura \ref{fig:circ-bias}): seguidor com
@@ -14,7 +14,7 @@ LTspice não a inclui automaticamente como o Micro-Cap faz.
         próprios resistores: $I_{B+} = -I(R_I)$ e $I_{B-} = I(R_F)$.
         Com $R_F = 0$ a saída vale $-I_{B+}R_I$. Com $R_F$ =
         \SI{1}{\mega\ohm} os dois efeitos quase se cancelam e a saída
-        mede a corrente de offset. Como o LTspice 26 não aceita
+        passa a refletir a corrente de offset. Como o LTspice 26 não aceita
         resistência zero em netlist, o $R_F = 0$ foi implementado como
         \SI{1}{\micro\ohm}, que tem efeito desprezível.
   \item \textbf{Item 3} (Figura \ref{fig:circ-vos}): malha aberta, com
@@ -25,16 +25,21 @@ LTspice não a inclui automaticamente como o Micro-Cap faz.
   \item \textbf{Item 4} (Figura \ref{fig:circ-ganhos}): a fonte
         \texttt{VOS} em série com a entrada não inversora cancela o
         offset medido no item 3 (arquivo \texttt{vos\_comp.inc}, gerado
-        automaticamente com o valor medido). Sem essa compensação, o ganho alto saturaria a
-        saída com poucos microvolts de entrada. Para o ganho
-        diferencial, repete-se a varredura do item 3. Para o ganho de
-        modo comum, as duas entradas varrem juntas de \SI{-3}{\volt} a
-        \SI{+3}{\volt} em passos de \SI{1}{\milli\volt}.
+        automaticamente com o valor medido). Sem essa compensação, o
+        ganho elevado saturaria a saída com poucos microvolts de
+        entrada. Para o ganho diferencial, repete-se a varredura do
+        item 3. Para o ganho de modo comum, as duas entradas são
+        varridas conjuntamente de \SI{-3}{\volt} a \SI{+3}{\volt} em
+        passos de \SI{1}{\milli\volt}.
   \item \textbf{Item 6} (Figura \ref{fig:circ-slew}): seguidor unitário
         com degrau de \SI{-15}{\volt} para \SI{+15}{\volt} e tempo de
         subida de \SI{1}{\pico\second}, simulado em transiente de
         \SI{200}{\micro\second} com passo máximo de
         \SI{100}{\nano\second}.
+  \item \textbf{Teste extra (item 7)}: o mesmo circuito e o mesmo
+        degrau do item 6, com o amplificador ADA4610 no lugar do OP07 e
+        sem compensação de offset, para comparação do slew rate com um
+        componente moderno.
 \end{itemize}
 
 \begin{figure}[htb]
@@ -76,32 +81,31 @@ LTspice não a inclui automaticamente como o Micro-Cap faz.
 \subsection{Modelo do OP07}
 \label{sec:modelo}
 
-O amplificador usado é o modelo \texttt{OP07} que vem instalado com o
-próprio LTspice 26, na biblioteca \texttt{LTC.lib}, carregado nas
-netlists com \texttt{.lib LTC.lib}; não foi preciso baixar nem instalar
-nada além do simulador. É o modelo da Analog Devices, e ele reproduz as
-não idealidades de propósito: o par de transistores da entrada tem
-parâmetros levemente diferentes entre si (o que gera $V_{OS}$, $I_{B+}$,
-$I_{B-}$ e $I_{OS}$), uma fonte interna deixa passar uma fração muito
-pequena do sinal de modo comum para a saída (o que gera a CMRR finita) e
-a corrente disponível para o estágio interno é limitada (o que gera o
-slew rate).
+O amplificador utilizado é o modelo \texttt{OP07} distribuído com o próprio
+LTspice 26, na biblioteca \texttt{LTC.lib}, carregado nas netlists com
+\texttt{.lib LTC.lib}, sem necessidade de bibliotecas externas. Trata-se
+do modelo da Analog Devices, que representa estruturalmente as não
+idealidades estudadas: o par de transistores de entrada tem parâmetros
+levemente assimétricos (o que gera $V_{OS}$, $I_{B+}$, $I_{B-}$ e
+$I_{OS}$), uma fonte controlada interna transfere uma fração reduzida do
+sinal de modo comum para a saída (o que gera a CMRR finita) e a corrente
+disponível para o estágio interno é limitada (o que gera o slew rate).
 
 \section{Procedimento de simulação}
 \label{sec:procedimento}
 
-Um script (\texttt{run\_all.sh}) executa tudo em duas etapas. Primeiro
-rodam os itens 1 a 3, que não dependem um do outro. Depois o $V_{OS}$
-medido no item 3 é gravado no arquivo \texttt{vos\_comp.inc}. Por fim
-rodam os itens 4 a 6, que usam essa compensação. O roteiro sugere o comando \texttt{dd(u)} do Micro-Cap para
-as derivadas. O LTspice não tem esse recurso quando roda de forma automatizada,
-então as
-derivadas $dv_{out}/dv_{in}$ (ganhos) e $dv_{out}/dt$ (slew rate,
-equivalente ao \texttt{ddt(u)}) foram calculadas numericamente a partir dos pontos exportados pela
-simulação, usando a diferença entre pontos vizinhos (o método de
-diferenças centrais), com o script \texttt{analyze.py}, que também gera
-os gráficos.
-As medidas pontuais (cruzamento por zero e tempos de subida) usam
-diretivas \texttt{.meas} do próprio LTspice. As netlists completas estão
-no Apêndice \ref{ap:netlist} e os passos para reproduzir tudo estão no
-Apêndice \ref{ap:reproducao}.
+O script \texttt{run\_all.sh} executa as simulações em duas etapas. Na
+primeira são executados os itens 1 a 3 e o teste extra do item 7, que
+são independentes entre si. O $V_{OS}$ medido no item 3 é então gravado
+no arquivo \texttt{vos\_comp.inc} e, na segunda etapa, são executados os
+itens 4 a 6, que usam essa compensação. O roteiro sugere o comando
+\texttt{dd(u)} do Micro-Cap para as derivadas. O LTspice não dispõe
+desse recurso em execução automatizada, de modo que as derivadas
+$dv_{out}/dv_{in}$ (ganhos) e $dv_{out}/dt$ (slew rate, equivalente ao
+\texttt{ddt(u)}) foram calculadas numericamente a partir dos pontos
+exportados pela simulação, usando a diferença entre pontos vizinhos
+(método de diferenças centrais), com o script \texttt{analyze.py}, que
+também gera os gráficos. As medidas pontuais (cruzamento por zero e
+tempos de subida) usam diretivas \texttt{.meas} do próprio LTspice. As
+netlists completas estão no Apêndice \ref{ap:netlist} e os passos de
+reprodução estão no Apêndice \ref{ap:reproducao}.

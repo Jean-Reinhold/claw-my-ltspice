@@ -3,17 +3,23 @@
 
 \subsection{Itens 1 e 2: correntes de polarização e de offset}
 
-Com $R_F = 0$, o ponto de operação deu $I_{B+}$ = \SI{0.783}{\nano\ampere}
-e $v_{out}$ = \SI{-0.7528}{\milli\volt}. Com $R_F$ = \SI{1}{\mega\ohm},
-a medida deu $I_{B-}$ = \SI{1.182}{\nano\ampere} e $v_{out}$ =
-\SI{0.4293}{\milli\volt}. A corrente de offset fica
+Com $R_F = 0$, o ponto de operação resultou em $I_{B+}$ =
+\SI{0.783}{\nano\ampere} e $v_{out}$ = \SI{-0.7528}{\milli\volt}. Com
+$R_F$ = \SI{1}{\mega\ohm}, a medida resultou em $I_{B-}$ =
+\SI{1.182}{\nano\ampere} e $v_{out}$ = \SI{0.4293}{\milli\volt}. A
+corrente de offset é
 \[
   I_{OS} = |I_{B+} - I_{B-}| = |0{,}783 - 1{,}182| = \SI{0.399}{\nano\ampere}.
 \]
 
-As duas saídas conferem com o esperado quando se inclui o $V_{OS}$ =
-\SI{-30.4}{\micro\volt} medido no item 3. No primeiro caso a saída
-esperada é
+As duas tensões de saída são consistentes com as expressões previstas
+pela análise do circuito quando se inclui o $V_{OS}$ =
+\SI{-30.4}{\micro\volt} medido no item 3. Com realimentação negativa e
+ganho elevado, a saída se ajusta até que $v_- = v_+ - V_{OS}$ (curto
+virtual incluindo o offset). A corrente $I_{B+}$, circulando por $R_I$,
+impõe $v_+ = -I_{B+}R_I$; com $R_F = 0$ a saída coincide com $v_-$, e
+com $R_F$ = \SI{1}{\mega\ohm} soma-se a queda $I_{B-}R_F$ entre o pino
+inversor e a saída. No primeiro caso a saída esperada é
 \[
   v_{out} = -I_{B+}R_I - V_{OS}
           = -0{,}783\,\mathrm{mV} + 0{,}030\,\mathrm{mV}
@@ -25,23 +31,25 @@ igual ao valor simulado. No segundo caso,
           = 1{,}182 - 0{,}783 + 0{,}030
           = 0{,}429\,\mathrm{mV},
 \]
-de novo igual ao simulado. A folha de dados do OP07C indica $I_B$ típico
-de $\pm$\SI{1.8}{\nano\ampere} (máximo $\pm$\SI{7}{\nano\ampere}) e
-$I_{OS}$ típico de \SI{0.8}{\nano\ampere} (máximo \SI{6}{\nano\ampere}),
-então os valores simulados ficam dentro das faixas. Em um amplificador
-ideal as duas medidas seriam zero. O resultado também mostra por que se
-usa resistências iguais nas duas entradas: o erro DC cai de $I_B R$
-(quase \SI{1}{\milli\volt} aqui) para o resíduo $I_{OS}R$, bem menor.
+novamente igual ao valor simulado. A folha de dados do OP07C indica
+$I_B$ típico de $\pm$\SI{1.8}{\nano\ampere} (máximo
+$\pm$\SI{7}{\nano\ampere}) e $I_{OS}$ típico de \SI{0.8}{\nano\ampere}
+(máximo \SI{6}{\nano\ampere}), de modo que os valores simulados ficam
+dentro das faixas especificadas. Em um amplificador ideal as duas
+medidas seriam nulas. O resultado também evidencia a razão do uso de
+resistências iguais nas duas entradas: o erro DC é reduzido de $I_B R$
+(próximo de \SI{1}{\milli\volt} neste ensaio) para o resíduo $I_{OS}R$,
+substancialmente menor.
 
 \subsection{Item 3: tensão de offset de entrada}
 
 A Figura \ref{fig:item3} mostra a curva de $v_{out}$ por $v_{in}$ em
-malha aberta. A saída satura perto de $\pm$\SI{14.2}{\volt} e cruza zero
+malha aberta. A saída satura próximo de $\pm$\SI{14.2}{\volt} e cruza zero
 em $V_{OS}$ = \SI{-30.4}{\micro\volt}. A folha de dados indica típico de
 \SI{60}{\micro\volt} e máximo de \SI{150}{\micro\volt} para o OP07C. No
 amplificador ideal a curva cruzaria exatamente na origem. A largura da
-região linear também confere com a teoria: a excursão total da saída
-dividida pelo ganho dá
+região linear também é consistente com a teoria: a excursão total da
+saída dividida pelo ganho resulta em
 \[
   \Delta v_{in} \approx \frac{28{,}4\,\mathrm{V}}{499\,888}
   \approx \SI{57}{\micro\volt},
@@ -67,19 +75,20 @@ curva fica centrada na origem e a derivada numérica $dv_{out}/dv_{in}$
   A_{vd} = 499\,888 \approx \SI{500}{\volt\per\milli\volt}
   \qquad (20\log_{10} 499\,888 = \SI{114.0}{\decibel}).
 \]
-Uma segunda estimativa, feita de outra forma (a inclinação da reta
-entre os pontos $v_{in}$ = \SI{-10}{\micro\volt} e
-\SI{+10}{\micro\volt}, medida com \texttt{.meas}), dá o mesmo valor (499\,888), o que confirma a derivada. O resultado fica um pouco
-acima do típico do OP07C (\SI{400}{\volt\per\milli\volt}, mínimo
-\SI{120}{\volt\per\milli\volt}) e coincide com o típico do OP07E
+Uma segunda estimativa, obtida por método independente (a inclinação da
+reta entre os pontos $v_{in}$ = \SI{-10}{\micro\volt} e
+\SI{+10}{\micro\volt}, medida com \texttt{.meas}), resulta no mesmo
+valor (499\,888), o que confirma a derivada. O resultado fica
+ligeiramente acima do típico do OP07C (\SI{400}{\volt\per\milli\volt},
+mínimo \SI{120}{\volt\per\milli\volt}) e coincide com o típico do OP07E
 (\SI{500}{\volt\per\milli\volt}).
 
 No caso de modo comum (Figura \ref{fig:item5}), a saída varia pouco em
-toda a varredura de $\pm$\SI{3}{\volt} e a derivada dá $A_{cm}$ =
-0,2494. A inclinação medida entre $\pm$\SI{1}{\volt} com \texttt{.meas} dá
-0,2493,
-praticamente o mesmo. No amplificador ideal o ganho diferencial seria
-infinito e o de modo comum seria zero.
+toda a varredura de $\pm$\SI{3}{\volt} e a derivada resulta em $A_{cm}$
+= 0,2494. A inclinação medida entre $\pm$\SI{1}{\volt} com
+\texttt{.meas} resulta em 0,2493, valor praticamente idêntico. No
+amplificador ideal o ganho diferencial seria infinito e o de modo comum
+seria nulo.
 
 \begin{figure}[htb]
   \centering
@@ -104,18 +113,19 @@ infinito e o de modo comum seria zero.
 
 \subsection{Item 5: CMRR}
 
-Com os dois ganhos medidos, a conta é direta:
+Com os dois ganhos medidos, a CMRR é calculada diretamente:
 \[
   \mathrm{CMRR} = 20\log_{10}\frac{A_{vd}}{|A_{cm}|}
                 = 20\log_{10}\frac{499\,888}{0{,}2494}
                 = 20\log_{10}(2{,}00\times 10^{6})
                 = \SI{126.0}{\decibel}.
 \]
-A folha de dados indica típico de \SI{120}{\decibel} e mínimo de
-\SI{100}{\decibel} para o OP07C. No amplificador ideal a CMRR seria
-infinita. Na prática, o valor obtido significa que os
-$\pm$\SI{3}{\volt} de modo comum do ensaio geram menos de
-\SI{3}{\micro\volt} de erro referido à entrada.
+A folha de dados indica CMRR típica de \SI{120}{\decibel} e mínima de
+\SI{100}{\decibel} para o OP07C; o ganho diferencial que entra no
+cálculo (499\,888) foi comparado à folha de dados na subseção
+anterior. No amplificador ideal a CMRR seria infinita. O valor obtido
+implica que os $\pm$\SI{3}{\volt} de modo comum do ensaio geram menos
+de \SI{3}{\micro\volt} de erro referido à entrada.
 
 \subsection{Item 6: taxa de inflexão (slew rate)}
 
@@ -130,8 +140,8 @@ e \SI{+10}{\volt}, extraídos com \texttt{.meas}:
               = \frac{20}{76{,}83\,\mu\mathrm{s}}
               = \SI{0.260}{\volt\per\micro\second}.
 \]
-O patamar da derivada no tempo (mediana na rampa) dá o mesmo valor,
-\SI{0.260}{\volt\per\micro\second}. Os dois são compatíveis com o típico
+O patamar da derivada no tempo (mediana na rampa) resulta no mesmo
+valor, \SI{0.260}{\volt\per\micro\second}. Ambos são compatíveis com o típico
 de \SI{0.3}{\volt\per\micro\second} da folha de dados (mínimo
 \SI{0.1}{\volt\per\micro\second}) e também com a estrutura interna do
 modelo, em que uma corrente de \SI{7.5}{\micro\ampere} carrega a
@@ -149,23 +159,24 @@ acompanharia o degrau sem atraso.
   \label{fig:item6}
 \end{figure}
 
-\subsection{Item 7 (extra): o mesmo degrau com um AmpOp moderno}
+\subsection{Item 7 (extra): o mesmo degrau com um amplificador moderno}
 
-Para dar escala ao resultado do item 6, repetimos o mesmo seguidor e o
-mesmo degrau com um amplificador moderno, o ADA4610 (JFET, modelo
-embarcado no LTspice), sem compensação de offset, que nesse
-amplificador é da ordem de microvolts. A saída cruza de \SI{-10}{\volt}
-a \SI{+10}{\volt} em \SI{0,31}{\micro\second}:
+Como referência de comparação para o item 6, o mesmo seguidor e o mesmo
+degrau foram simulados com um amplificador operacional moderno, o
+ADA4610 (entrada JFET, modelo embarcado no LTspice), sem compensação de
+offset, dispensável neste ensaio porque o offset desse amplificador é
+da ordem de microvolts. A saída cruza de \SI{-10}{\volt} a
+\SI{+10}{\volt} em \SI{0,3068}{\micro\second}:
 \[
-  \mathrm{SR} = \frac{20\,\mathrm{V}}{0{,}31\,\mu\mathrm{s}}
+  \mathrm{SR} = \frac{20\,\mathrm{V}}{0{,}3068\,\mu\mathrm{s}}
               = \SI{65.2}{\volt\per\micro\second},
 \]
-com patamar da derivada em \SI{67.9}{\volt\per\micro\second}. É umas
-250 vezes o slew rate do OP07 no mesmo ensaio
-(Figura~\ref{fig:item7}): a transição que no OP07 leva \SI{77}{\micro\second}
-termina em menos de meio microssegundo. O preço aparece nas outras
-não idealidades: o ADA4610 troca a precisão DC do OP07 por velocidade,
-e a escolha entre os dois depende do que a aplicação pede.
+com patamar da derivada em \SI{67.9}{\volt\per\micro\second}. O valor
+corresponde a cerca de 250 vezes o slew rate do OP07 no mesmo ensaio
+(Figura~\ref{fig:item7}): a transição que no OP07 dura
+\SI{77}{\micro\second} se completa em menos de
+\SI{0,5}{\micro\second}. A escolha entre os dois componentes depende
+dos requisitos de velocidade e de precisão DC da aplicação.
 
 \begin{figure}[htb]
   \centering
@@ -181,17 +192,18 @@ e a escolha entre os dois depende do que a aplicação pede.
 \subsection{Verificação das derivadas numéricas}
 \label{sec:derivadas}
 
-Como os ganhos e o slew rate vêm de derivadas calculadas numericamente
-(diferença entre pontos vizinhos dos dados da simulação), três problemas
-potenciais foram verificados:
+Como os ganhos e o slew rate são obtidos de derivadas calculadas
+numericamente (diferença entre pontos vizinhos dos dados da simulação),
+três problemas potenciais foram verificados:
 
 \begin{enumerate}
   \item \textbf{Pico falso no degrau (item 6).} A derivada bruta da
         saída tem um pico de cerca de
         \SI{93000}{\volt\per\micro\second} no instante do degrau de
-        entrada. Isso não é slew do amplificador: é o salto quase
-        instantâneo da entrada (subida de \SI{1}{\pico\second}) que
-        aparece na saída como descontinuidade numérica naquele ponto.
+        entrada. Esse pico não corresponde ao slew rate do
+        amplificador: é o salto quase instantâneo da entrada (subida de
+        \SI{1}{\pico\second}) que aparece na saída como
+        descontinuidade numérica naquele ponto.
         Por isso o cálculo considera apenas a região da rampa, com
         $|v_{out}| < \SI{10}{\volt}$, que é a mesma janela da medida de
         folha de dados.
@@ -199,26 +211,27 @@ potenciais foram verificados:
         dentro da rampa, o máximo pontual da derivada
         (\SI{0.266}{\volt\per\micro\second}) ocorre logo que o
         amplificador sai da saturação negativa, em $t$ =
-        \SI{28.5}{\micro\second}. É um transitório curto, não o regime
-        da rampa. O valor representativo é o patamar (mediana da
+        \SI{28.5}{\micro\second}. Trata-se de um transitório curto, não
+        do regime da rampa. O valor representativo é o patamar (mediana da
         derivada na rampa), \SI{0.260}{\volt\per\micro\second}, que
         coincide com a medida clássica entre $\pm$\SI{10}{\volt}.
   \item \textbf{Ruído e bordas nas varreduras DC (itens 4 e 5).} Cada
-        ponto da varredura vem de uma solução independente do
-        simulador, então a derivada ponto a ponto poderia amplificar o
-        ruído numérico; além disso o primeiro e o último ponto usam
+        ponto da varredura provém de uma solução independente do
+        simulador, de modo que a derivada ponto a ponto poderia
+        amplificar o ruído numérico; além disso o primeiro e o último ponto usam
         diferença unilateral, menos precisa, e por isso não entram na
         procura do máximo. A verificação mostrou que o efeito é pequeno:
         no item 4 o máximo da derivada e a inclinação medida com
-        \texttt{.meas} dão o mesmo 499\,888; no item 5 a derivada varia só de 0,2492 a
+        \texttt{.meas} resultam no mesmo 499\,888; no item 5 a derivada
+        varia apenas de 0,2492 a
         0,2494 ao longo de toda a varredura (variação de 0,06\%) e a
-        inclinação medida dá 0,2493. Recalcular a derivada usando pontos
-        mais espaçados (5, 25 e 100 passos de distância) muda o
-        resultado em menos de 0,05\%.
+        inclinação medida resulta em 0,2493. Recalcular a derivada
+        usando pontos mais espaçados (5, 25 e 100 passos de distância)
+        altera o resultado em menos de 0,05\%.
 \end{enumerate}
 
-Em resumo, cada valor obtido por derivada ($A_{vd}$, $A_{cm}$ e SR) foi
-confirmado por uma segunda medida, feita de outra forma.
+Cada valor obtido por derivada ($A_{vd}$, $A_{cm}$ e SR) foi, portanto,
+confirmado por uma segunda medida independente.
 
 \subsection{Síntese e discussão}
 
@@ -247,13 +260,12 @@ confirmado por uma segunda medida, feita de outra forma.
 Todos os parâmetros ficaram dentro das faixas do fabricante, o que era
 esperado, já que o modelo da Analog Devices é ajustado para
 reproduzir os valores típicos da folha de dados (as páginas de
-especificações estão no Apêndice \ref{ap:datasheet}). As diferenças que
-sobram têm duas causas principais. Primeiro, o modelo representa um
-exemplar fixo do componente, enquanto a folha de dados descreve a
-variação estatística da fabricação, por isso ela traz típico e máximo.
-Segundo, as condições de medida não são idênticas: o fabricante mede o
-ganho com carga de \SI{2}{\kilo\ohm} na saída, e a simulação do item 4
-roda sem carga. No conjunto, as medidas mostram por que o OP07 é
-considerado um amplificador de precisão: offset de dezenas de
-microvolts, correntes de entrada de poucos nanoamperes e CMRR acima de
-\SI{100}{\decibel}.
+especificações estão no Apêndice \ref{ap:datasheet}). As diferenças restantes têm duas causas principais. Primeiro, o modelo
+representa um exemplar fixo do componente, enquanto a folha de dados
+descreve a variação estatística da fabricação, razão pela qual ela traz
+valores típico e máximo. Segundo, as condições de medida não são
+idênticas: o fabricante mede o ganho com carga de \SI{2}{\kilo\ohm} na
+saída, e a simulação do item 4 é executada sem carga. Em conjunto, as
+medidas justificam a classificação do OP07 como amplificador de
+precisão: offset de dezenas de microvolts, correntes de entrada de
+poucos nanoamperes e CMRR acima de \SI{100}{\decibel}.
