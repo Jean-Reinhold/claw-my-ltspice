@@ -1,38 +1,56 @@
 \section{Conclusão}
 \label{sec:conclusao}
 
-A rede treinada sob as regras do circuito passou de
-\SI{97}{\percent} de acurácia no MNIST reduzido, e a tradução para
-hardware é literal: cada um dos 5451 pesos é um resistor E96 em um
-somador inversor, a ReLU é a saturação do próprio AmpOp em trilhos
-assimétricos e a decisão final é um comparador por dígito. No LTspice,
-tanto com o AmpOp ideal quanto com o LM741, o circuito reproduziu o
-modelo nas saídas que decidem (milivolts de erro no ideal, dezenas de
-milivolts no 741) e acendeu o comparador certo, e somente ele, nas
-vinte imagens da bateria de teste.
+Os quatro objetivos do experimento foram atingidos. A rede treinada
+sob as restrições do circuito alcançou \SI{97,15}{\percent} de
+acurácia no conjunto de teste do MNIST reduzido, com
+\SI{96,44}{\percent} de disparo único correto pelo critério do
+comparador, e a tradução para hardware é literal: cada um dos
+\num{5451} pesos é um resistor da série E96 em um somador inversor, a
+ativação é a saturação do próprio amplificador em trilhos calibrados e
+a decisão é um comparador por dígito, sem processamento adicional.
 
-A comparação com software ficou equilibrada para uma imagem sozinha: o
-circuito com 741 decide em dezenas de microssegundos, na mesma ordem de
-grandeza da inferência avulsa em numpy neste Mac, e na bancada do
-caminho crítico, o AmpOp moderno (LT1810) decide mais rápido que a
-inferência avulsa do Mac. O computador ganha com folga quando processa em lote, e o custo de
-levar o formato a um chip só se justifica com requisitos fortes de
-latência e consumo. O
-valor do experimento está no que ele deixa visível: neurônios saturando
-no trilho, o terra virtual segurando o nó de soma e um padrão interno
-diferente para cada dígito, tudo medido em tensões.
+Nas simulações da rede completa, o circuito reproduziu o modelo em
+software nas saídas que decidem e acertou, com disparo único, as vinte
+janelas da sequência de teste tanto com o amplificador ideal (erro
+médio de \vErrIdealMedio~\si{\milli\volt}) quanto com o LM741 (erro
+médio de \vErrLmMedio~\si{\milli\volt}, concentrado nas saídas
+rejeitadas, sem efeito sobre a decisão). As medições internas
+confirmaram a correspondência entre a rede neural e o circuito: os
+três regimes da curva de transferência aparecem na distribuição das
+ativações, e a perda do terra virtual no nó de soma coincide com o
+corte da ReLU, como previsto.
 
-O teste com o LT1810 também confirmou o que a calibração sugeria: com
-saída que chega até os trilhos, a folga medida na bancada cai para
-milivolts e os neurônios passam a rodar com \SI{4,8}{\volt} e o
-próprio terra. O mesmo teste deixou uma lição dupla: na simulação, o modelo de
-\SI{325}{\mega\hertz} torna a rede completa impraticável e a
-caracterização teve de ser feita por bancadas menores; no circuito, a
-velocidade cobra as duas correções que o 741 dispensava, a compensação
-de \SI{2}{\pico\farad} e o equilíbrio de polarização de
-\SI{49,9}{\kilo\ohm}.
-Como próximos passos, seria interessante rodar Monte Carlo com
-tolerância de \SI{1}{\percent} nos resistores e offset real dos
-amplificadores para estimar o rendimento de uma montagem física, e
-podar a rede com foco em custo de hardware até caber em uma montagem
-discreta de bancada.
+A caracterização do LT1810 mostrou que a velocidade do amplificador
+moderno tem pré-requisitos. Sem correções, a rede completa é
+inutilizável: a capacitância de entrada com os \SI{100}{\kilo\ohm} de
+realimentação produz oscilação sustentada em todos os estágios, e o
+deslocamento de polarização de \vVtcOffsetMod~\si{\volt} por estágio,
+acumulado pelos cinco estágios, faz um comparador arbitrário disparar
+independentemente da entrada. Com as duas correções derivadas em
+bancada e aplicadas à rede inteira (capacitor de
+\SI{2}{\pico\farad} sobre cada realimentação e resistor de equilíbrio
+igual à resistência de Thévenin de cada nó de soma), a rede completa
+decidiu corretamente todas as janelas, com latência mediana de
+\vModRedeLatMediana~\si{\micro\second} e pior caso de
+\vModRedeLatMax~\si{\micro\second}, confirmando a estimativa da
+bancada de caminho crítico com diferença inferior a
+\SI{2}{\percent}. A compensação teve ainda um efeito colateral útil:
+ao eliminar a oscilação, reduziu o custo da simulação de
+\vModRedeCpuSemComp~para \vModRedeCpuComp~segundos de CPU.
+
+Na comparação com software, a rede com LM741 decide em dezenas de
+microssegundos, uma ordem de grandeza atrás da inferência avulsa em
+numpy no computador de referência; a rede com LT1810 compensado decide
+em menos de \SI{2}{\micro\second} e supera essa inferência avulsa por
+fator próximo de cinco. Em processamento por lote o computador supera
+qualquer variante do circuito, e a análise de custo indica que a
+implementação analógica só se justifica sob requisitos simultâneos de
+latência e consumo.
+
+Como continuidade, propõe-se: análise de Monte Carlo com tolerância de
+\SI{1}{\percent} nos resistores e offset real dos amplificadores, para
+estimar o rendimento de uma montagem física; poda orientada a custo de
+hardware, visando uma montagem discreta de bancada; e a medição do
+consumo de potência das variantes, completando o critério de
+comparação com a implementação em software.

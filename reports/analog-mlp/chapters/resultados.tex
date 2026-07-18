@@ -1,223 +1,432 @@
 \section{Resultados}
 \label{sec:resultados}
 
-\subsection{Um dígito atravessando a rede}
+\subsection{Resposta da camada de saída para uma amostra}
+\label{sec:amostra}
 
-A Figura~\ref{fig:amostra-saidas} resume o experimento em uma imagem.
-Um dígito 3 do conjunto de teste entra como 64 tensões e a camada de
-saída inteira é medida. A saída $z_3$ é a única acima do trilho
-$V_{TH}=\SI{2,65}{\volt}$, então só o comparador do 3 satura no nível
-alto. Os outros nove ficam em \SI{0}{\volt}.
+A Figura~\ref{fig:amostra-saidas} apresenta a resposta completa da
+camada de saída para uma única imagem, um dígito 3 do conjunto de
+teste, medida na simulação com LM741. O painel esquerdo mostra a
+entrada: a imagem $8\times 8$, isto é, as 64 tensões aplicadas às
+fontes. O painel direito mostra, para cada um dos dez neurônios de
+saída, duas barras: a tensão $V(z_k)$ do somador linear (azul) e a
+tensão $V(out_k)$ do comparador correspondente (verde); a linha
+tracejada vermelha é o limiar $V_{TH} = \SI{2,65}{\volt}$.
+
+Três observações resumem o funcionamento da rede. Primeiro, apenas
+$z_3$ está acima do limiar; as demais saídas estão volts abaixo, a
+maioria em valores negativos, resultado do treinamento que empurra os
+dígitos rejeitados para baixo. Segundo, os comparadores traduzem essa
+separação em níveis lógicos: somente $out_3$ está no nível alto,
+próximo de \SI{4,8}{\volt}, e os outros nove permanecem em
+\SI{0}{\volt}. Terceiro, a margem entre $z_3$ e o limiar (e entre o
+limiar e a segunda maior saída) é da ordem de volts, muito acima dos
+erros de milivolts a centenas de milivolts introduzidos pelos
+amplificadores reais, o que explica a robustez da decisão observada em
+todas as variantes.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{amostra_saidas.png}
-  \caption{Uma amostra, todas as saídas: as dez tensões $V(z_k)$ e os
-  dez comparadores $V(out_k)$ medidos no LTspice (variante LM741) para
-  um dígito 3 do conjunto de teste.}
+  \caption{Resposta da camada de saída para um dígito 3 do conjunto de
+  teste, medida no LTspice (variante LM741): tensões $V(z_k)$ dos dez
+  somadores e $V(out_k)$ dos dez comparadores, com o limiar $V_{TH}$
+  indicado.}
   \label{fig:amostra-saidas}
 \end{figure}
 
-Na sequência completa, com um dígito novo a cada
-\SI{250}{\micro\second}, o comportamento se repete janela após janela
-(Figura~\ref{fig:ondas}): quando a imagem troca, a saída $z$ do novo
-dígito cruza $V_{TH}$ e o comparador correspondente dispara. A
-Figura~\ref{fig:heatmap} mostra as vinte janelas de uma vez. A diagonal
-de células escuras sobre os contornos vermelhos é a rede acertando as
-vinte imagens.
+\subsection{Sequência de vinte janelas}
+\label{sec:sequencia}
+
+A Figura~\ref{fig:ondas} apresenta as formas de onda das dez primeiras
+janelas da sequência de teste, na variante LM741. No painel superior
+estão as dez saídas $z_k$: os traços cinza são os dez sinais
+sobrepostos e, em cada janela, o traço azul destaca a saída do dígito
+efetivamente apresentado. O painel inferior mostra a tensão do
+comparador desse mesmo dígito, com o rótulo da janela anotado. A cada
+troca de imagem observa-se a mesma sequência de eventos: as saídas
+$z_k$ acomodam-se nos novos valores em algumas dezenas de
+microssegundos (limitadas pelo slew rate do LM741,
+Seção~\ref{sec:tempo}), a saída do novo dígito cruza o limiar e o
+comparador correspondente comuta para o nível alto, onde permanece até
+o fim da janela. O comparador da janela anterior comuta para baixo na
+mesma transição.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{formas_de_onda.png}
-  \caption{Dez janelas de \SI{250}{\micro\second}: as dez saídas $z$ (acima) e o
-  comparador do dígito correto (abaixo).}
+  \caption{Dez janelas de \SI{250}{\micro\second} da sequência de
+  teste (variante LM741). Acima: as dez saídas $z_k$ (cinza), com a
+  saída do dígito apresentado em azul e o limiar $V_{TH}$ tracejado.
+  Abaixo: o comparador do dígito apresentado em cada janela.}
   \label{fig:ondas}
 \end{figure}
+
+A Figura~\ref{fig:heatmap} condensa as vinte janelas em uma única
+matriz. Cada coluna é uma janela (o dígito apresentado está no eixo
+horizontal) e cada linha é um comparador; a intensidade da célula é a
+tensão medida do comparador ao fim da janela, de \SI{0}{\volt} (claro)
+a \SI{4,8}{\volt} (escuro). O contorno vermelho marca, em cada coluna,
+a célula do dígito correto. O padrão observado é uma diagonal dupla de
+células escuras exatamente sobre os contornos (a sequência apresenta
+os dígitos 0 a 9 duas vezes) sem nenhuma célula escura fora deles: nas
+vinte janelas, o comparador correto disparou sozinho, o que
+corresponde a \vDisparosLm~acertos pelo critério de disparo único.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{comparadores_heatmap.png}
-  \caption{As vinte janelas de teste: tensão dos dez comparadores em
-  cada janela; o contorno vermelho marca o dígito apresentado.}
+  \caption{Tensão dos dez comparadores em cada uma das vinte janelas
+  de teste (variante LM741). O contorno vermelho indica o dígito
+  apresentado; a diagonal escura sobre os contornos corresponde aos
+  vinte disparos únicos corretos.}
   \label{fig:heatmap}
 \end{figure}
 
-\subsection{Estados internos}
+\subsection{Estados internos da rede}
+\label{sec:internos}
 
-O arquivo \texttt{.raw} da variante com AmpOp ideal guarda os 120
-neurônios ocultos, então dá para ver o que o circuito está fazendo por
-dentro. Cada efeito da rede neural corresponde a um comportamento
-clássico de AmpOp, e todos aparecem nas formas de onda. A
-Figura~\ref{fig:estados} mostra as quatro camadas
-ocultas no instante em que o dígito 3 está na entrada: a maior parte
-dos neurônios está desligada (\SI{0}{\volt}, AmpOp saturado no trilho
-de baixo), alguns operam na região linear e uns poucos encostam no teto
-de \SI{4,8}{\volt}. A ReLU do modelo é o estágio de saída do
-amplificador saturando no trilho.
+O arquivo \texttt{.raw} da variante ideal registra os 120 neurônios
+ocultos, o que permite observar o mecanismo interno da rede e
+relacioná-lo aos regimes de operação do amplificador operacional.
+
+A Figura~\ref{fig:estados} mostra uma fotografia instantânea: a tensão
+de saída de cada neurônio oculto, camada por camada, no instante de
+medição da janela do dígito 3. Cada painel é uma camada (48, 32, 24 e
+16 neurônios) e cada barra é a tensão de um neurônio; a linha
+tracejada marca o teto de \SI{4,8}{\volt}. A distribuição observada é
+a esperada para uma rede com ReLU: a maioria dos neurônios está em
+\SI{0}{\volt} (amplificador saturado no trilho inferior, neurônio
+cortado pela ativação), uma fração opera na região linear com tensões
+intermediárias e poucos neurônios encostam no teto (saturação
+superior). Os três grupos correspondem exatamente aos três trechos da
+curva de transferência da Figura~\ref{fig:vtc}.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{estados_internos.png}
-  \caption{Estados internos com o dígito 3 na entrada: tensão de saída
-  de cada neurônio oculto, camada por camada.}
+  \caption{Tensão de saída dos 120 neurônios ocultos, camada por
+  camada, no instante de medição da janela do dígito 3 (variante
+  ideal). A linha tracejada é o teto de saturação de
+  \SI{4,8}{\volt}.}
   \label{fig:estados}
 \end{figure}
 
 A Figura~\ref{fig:atividade} acompanha a última camada oculta (16
-neurônios) ao longo das vinte janelas: cada dígito acende uma
-combinação própria de neurônios, e é esse padrão que a camada de saída
-converte em um único comparador aceso. A Figura~\ref{fig:terra} mostra
-os dois regimes do somador no mesmo gráfico. Enquanto o amplificador
-está na região linear, o nó de soma fica parado no terra virtual, e é
-isso que garante que a soma dos pesos seja só uma soma de correntes em
-resistores. Quando a saída satura em \SI{0}{\volt} (a ReLU cortando o
-neurônio), a realimentação abre e o nó de soma foge algumas centenas de
-milivolts do zero. A saturação que faz a ativação e a perda do terra
-virtual são o mesmo evento, visto de dois nós diferentes.
+neurônios) ao longo das vinte janelas. Cada coluna é uma janela e cada
+linha um neurônio; a intensidade é a tensão no instante de medição.
+Observa-se que cada dígito ativa uma combinação própria de neurônios e
+que as duas apresentações do mesmo dígito (janelas 0 e 10, 1 e 11,
+etc.) produzem colunas semelhantes, embora não idênticas, pois as
+imagens são amostras diferentes da mesma classe. É esse código
+interno, e não qualquer pixel individual, que a camada de saída
+converte em um único comparador ativo.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{atividade_oculta.png}
-  \caption{Última camada oculta ao longo das vinte janelas: o padrão
-  interno de cada dígito.}
+  \caption{Tensão dos 16 neurônios da última camada oculta em cada uma
+  das vinte janelas (variante ideal): cada dígito ativa um padrão
+  próprio, repetido de forma aproximada na segunda apresentação da
+  mesma classe.}
   \label{fig:atividade}
 \end{figure}
+
+A Figura~\ref{fig:terra} examina um único neurônio, $a^{(4)}_7$, sob
+dois pontos de vista simultâneos. O painel superior mostra a tensão de
+saída ao longo de dez janelas: o neurônio alterna entre janelas em que
+opera na região linear (tensões entre \SI{0}{\volt} e
+\SI{4,8}{\volt}) e janelas em que a ativação o corta em
+\SI{0}{\volt}. O painel inferior mostra o nó de soma do mesmo
+neurônio, em escala de milivolts. Enquanto a saída está na região
+linear, a realimentação mantém o nó de soma no terra virtual, a
+milivolts do zero -- condição que garante que a soma ponderada seja de
+fato uma soma de correntes definidas apenas pelos resistores. Quando a
+saída satura em \SI{0}{\volt}, a malha de realimentação abre
+(o amplificador não pode mais baixar a saída) e o nó de soma
+afasta-se do zero em algumas centenas de milivolts, seguindo as
+entradas. A saturação que implementa a ativação e a perda do terra
+virtual são o mesmo evento observado em dois nós distintos do
+circuito; o erro de soma associado não se propaga, pois ocorre
+justamente quando a saída está grampeada no valor correto da ReLU.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{terra_virtual.png}
-  \caption{Saída do neurônio $a^{(4)}_7$ (acima) e o seu nó de soma em
-  escala de milivolts (abaixo): terra virtual na região linear; quando
-  a saída satura, a malha abre e o nó se afasta do zero.}
+  \caption{Neurônio $a^{(4)}_7$ (variante ideal): tensão de saída
+  (acima) e nó de soma em escala de milivolts (abaixo). Na região
+  linear o nó permanece em terra virtual; quando a saída satura em
+  \SI{0}{\volt}, a malha abre e o nó de soma afasta-se do zero.}
   \label{fig:terra}
 \end{figure}
 
-\subsection{Modelo ideal, LM741 e software}
+\subsection{Comparação com o modelo em software}
 \label{sec:medidas}
 
 A Tabela~\ref{tab:medidas} compara, para as dez primeiras janelas, a
-saída $z$ do dígito correto no modelo em software e nas duas simulações
-da rede completa. A Figura~\ref{fig:scatter} estende a comparação às
-200 medidas de $z$ de cada variante. Com o AmpOp ideal o erro fica em
-\vErrIdealMedio~\si{\milli\volt} na média. Com o LM741 o erro médio
-sobe para \vErrLmMedio~\si{\milli\volt}, mas ele se concentra na
-região bem negativa, dos dígitos rejeitados, onde offset, ganho finito
-e a saturação real do 741 se acumulam sem afetar nada: essas saídas
-ficam volts abaixo do trilho de comparação. Nas saídas que importam,
-as que cruzam $V_{TH}$, a diferença para o modelo é de uns
-\SI{17}{\milli\volt}, que é só a folga entre a saturação calibrada do
-741 (\SI{4,82}{\volt}) e o teto de \SI{4,8}{\volt} do modelo. A coluna
-``maior errada'' da tabela mostra a folga: nas vinte janelas, a maior
-saída errada nunca passou de \SI{0,29}{\volt}, mais de \SI{2,3}{\volt}
-abaixo do trilho de comparação. Por isso a decisão não muda:
-\vDisparosLm~das 20 janelas terminaram com disparo único e correto.
+saída $z$ do dígito correto em três avaliações: o modelo em software
+(numpy, com os pesos E96), o circuito com amplificador ideal e o
+circuito com LM741. A coluna ``maior errada'' registra a maior saída
+entre os nove dígitos incorretos (medida na variante LM741) e a coluna
+``disparo'' indica se apenas o comparador correto ultrapassou o limiar
+naquela janela.
 
 \begin{table}[htb]
   \centering
-  \caption{Saída $z$ do dígito correto em cada janela: modelo em software,
-  circuito com AmpOp ideal e circuito com LM741. Disparo indica que
-  apenas o comparador certo acendeu (variante LM741).}
+  \caption{Saída $z$ do dígito correto em cada janela: modelo em
+  software, circuito com amplificador ideal e circuito com LM741.
+  ``Maior errada'' é a maior saída entre os dígitos incorretos e
+  ``disparo'' indica disparo único correto (ambos na variante LM741).}
   \label{tab:medidas}
   \input{gerado/tabela_medidas}
 \end{table}
 
+A Figura~\ref{fig:scatter} estende a comparação às 200 medidas de $z$
+de cada variante (dez saídas em vinte janelas). O eixo horizontal é o
+valor previsto pelo modelo e o vertical o valor medido no LTspice; a
+reta cinza é a identidade, sobre a qual estariam medidas perfeitas.
+Com o amplificador ideal os pontos são indistinguíveis da identidade
+(erro médio de \vErrIdealMedio~\si{\milli\volt}, máximo de
+\vErrIdealMax~\si{\milli\volt}): esse resíduo mede o erro estrutural
+do circuito, dominado pelo arredondamento E96 e pelo ganho finito.
+Com o LM741 o erro médio sobe para \vErrLmMedio~\si{\milli\volt}, mas
+a dispersão concentra-se no canto inferior esquerdo do gráfico, na
+região das saídas fortemente negativas dos dígitos rejeitados, onde
+offset, ganho finito e a saturação real do LM741 se acumulam sem
+consequência: essas saídas permanecem volts abaixo do limiar de
+comparação. Nas saídas que decidem, próximas ou acima de $V_{TH}$, a
+diferença para o modelo é de dezenas de milivolts, essencialmente a
+folga entre o nível de saturação calibrado do LM741
+($\approx\SI{4,81}{\volt}$) e o teto de \SI{4,8}{\volt} do modelo. A
+tabela confirma a margem: em vinte janelas, a maior saída errada não
+passou de \SI{0,29}{\volt}, mais de \SI{2,3}{\volt} abaixo do limiar.
+Por essa razão a decisão é idêntica nas três avaliações:
+\vDisparosLm~das vinte janelas com disparo único correto.
+
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.66\textwidth]{logits_spice_vs_numpy.png}
-  \caption{Saídas $z$ medidas contra o modelo: AmpOp ideal e LM741.}
+  \caption{Saídas $z$ medidas no LTspice contra o modelo em software
+  (200 medidas por variante). O erro do LM741 concentra-se nas saídas
+  fortemente negativas, sem efeito sobre a decisão.}
   \label{fig:scatter}
 \end{figure}
 
-No conjunto de teste completo (\num{10000} imagens), o modelo com os
-valores E96 acerta \SI{97,15}{\percent} quando a resposta é o neurônio
-de maior saída. Em
-\SI{96,44}{\percent} das imagens o critério do comparador funciona de
-forma limpa (só o neurônio certo acima de $V_{TH}$), em
-\SI{0,86}{\percent} nenhum comparador acende e em \SI{0,51}{\percent}
-mais de um acende. A matriz de confusão está na
-Figura~\ref{fig:confusao}; os erros se concentram nos pares esperados
-em baixa resolução, como 4 com 9 e 5 com 3.
+No conjunto de teste completo (\num{10000} imagens), avaliado em
+software com os pesos E96, o modelo atinge \SI{97,15}{\percent} de
+acurácia pelo critério do máximo. Pelo critério mais exigente do
+comparador, \SI{96,44}{\percent} das imagens produzem disparo único
+correto, \SI{0,86}{\percent} não disparam comparador algum (todas as
+saídas abaixo do limiar) e \SI{0,51}{\percent} disparam mais de um. A
+Figura~\ref{fig:confusao} apresenta a matriz de confusão pelo critério
+do máximo: linhas são o dígito verdadeiro, colunas a resposta da rede,
+e a diagonal concentra a quase totalidade das imagens. Os erros
+restantes agrupam-se nos pares esperados para a resolução $8\times 8$,
+como 4 confundido com 9 e 5 com 3, pares cujos traços se tornam
+semelhantes após a redução da imagem.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.68\textwidth]{matriz_confusao.png}
-  \caption{Matriz de confusão no conjunto de teste (resposta pelo
-  neurônio de maior saída).}
+  \caption{Matriz de confusão no conjunto de teste completo
+  (\num{10000} imagens, resposta pelo neurônio de maior saída). Os
+  erros concentram-se em pares visualmente próximos na resolução
+  reduzida.}
   \label{fig:confusao}
 \end{figure}
 
-\subsection{Tempo de inferência e custo}
-\label{sec:tempo-custo}
+\subsection{Rede completa com o LT1810}
+\label{sec:moderno-resultados}
 
-No circuito, a inferência é o tempo de acomodação: da troca da imagem
-na entrada até o comparador correto cruzar o nível de decisão. A
-Figura~\ref{fig:transicao} amplia uma dessas trocas. Com o AmpOp ideal
-a saída acompanha a entrada quase instantaneamente; com o LM741 dá para
-ver a rampa do slew rate de uns \SI{0,5}{\volt\per\micro\second}
-atravessando os cinco estágios até o comparador virar. Medindo nas
-formas de onda da rede completa, a mediana da latência do LM741 fica em
-\vLatenciaLmMediana~\si{\micro\second} e o pior caso em
-\vLatenciaLmMax~\si{\micro\second}. A bancada do caminho crítico aproxima a rede por cinco estágios em
-série. Com o LM741 ela decide em
-\vLatenciaCadeiaLm~\si{\micro\second}, abaixo dos
-\vLatenciaLmMax~\si{\micro\second} medidos na rede completa: o tempo
-do 741 é dominado pelo slew rate, e as excursões da bancada (\SI{3}{\volt}
-por estágio) são menores que as da rede. O LT1810 trouxe duas lições de bancada antes do número. Primeira: com
-\SI{100}{\kilo\ohm} de realimentação, a capacitância de entrada do
-amplificador de \SI{325}{\mega\hertz} cria um polo dentro da banda e
-cada estágio oscila; a correção clássica é um capacitor de
-\SI{2}{\pico\farad} em paralelo com cada $R_f$, que estabiliza a
-malha e define a banda de cada estágio em uns \SI{800}{\kilo\hertz}.
-Segunda: a corrente de polarização do LT1810, bipolar, é de uns
-\SI{1,5}{\micro\ampere}, mil vezes a do 741, e sobre \SI{100}{\kilo\ohm}
-desloca cada estágio em \SI{0,15}{\volt}; sem o resistor de equilíbrio
-de \SI{49,9}{\kilo\ohm} na entrada não inversora, o deslocamento
-acumulado impedia o comparador de disparar. Com as duas correções, que
-uma montagem real da rede inteira também precisaria, a cadeia decide em
-\vLatenciaCadeiaMod~\si{\micro\second}: a latência é limitada pelo RC
-da compensação, e não pelo slew rate do amplificador.
-A Figura~\ref{fig:cadeia} mostra as duas cadeias respondendo ao mesmo
-degrau, cada uma na sua escala de tempo.
+As duas simulações de janela reduzida descritas na
+Seção~\ref{sec:moderno-rede} verificam se as correções derivadas nas
+bancadas sustentam a rede completa de 260 amplificadores. A
+Figura~\ref{fig:moderno-saidas} resume o resultado no formato da
+Figura~\ref{fig:heatmap}: tensão dos dez comparadores ao fim de cada
+uma das seis janelas, sem compensação (acima) e com compensação
+(abaixo); o contorno vermelho marca o dígito apresentado e a linha
+pontilhada separa as duas janelas de partida, excluídas das
+estatísticas.
+
+O contraste é imediato. Sem compensação, o comparador do dígito 7
+domina cinco das seis janelas, independentemente da imagem
+apresentada; das quatro janelas válidas, apenas uma
+(\vModRedeAcertosSemComp~de \vModRedeJanelasValidas) termina com o
+comparador correto sozinho em nível alto, e mesmo nesse caso o
+disparo ocorreu ainda na janela anterior. Com compensação, todas as
+janelas, inclusive as de partida, terminam com disparo único correto
+(\vModRedeAcertosComp~de \vModRedeJanelasValidas~válidas).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\textwidth]{cadeia_critica.png}
-  \caption{Bancada do caminho crítico: os cinco estágios e o comparador
-  respondendo ao degrau de entrada, com o LM741 (esquerda) e com o
-  LT1810 (direita). A linha tracejada é o trilho $V_{TH}$.}
-  \label{fig:cadeia}
+  \includegraphics[width=0.85\textwidth]{moderno_rede_saidas.png}
+  \caption{Rede completa com LT1810, janela reduzida de
+  \SI{15}{\micro\second}: tensão dos dez comparadores ao fim de cada
+  janela, sem compensação (acima) e com compensação (abaixo). O
+  contorno vermelho indica o dígito apresentado; a linha pontilhada
+  separa as janelas sob a rampa de partida.}
+  \label{fig:moderno-saidas}
 \end{figure}
+
+A Figura~\ref{fig:moderno-ondas} mostra as formas de onda por trás
+das duas matrizes. Em cada painel, o traço azul é o comparador do
+dígito da janela corrente, o cinza são os demais comparadores e, no
+painel superior, o traço vermelho destaca $out_7$. Sem compensação
+(painel superior) o circuito exibe as duas patologias previstas pelas
+bancadas. A primeira é o disparo indevido: $out_7$ sobe ainda durante
+a rampa de partida e permanece dominante, porque o deslocamento de
+polarização de cada estágio (\vVtcOffsetMod~\si{\volt} por estágio
+unitário, Figura~\ref{fig:vtc}), acumulado ao longo dos cinco
+estágios, desloca as saídas $z$ o suficiente para levar $z_7$ acima do
+limiar independentemente da entrada. A segunda é a instabilidade: os
+traços apresentam oscilação sustentada de alta frequência (as faixas
+densas do gráfico), consequência do polo formado pela capacitância de
+entrada com os \SI{100}{\kilo\ohm} de realimentação em cada um dos 260
+estágios. Essa oscilação tem um custo direto de simulação: o passo de
+tempo permanece na escala do período da oscilação e a simulação
+consumiu \vModRedeCpuSemComp~segundos de CPU para
+\SI{90}{\micro\second} simulados. No painel inferior, com as duas
+correções aplicadas, as duas patologias desaparecem: não há oscilação
+visível, os comparadores repousam em \SI{0}{\volt} e, a cada troca de
+janela, apenas o comparador do novo dígito comuta para
+\SI{4,8}{\volt}. A mesma simulação passou a consumir
+\vModRedeCpuComp~segundos de CPU, cerca de 34 vezes menos: a
+compensação estabiliza o circuito e, por consequência, também o
+integrador numérico.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{moderno_rede_ondas.png}
+  \caption{Formas de onda dos dez comparadores nas duas simulações da
+  rede completa com LT1810. Sem compensação (acima): oscilação
+  sustentada e disparo indevido de $out_7$ pelo acúmulo do
+  deslocamento de polarização. Com compensação (abaixo): disparos
+  únicos corretos em todas as janelas.}
+  \label{fig:moderno-ondas}
+\end{figure}
+
+A Figura~\ref{fig:moderno-decisao} mede a latência de decisão da rede
+compensada nas quatro janelas válidas. Cada traço é o comparador do
+dígito correto de uma janela, com o tempo contado a partir do início
+da troca de imagem; o ponto marca o cruzamento do nível de decisão de
+\SI{2,4}{\volt} (metade do nível alto). As quatro decisões ocorrem
+entre \SI{1,32}{\micro\second} e \vModRedeLatMax~\si{\micro\second},
+com mediana de \vModRedeLatMediana~\si{\micro\second}. O pior caso de
+\vModRedeLatMax~\si{\micro\second} confirma, agora na rede completa, a
+estimativa de \vLatenciaCadeiaMod~\si{\micro\second} obtida na bancada
+de caminho crítico (Seção~\ref{sec:tempo}): a diferença entre a
+bancada e a rede é inferior a \SI{2}{\percent}. Confirma também o
+regime previsto: com a compensação de \SI{2}{\pico\farad}, a latência
+é limitada pela constante de tempo $R_f C_f$ dos cinco estágios em
+cascata, e não pelo slew rate do amplificador.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.85\textwidth]{moderno_rede_decisao.png}
+  \caption{Latência de decisão da rede completa compensada com LT1810:
+  comparador do dígito correto nas quatro janelas válidas, alinhadas
+  ao início da troca de imagem. Os pontos marcam o cruzamento do nível
+  de decisão de \SI{2,4}{\volt}.}
+  \label{fig:moderno-decisao}
+\end{figure}
+
+Nas janelas válidas, o erro médio das saídas $z$ da rede compensada em
+relação ao modelo é de \vModRedeErrMedio~\si{\milli\volt} (máximo de
+\vModRedeErrMax~\si{\milli\volt}), da mesma ordem do LM741. O resíduo
+deve-se à parcela das correntes de polarização que o resistor de
+equilíbrio não cancela (a corrente de offset entre as duas entradas) e
+ao próprio deslocamento dos comparadores, que permanecem sem
+correção; como as margens de decisão são de volts, o disparo não é
+afetado em nenhuma janela.
+
+\subsection{Tempo de inferência e comparação com software}
+\label{sec:tempo}
+
+No circuito, o tempo de inferência é o tempo de acomodação: o
+intervalo entre a troca da imagem na entrada e o cruzamento do nível
+de decisão pelo comparador correto. A Figura~\ref{fig:transicao}
+amplia uma troca de janela nas duas variantes da rede completa
+principal. O painel superior mostra a saída $z$ do dígito da nova
+janela e o inferior o comparador correspondente. Com o amplificador
+ideal (azul), a saída acompanha a rampa de entrada de
+\SI{10}{\micro\second} quase sem atraso adicional e o comparador
+comuta assim que $z$ cruza o limiar. Com o LM741 (laranja), a saída
+sobe em rampas retas de aproximadamente
+\SI{0,5}{\volt\per\micro\second} -- o slew rate do amplificador, que
+se torna o fator dominante porque cada um dos cinco estágios em
+cascata precisa percorrer a sua excursão nessa taxa antes de o
+seguinte concluir a dele.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.9\textwidth]{transicao_janela.png}
-  \caption{Uma troca de imagem ampliada: saída $z$ do dígito correto
-  (acima) e comparador (abaixo), com o AmpOp ideal e com o LM741.}
+  \caption{Ampliação de uma troca de imagem: saída $z$ do dígito da
+  nova janela (acima) e comparador correspondente (abaixo), com o
+  amplificador ideal e com o LM741. As rampas retas do LM741 são o seu
+  slew rate de \SI{0,5}{\volt\per\micro\second}.}
   \label{fig:transicao}
 \end{figure}
 
-No computador (este Mac, numpy nativo), o mesmo modelo responde em
-\SI{\vMacUmaImagem}{\micro\second} para uma imagem avulsa, e em
-\SI{\vMacLote}{\micro\second} por imagem quando processa \num{10000} de
-uma vez. A Tabela~\ref{tab:fps} traduz tudo em imagens por segundo,
-usando o pior caso de cada circuito como período seguro de amostragem.
-Para uma imagem sozinha, a rede de AmpOps de 1968 fica na mesma ordem
-de grandeza do processador, e a versão com o AmpOp moderno passa na
-frente da inferência avulsa do Mac. Em lote, o computador ganha com
-folga.
+Medida sobre as formas de onda das vinte janelas, a latência de
+decisão do LM741 tem mediana de
+\vLatenciaLmMediana~\si{\micro\second} e pior caso de
+\vLatenciaLmMax~\si{\micro\second}; a variante ideal, limitada apenas
+pela rampa de entrada e pelo RC de saída do macromodelo, decide com
+mediana de \vLatenciaIdealMediana~\si{\micro\second} e pior caso de
+\vLatenciaIdealMax~\si{\micro\second}.
+
+A Figura~\ref{fig:cadeia} apresenta as bancadas de caminho crítico:
+cinco somadores unitários em série e o comparador, submetidos a um
+degrau de entrada, com o LM741 (esquerda) e com o LT1810 compensado
+(direita), cada qual na sua escala de tempo. Em ambos os painéis o
+traço azul é a saída do quinto estágio e o verde o comparador; a linha
+tracejada é o limiar. Com o LM741 a cadeia decide em
+\vLatenciaCadeiaLm~\si{\micro\second}, abaixo do pior caso de
+\vLatenciaLmMax~\si{\micro\second} da rede completa: o tempo do LM741
+é dominado pelo slew rate e as excursões da bancada
+(\SI{3}{\volt} por estágio) são menores que as excursões de até
+\SI{9}{\volt} das saídas da rede. A bancada fornece portanto a ordem
+de grandeza correta e o mecanismo dominante, e o valor exato requer a
+rede completa. Com o LT1810 compensado a cadeia decide em
+\vLatenciaCadeiaMod~\si{\micro\second}, valor confirmado pela rede
+completa compensada (\vModRedeLatMax~\si{\micro\second},
+Seção~\ref{sec:moderno-resultados}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{cadeia_critica.png}
+  \caption{Bancadas de caminho crítico (cinco somadores unitários e
+  comparador) respondendo a um degrau de entrada: LM741 (esquerda) e
+  LT1810 compensado (direita), em escalas de tempo distintas. A linha
+  tracejada é o limiar $V_{TH}$.}
+  \label{fig:cadeia}
+\end{figure}
+
+No computador usado como referência (numpy nativo no hospedeiro), o
+mesmo modelo responde em \SI{\vMacUmaImagem}{\micro\second} para uma
+imagem avulsa e em \SI{\vMacLote}{\micro\second} por imagem quando
+processa as \num{10000} imagens em lote. A Tabela~\ref{tab:fps} e a
+Figura~\ref{fig:tempos} traduzem os piores casos medidos em taxa de
+imagens por segundo, adotando o pior caso como período seguro de
+amostragem. Para inferência de imagem única, a rede com LM741 fica
+uma ordem de grandeza abaixo do computador; a rede com LT1810
+compensado, decidindo em menos de \SI{2}{\micro\second}, supera a
+inferência avulsa do computador por fator próximo de cinco. Em lote,
+o computador amortiza custos fixos sobre \num{10000} imagens e supera
+qualquer das variantes por mais de uma ordem de grandeza.
 
 \begin{table}[htb]
   \centering
-  \caption{Tempo por imagem e taxa de imagens por segundo de cada
+  \caption{Tempo por imagem e taxa correspondente de cada
   implementação. Para os circuitos, o período é o pior caso medido da
-  latência de decisão.}
+  latência de decisão (rede completa em ambos os casos).}
   \label{tab:fps}
   \begin{tabular}{lrr}
     \toprule
     Implementação & Tempo por imagem & Imagens por segundo \\
     \midrule
     Rede com LM741 & \vLatenciaLmMax~\si{\micro\second} & \vFpsLm \\
-    Rede com LT1810 (caminho crítico) & \vLatenciaCadeiaMod~\si{\micro\second} & \vFpsMod \\
+    Rede com LT1810 compensado & \vModRedeLatMax~\si{\micro\second} & \vFpsModRede \\
     Mac, uma imagem por vez & \vMacUmaImagem~\si{\micro\second} & \vMacFpsUma \\
     Mac, lote de \num{10000} & \vMacLote~\si{\micro\second} & \vMacFpsLote \\
     \bottomrule
@@ -228,21 +437,27 @@ folga.
   \centering
   \includegraphics[width=\textwidth]{tempo_por_imagem.png}
   \caption{Tempo por imagem de cada implementação, em escala
-  logarítmica.}
+  logarítmica. Para o LT1810 a figura usa a estimativa da bancada de
+  caminho crítico (\vLatenciaCadeiaMod~\si{\micro\second}), que difere
+  menos de \SI{2}{\percent} do valor medido na rede completa
+  compensada.}
   \label{fig:tempos}
 \end{figure}
 
-Sobre custo, em ordens de grandeza. Montar esta rede com componentes
-discretos (260 LM741, quase 6000 resistores de precisão e as placas
-para tudo isso) fica na casa de poucos milhares de reais, e o resultado
-ocupa uma bandeja inteira. Integrar a mesma topologia em um chip
-analógico configurável, com AmpOps pequenos e resistores programáveis
-guardando os pesos em um processo maduro de \SI{180}{\nano\metre},
-daria um chip de algumas dezenas de \si{\milli\metre\squared}: o custo
-por chip em volume é de poucos dólares, mas o custo fixo de projeto e
-máscaras fica na casa das centenas de milhares de dólares. Enquanto
-isso, um microcontrolador de poucos reais roda o mesmo modelo em
-software em alguns milissegundos. A conclusão é que o formato analógico só compensa quando latência de
-microssegundos e consumo muito baixo são requisitos reais. Como
-ferramenta didática, porém, o formato tem a vantagem de ser concreto:
-cada peso da rede é um resistor visível no esquemático.
+Quanto ao custo, a análise limita-se a ordens de grandeza. Uma
+montagem discreta desta rede (260 amplificadores, cerca de 6000
+resistores de precisão e as placas correspondentes) situa-se na casa
+de poucos milhares de reais e ocupa área de bancada considerável. A
+integração da mesma topologia em um processo maduro de
+\SI{180}{\nano\metre}, com amplificadores compactos e resistores
+programáveis armazenando os pesos, resultaria em um circuito integrado
+de algumas dezenas de milímetros quadrados: unidades de poucos dólares
+em volume, porém com custo fixo de projeto e máscaras na casa das
+centenas de milhares de dólares. Em contrapartida, um microcontrolador
+de baixo custo executa o mesmo modelo em software em alguns
+milissegundos. Conclui-se que a implementação analógica só se
+justifica quando latência de microssegundos e consumo muito baixo são
+requisitos simultâneos; como instrumento didático, entretanto, ela tem
+o mérito da concretude, pois cada peso da rede é um resistor
+identificável no esquemático e cada não idealidade do amplificador tem
+efeito mensurável e explicável.

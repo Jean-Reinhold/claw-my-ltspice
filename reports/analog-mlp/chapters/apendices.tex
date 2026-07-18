@@ -3,13 +3,17 @@
 \section{Netlist do circuito}
 \label{ap:netlist}
 
-As três netlists completas (\texttt{analog\_mlp.cir} com o AmpOp ideal,
-\texttt{analog\_mlp\_741.cir} com o LM741 e
-\texttt{analog\_mlp\_moderno.cir} com o LT1810, cerca de 6600 linhas
-cada) são geradas automaticamente a partir dos pesos treinados e ficam
-em \texttt{experiments/analog-mlp/}. Abaixo, um trecho representativo,
-exatamente como simulado: trilhos, um pixel de entrada, um neurônio
-oculto completo e os comparadores.
+As netlists completas das variantes são geradas automaticamente a
+partir dos pesos treinados e residem em
+\texttt{experiments/analog-mlp/}: \texttt{analog\_mlp.cir}
+(amplificador ideal), \texttt{analog\_mlp\_741.cir} (LM741),
+\texttt{analog\_mlp\_moderno.cir} (LT1810) e as versões de janela
+reduzida \texttt{analog\_mlp\_moderno\_fast.cir} e
+\texttt{analog\_mlp\_moderno\_comp.cir}
+(Seção~\ref{sec:moderno-rede}), com cerca de 6600 linhas cada.
+Abaixo, um trecho representativo,
+exatamente como simulado: trilhos, um pixel de entrada com o seu
+trilho negado, um neurônio oculto completo e os comparadores.
 
 {\small
 \begin{verbatim}
@@ -49,13 +53,13 @@ RL0 out0 0 100k
 \end{verbatim}
 }
 
-Nas variantes com AmpOp real mudam só a biblioteca
-(\texttt{models/lm741.lib} para o LM741, baixado à parte por não ser
-redistribuível, e \texttt{LTC.lib} embarcada no LTspice para o LT1810)
-e os valores dos trilhos, calibrados com \texttt{bench\_741\_sat.cir} e
-\texttt{bench\_moderno\_sat.cir} para colocar a saturação dos neurônios
-em \SI{0}{\volt} e \SI{4,8}{\volt}. O modelo ideal da primeira
-variante:
+Nas variantes com amplificador comercial mudam apenas a biblioteca
+(\texttt{models/lm741.lib} para o LM741, obtida à parte por não ser
+redistribuível, e \texttt{LTC.lib}, embarcada no LTspice, para o
+LT1810) e os trilhos de alimentação, calibrados com
+\texttt{bench\_741\_sat.cir} e \texttt{bench\_moderno\_sat.cir} para
+posicionar a saturação dos neurônios ocultos em \SI{0}{\volt} e
+\SI{4,8}{\volt}. O macromodelo ideal da primeira variante:
 
 {\small
 \begin{verbatim}
@@ -68,31 +72,80 @@ COUT OUT 0 {Cload}
 \end{verbatim}
 }
 
+Na versão compensada da rede com LT1810, o pós-processador
+acrescenta, a cada estágio com realimentação, o capacitor de
+compensação e o resistor de equilíbrio de polarização, este calculado
+como o paralelo exato de todos os resistores do nó de soma do
+estágio. O mesmo neurônio do trecho anterior torna-se:
+
+{\small
+\begin{verbatim}
+XS4_0 bS4_0 s4_0 vcc veer a4_0 LT1810
+RBALS4_0 bS4_0 0 8.89269k
+RF4_0 a4_0 s4_0 100k
+CFRF4_0 a4_0 s4_0 2p
+   ... (ramos de peso inalterados)
+XI4_0 bI4_0 si4_0 vcc vee na4_0 LT1810
+RBALI4_0 bI4_0 0 50k
+RIF4_0 na4_0 si4_0 100k
+CFRIF4_0 na4_0 si4_0 2p
+\end{verbatim}
+}
+
 \section{Código e reprodução}
 \label{ap:codigo}
 
-Os scripts ficam em \texttt{experiments/analog-mlp/}:
-\texttt{train\_analog\_mlp.py} baixa o MNIST, treina com as regras do
-circuito e grava os pesos; \texttt{analog\_mlp.py} gera as três
-netlists, os esquemáticos e a figura de topologia;
-\texttt{bench\_741\_sat.cir} e \texttt{bench\_moderno\_sat.cir} calibram
-a saturação do LM741 e do LT1810; \texttt{bench\_chain\_741.cir} e
-\texttt{bench\_chain\_moderno.cir} medem a latência do caminho crítico
-de cinco estágios; \texttt{analyze\_results.py} compara as simulações com o modelo,
-extrai a latência dos comparadores e gera as figuras e tabelas deste
-relatório; \texttt{bench\_host\_inference.py} mede o tempo de
-inferência em numpy no hospedeiro. Sequência completa:
+Os scripts residem em \texttt{experiments/analog-mlp/}:
+
+\begin{itemize}
+  \item \texttt{train\_analog\_mlp.py} -- obtém o MNIST, treina com as
+        restrições do circuito e grava os pesos;
+  \item \texttt{analog\_mlp.py} -- gera as três netlists principais,
+        os esquemáticos e a figura de topologia;
+  \item \texttt{bench\_741\_sat.cir} e
+        \texttt{bench\_moderno\_sat.cir} -- calibram a saturação do
+        LM741 e do LT1810; \texttt{bench\_vtc.cir} -- mede a curva de
+        transferência final dos três amplificadores nos trilhos
+        calibrados;
+  \item \texttt{bench\_chain\_741.cir} e
+        \texttt{bench\_chain\_moderno.cir} -- medem a latência do
+        caminho crítico de cinco estágios;
+  \item \texttt{analog\_mlp\_moderno\_fast.py} e
+        \texttt{analog\_mlp\_moderno\_comp.py} -- geram as redes
+        completas de janela reduzida com LT1810, sem e com as
+        correções de compensação e equilíbrio;
+  \item \texttt{analyze\_results.py} -- compara as simulações
+        principais com o modelo, extrai latências e gera figuras e
+        tabelas; \texttt{analyze\_moderno\_rede.py} -- analisa as
+        redes de janela reduzida, a curva de transferência e o esquema
+        de entrada, gerando as figuras e macros correspondentes;
+  \item \texttt{bench\_host\_inference.py} -- mede o tempo de
+        inferência em numpy no hospedeiro.
+\end{itemize}
+
+Sequência completa de reprodução:
 
 \begin{verbatim}
 ./claw-spice code build experiments/analog-mlp/train_analog_mlp.py \
     --output-dir experiments/analog-mlp
 ./claw-spice code build experiments/analog-mlp/analog_mlp.py \
     --output-dir experiments/analog-mlp
+./claw-spice code build experiments/analog-mlp/analog_mlp_moderno_fast.py \
+    --output-dir experiments/analog-mlp
+./claw-spice code build experiments/analog-mlp/analog_mlp_moderno_comp.py \
+    --output-dir experiments/analog-mlp
 ./claw-spice sim run experiments/analog-mlp/analog_mlp.cir --timeout 2400
 ./claw-spice sim run experiments/analog-mlp/analog_mlp_741.cir --timeout 2400
-./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
 ./claw-spice sim run experiments/analog-mlp/bench_chain_741.cir --timeout 1800
+./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
+./claw-spice sim run experiments/analog-mlp/bench_vtc.cir --timeout 600
+./claw-spice sim run experiments/analog-mlp/analog_mlp_moderno_fast.cir \
+    --timeout 2400
+./claw-spice sim run experiments/analog-mlp/analog_mlp_moderno_comp.cir \
+    --timeout 2400
 ./claw-spice code build experiments/analog-mlp/analyze_results.py \
+    --output-dir experiments/analog-mlp
+./claw-spice code build experiments/analog-mlp/analyze_moderno_rede.py \
     --output-dir experiments/analog-mlp
 python3 experiments/analog-mlp/bench_host_inference.py
 ./claw-spice report analog-mlp

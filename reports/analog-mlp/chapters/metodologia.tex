@@ -1,176 +1,325 @@
-\section{Projeto}
+\section{Metodologia}
 \label{sec:projeto}
 
-\subsection{O neurônio com amplificadores operacionais}
+\subsection{O neurônio como somador inversor}
 \label{sec:neuronio}
 
-O bloco básico é o somador inversor com realimentação
-$R_f = \SI{100}{\kilo\ohm}$. A saída é a soma das entradas, cada uma
-com ganho $R_f/R_i$:
+O bloco fundamental da rede é o somador inversor com resistor de
+realimentação $R_f = \SI{100}{\kilo\ohm}$. Com o nó inversor mantido em
+terra virtual pela realimentação negativa, a saída é a combinação
+linear das entradas:
 %
 \[ v_{\mathrm{out}} = -R_f\left(\frac{v_1}{R_1} + \frac{v_2}{R_2} +
-   \dots\right). \]
+   \dots\right), \]
 %
-Um peso $w$ da rede vira um resistor $R_i = R_f/|w|$. Um peso de
-$0{,}77$, por exemplo, vira \SI{130}{\kilo\ohm}; um peso de $0{,}1$
-vira \SI{1}{\mega\ohm}.
+de modo que um peso $w$ do modelo corresponde a um resistor de entrada
+$R_i = R_f/|w|$. Um peso de $0{,}77$, por exemplo, é realizado por um
+resistor de \SI{130}{\kilo\ohm}; um peso de $0{,}1$, por um de
+\SI{1}{\mega\ohm}. Todos os valores são arredondados para a série E96
+ainda durante o treinamento (Seção~\ref{sec:treinamento}).
 
-Faltam três detalhes, e todos se resolvem com mais AmpOps. Primeiro, o
-sinal do peso: o somador inverte tudo, então cada neurônio publica
-também uma cópia negada da sua saída, feita com um inversor de ganho 1
-(dois resistores de \SI{100}{\kilo\ohm}). Peso positivo entra pelo
-trilho negado e peso negativo pelo trilho direto. Assim todos os
-resistores são positivos e a soma sai com o sinal certo. O termo de
-polarização de cada neurônio usa o mesmo truque, com trilhos fixos de
-$\pm\SI{1}{\volt}$.
+Dois aspectos do modelo exigem estrutura adicional no circuito. O
+primeiro é o sinal dos pesos: o somador inversor nega a soma e
+resistores realizam apenas coeficientes positivos. A solução adotada é
+cada neurônio publicar, além da sua saída $a$, uma cópia negada $-a$,
+produzida por um inversor de ganho unitário (dois resistores de
+\SI{100}{\kilo\ohm}). Os pesos positivos da camada seguinte
+conectam-se ao trilho negado e os negativos ao trilho direto; com isso
+todos os resistores são positivos e a soma resulta com o sinal
+correto. O termo de polarização de cada neurônio usa o mesmo
+mecanismo, a partir de trilhos fixos de $\pm\SI{1}{\volt}$. O segundo
+aspecto, a função de ativação e a decisão de saída, é tratado na
+Seção~\ref{sec:ativacao}.
 
-Segundo, a ativação. Aqui não entra circuito nenhum. O somador dos
-neurônios ocultos é alimentado com $+\SI{5}{\volt}$ e
-$-\SI{0,2}{\volt}$, e o AmpOp satura a \SI{0,2}{\volt} dos trilhos.
-A saída então só existe entre \SI{0}{\volt} e \SI{4,8}{\volt}, que é
-uma ReLU com teto. O próprio AmpOp é a função de ativação. Os
-somadores da camada de saída usam alimentação simétrica e ficam
-lineares.
-
-Terceiro, a decisão. A saída de cada um dos dez somadores finais, a
-tensão $z_k$ do dígito $k$, entra em um AmpOp
-em malha aberta, comparando com um trilho comum de
-$V_{TH} = \SI{2,65}{\volt}$. Saída acima do trilho satura o comparador
-no nível alto; abaixo, no nível baixo. Para cada imagem, um único
-comparador deve acender.
-
-A Figura~\ref{fig:esq-neuronio} mostra um neurônio oculto real da rede
-treinada, com os valores E96 dos resistores. A
-Figura~\ref{fig:esq-saida} mostra a cadeia completa de um dígito, do
-somador da saída $z_3$ ao comparador.
+A Figura~\ref{fig:esq-neuronio} apresenta um neurônio oculto real da
+rede treinada, desenhado a partir do netlist com os valores E96 dos
+resistores. No lado esquerdo está o somador inversor: os resistores de
+entrada chegam ao nó de soma, o resistor de realimentação fecha a
+malha e a alimentação assimétrica define os limites de saturação. No
+lado direito está o inversor de ganho unitário que gera o trilho
+negado $-a$ consumido pela camada seguinte. A
+Figura~\ref{fig:esq-saida} apresenta a cadeia completa de um dígito da
+camada de saída: o somador linear que produz a tensão $z_3$ e o
+comparador que a confronta com o limiar de decisão.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{neuronio_oculto.png}
-  \caption{Neurônio oculto $a^{(4)}_7$ como está no netlist. À
+  \caption{Neurônio oculto $a^{(4)}_7$ como consta no netlist. À
   esquerda, o somador inversor alimentado com \SI{5}{\volt} e
-  \SI{-0,2}{\volt} (a saturação em \SI{0}{\volt} faz a ReLU). À
-  direita, o inversor que gera o trilho negado para a camada seguinte.}
+  \SI{-0,2}{\volt}, cuja saturação inferior em \SI{0}{\volt} realiza a
+  ReLU; à direita, o inversor de ganho unitário que publica o trilho
+  negado para a camada seguinte.}
   \label{fig:esq-neuronio}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{neuronio_saida.png}
-  \caption{Cadeia de saída do dígito 3: somador da saída $z_3$ e
-  comparador contra o trilho $V_{TH}=\SI{2,65}{\volt}$, com carga de
-  \SI{100}{\kilo\ohm}.}
+  \caption{Cadeia de saída do dígito 3: somador linear da saída $z_3$
+  (alimentação simétrica) e comparador contra o trilho
+  $V_{TH}=\SI{2,65}{\volt}$, com carga de \SI{100}{\kilo\ohm}.}
   \label{fig:esq-saida}
 \end{figure}
 
-\subsection{Treinamento com as regras do circuito}
+\subsection{Ativação por saturação e decisão por comparador}
+\label{sec:ativacao}
+
+A função de ativação dos neurônios ocultos não emprega componente
+adicional: ela é a saturação do próprio somador. Os somadores das
+camadas ocultas são alimentados com $+\SI{5}{\volt}$ e
+$-\SI{0,2}{\volt}$, e o macromodelo ideal satura a \SI{0,2}{\volt} de
+cada trilho; a saída fica portanto confinada ao intervalo de
+\SI{0}{\volt} a \SI{4,8}{\volt}. O resultado é uma ReLU com teto:
+somas negativas são cortadas em \SI{0}{\volt} (neurônio desligado),
+somas positivas seguem lineares com ganho $-R_f/R_i$ e somas elevadas
+saturam em \SI{4,8}{\volt}. Os somadores da camada de saída, ao
+contrário, usam alimentação simétrica e permanecem na região linear,
+pois as suas saídas $z_k$ devem preservar magnitude para a comparação
+final.
+
+A decisão é realizada por dez amplificadores em malha aberta, um por
+dígito. Cada saída $z_k$ é comparada com um trilho comum
+$V_{TH} = \SI{2,65}{\volt}$, valor determinado no treinamento
+(Seção~\ref{sec:treinamento}): quando $z_k > V_{TH}$ o comparador
+satura no nível alto; caso contrário permanece no nível baixo, próximo
+de \SI{0}{\volt}. O critério de acerto adotado em todo o relatório é o
+disparo único: para cada imagem, exatamente um comparador (o do dígito
+correto) deve estar em nível alto.
+
+\subsection{Treinamento sob as restrições do circuito}
 \label{sec:treinamento}
 
-Cada imagem do MNIST ($28\times 28$) é recortada para $24\times 24$ e
-reduzida por média em blocos de $3\times 3$, virando 64 tensões entre
-\SI{0}{\volt} e \SI{1}{\volt} (Figura~\ref{fig:amostras}). Com as 784
-entradas originais o circuito precisaria de dezenas de milhares de
-resistores; com 64 ele fica em um tamanho construível.
+Cada imagem do MNIST ($28\times 28$ pixels) é recortada para
+$24\times 24$ e reduzida por média em blocos de $3\times 3$,
+resultando em 64 valores que são mapeados linearmente para tensões
+entre \SI{0}{\volt} (fundo branco) e \SI{1}{\volt} (traço em
+intensidade máxima). A redução é necessária para manter o circuito em
+tamanho construível: com as 784 entradas originais, a primeira camada
+sozinha exigiria dezenas de milhares de resistores. A
+Figura~\ref{fig:amostras} compara, para dez amostras do conjunto de
+teste, a imagem original (linha superior) e a versão $8\times 8$
+efetivamente apresentada à rede (linha inferior); observa-se que os
+traços permanecem distinguíveis mesmo na resolução reduzida.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{amostras_digitos.png}
-  \caption{Dígitos do conjunto de teste como o MNIST fornece
-  ($28\times 28$, acima) e como a rede recebe ($8\times 8$, abaixo).}
+  \caption{Dígitos do conjunto de teste na resolução original do MNIST
+  ($28\times 28$, acima) e na resolução $8\times 8$ apresentada à rede
+  (abaixo).}
   \label{fig:amostras}
 \end{figure}
 
-O treinamento foi implementado em numpy, com o procedimento usual de
-redes neurais (retropropagação), usando a mesma matemática do circuito. A ativação dos
-neurônios ocultos é o recorte entre \SI{0}{\volt} e \SI{4,8}{\volt}, a
-mesma saturação do somador. A perda trata cada neurônio de saída como
-uma decisão independente: a saída $z$ do dígito certo é empurrada para
-cima de $V_{TH}$ e os outros para baixo. É isso que faz um único
-comparador acender por imagem.
+O treinamento foi implementado em numpy com retropropagação
+convencional, porém com a matemática do circuito: a ativação dos
+neurônios ocultos é o recorte entre \SI{0}{\volt} e \SI{4,8}{\volt}
+imposto pela saturação do somador. A função de perda trata cada
+neurônio de saída como uma decisão binária independente, empurrando a
+saída $z$ do dígito correto para cima do limiar $V_{TH}$ e as demais
+para baixo. Esse critério, e não a classificação pelo máximo, é o que
+garante o comportamento de disparo único dos comparadores.
 
-Depois de 40 épocas, os pesos menores que $0{,}04$ são removidos (um
-peso desses precisaria de um resistor acima de \SI{2,5}{\mega\ohm} para
-quase não contribuir) e a rede treina mais 12 épocas sem eles. No fim,
-cada peso é arredondado para o valor E96 mais próximo. O modelo final
-avaliado em software usa exatamente os mesmos números que os resistores
-do netlist. A Figura~\ref{fig:treinamento} mostra a evolução do
-treinamento; a linha tracejada marca a poda. Dos \num{6050} pesos,
-\num{5451} sobrevivem.
+O procedimento tem três fases. Primeiro, a rede é treinada por 40
+épocas com todos os \num{6050} pesos. Em seguida, os pesos de módulo
+inferior a $0{,}04$ são removidos: um peso dessa magnitude exigiria um
+resistor acima de \SI{2,5}{\mega\ohm} para contribuir com menos de
+\SI{2}{\percent} do ganho de um peso unitário, e a sua eliminação
+reduz o número de componentes sem custo relevante de acurácia. A rede
+é então ajustada por mais 12 épocas sem os pesos removidos. Por fim,
+cada peso restante é arredondado para o valor E96 mais próximo do
+resistor correspondente, e o modelo avaliado em software passa a usar
+exatamente os mesmos números que os resistores do netlist. Dos
+\num{6050} pesos iniciais, \num{5451} permanecem.
+
+A Figura~\ref{fig:treinamento} documenta a evolução do treinamento. O
+eixo horizontal são as épocas; a linha tracejada vertical marca a
+poda. O painel da perda mostra a queda usual e um pequeno degrau na
+poda, recuperado nas épocas seguintes. No painel de acurácias, a curva
+superior é a acurácia de validação pelo critério do máximo (o neurônio
+de maior saída) e a inferior é o disparo exato, critério mais
+exigente em que somente o comparador do dígito correto está acima do
+limiar. A diferença entre as duas curvas corresponde às imagens em que
+a rede acerta o máximo mas outro neurônio também cruza o limiar, ou
+nenhum cruza.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{curvas_treinamento.png}
-  \caption{Perda de treinamento e acurácias de validação. Disparo exato
-  quer dizer que só o comparador do dígito correto acendeu.}
+  \caption{Perda de treinamento e acurácias de validação ao longo das
+  épocas. A linha tracejada marca a poda dos pesos de módulo inferior
+  a $0{,}04$; disparo exato indica que somente o comparador do dígito
+  correto ultrapassou o limiar.}
   \label{fig:treinamento}
 \end{figure}
 
-\subsection{A rede completa e as simulações}
+\subsection{Representação da entrada no circuito}
+\label{sec:entrada}
+
+A rede é um circuito contínuo no tempo, mas as imagens são dados
+discretos. A interface entre os dois domínios é feita por 64 fontes de
+tensão independentes, uma por pixel, do tipo PWL (\emph{piecewise
+linear}): cada fonte mantém a tensão do pixel constante durante a
+janela de \SI{250}{\micro\second} da imagem corrente e, na troca de
+imagem, percorre uma rampa linear de \SI{10}{\micro\second} até o
+valor da imagem seguinte. O comportamento equivale a um conversor
+digital-analógico com retenção de ordem zero e tempo de subida
+controlado. A rampa cumpre duas funções: limita a taxa de variação
+imposta aos amplificadores da primeira camada, evitando que a medição
+seja contaminada por um transitório de slew rate artificialmente
+abrupto, e fornece ao simulador uma borda de duração finita, sem
+descontinuidades. As medições são feitas a \SI{200}{\micro\second} do
+início de cada janela, com o circuito acomodado
+(Seção~\ref{sec:protocolo}).
+
+A Figura~\ref{fig:entrada} ilustra o esquema com os três pixels de
+maior variância da sequência de teste. No painel superior, cada traço
+é a tensão de uma fonte ao longo das vinte janelas; o dígito
+apresentado em cada janela está indicado no topo. As tensões formam
+patamares constantes, um por imagem, entre \SI{0}{\volt} e
+\SI{1}{\volt}. O painel inferior amplia uma troca de janela e mostra a
+rampa de \SI{10}{\micro\second} entre dois patamares. Duas
+simplificações completam o esquema: pixels cujo valor é idêntico em
+todas as janelas viram fontes de tensão contínua, e pixels cujos pesos
+foram todos podados não recebem fonte.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{entrada_pwl.png}
+  \caption{Representação da entrada discreta: três fontes PWL ao longo
+  das vinte janelas de \SI{250}{\micro\second} (acima) e ampliação de
+  uma troca de imagem, com a rampa linear de \SI{10}{\micro\second}
+  (abaixo). Os pixels 20, 28 e 45 correspondem às posições (2,4),
+  (3,4) e (5,5) da grade $8\times 8$.}
+  \label{fig:entrada}
+\end{figure}
+
+Cada pixel com ao menos um peso positivo na primeira camada precisa
+também do trilho negado, como qualquer neurônio. No netlist esse
+trilho é gerado por uma fonte controlada ideal
+(\texttt{BNX$i$ nx$i$ 0 V=-V(x$i$)}), e não por um inversor com
+AmpOp. A simplificação é deliberada: o condicionamento do sinal de
+entrada pertence ao conversor que alimenta o circuito, não à rede sob
+teste, e uma fonte ideal evita atribuir à rede erros e atrasos desse
+estágio externo. Em uma montagem física, seriam necessários 64
+inversores adicionais ou um conversor com saídas diferenciais.
+
+\subsection{Geração do netlist e variantes de amplificador}
 \label{sec:rede}
 
-O gerador lê os pesos treinados e escreve o netlist da rede inteira:
-130 somadores, 120 inversores de trilho e 10 comparadores, num total de
-260 AmpOps e 5831 resistores. A Figura~\ref{fig:topologia} mostra a
-topologia que sobrou depois da poda e a Figura~\ref{fig:resistores}
-mostra a distribuição dos resistores, todos entre uns
-\SI{56}{\kilo\ohm} e \SI{5}{\mega\ohm}, valores comuns de prateleira.
+Um gerador em Python lê os pesos treinados e escreve o netlist da rede
+completa: 130 somadores (120 neurônios ocultos e 10 saídas), 120
+inversores de trilho negado e 10 comparadores, totalizando 260
+amplificadores e 5831 resistores, dos quais \num{5451} são resistores
+de peso. A Figura~\ref{fig:topologia} apresenta a topologia
+resultante: cada coluna de nós é uma camada e cada linha é um resistor
+de entrada de um somador. A cor codifica o sinal do peso (azul, peso
+positivo, ligado ao trilho negado da camada anterior; laranja, peso
+negativo, ligado ao trilho direto) e a espessura é proporcional à
+magnitude. Nota-se a redução progressiva da largura das camadas e a
+ausência das conexões podadas.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{rede_topologia.png}
-  \caption{A rede treinada: cada linha é um resistor de entrada de um
-  somador (azul: peso positivo, pelo trilho negado; laranja: peso
-  negativo, pelo trilho direto).}
+  \caption{Topologia da rede treinada após a poda. Cada linha é um
+  resistor de entrada de um somador; azul indica peso positivo (trilho
+  negado) e laranja peso negativo (trilho direto), com espessura
+  proporcional à magnitude do peso.}
   \label{fig:topologia}
 \end{figure}
+
+A Figura~\ref{fig:resistores} apresenta o histograma dos \num{5451}
+resistores de peso resultantes de $R_i = R_f/|w|$. A distribuição
+ocupa a faixa de \SI{56}{\kilo\ohm} a \SI{5}{\mega\ohm}, valores
+disponíveis em série E96 de \SI{1}{\percent}: o limite inferior
+corresponde aos maiores pesos da rede e o superior é consequência
+direta da poda, que elimina os pesos que exigiriam resistores acima de
+\SI{2,5}{\mega\ohm}, exceto os termos de polarização, que podem ser
+menores em módulo.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\textwidth]{histograma_resistores.png}
-  \caption{Os \num{5451} resistores de peso ($R_i = R_f/|w|$, série
-  E96).}
+  \caption{Distribuição dos \num{5451} resistores de peso
+  ($R_i = R_f/|w|$, série E96).}
   \label{fig:resistores}
 \end{figure}
 
-Foram geradas três versões do mesmo circuito. A primeira usa um modelo
-ideal de AmpOp (ganho $10^5$, saturação a \SI{0,2}{\volt} dos trilhos).
-A segunda usa o macromodelo comercial do LM741. Como o 741 não chega
-perto dos trilhos, as alimentações dessa versão foram calibradas em uma
-bancada separada (\texttt{bench\_741\_sat.cir}): mede-se onde o 741
-satura de verdade para cada par de trilhos e escolhe-se o par que
-coloca a saturação dos neurônios ocultos em \SI{0}{\volt} e
-\SI{4,8}{\volt}, os mesmos limites usados no treino. A terceira versão
-usa um AmpOp moderno, o LT1810 (\SI{325}{\mega\hertz}, slew rate de
-\SI{350}{\volt\per\micro\second}, saída que chega até os trilhos),
-com o modelo que já vem embarcado no LTspice. A bancada de saturação
-(\texttt{bench\_moderno\_sat.cir}) mostrou folga de só
-\SI{2,4}{\milli\volt} para o trilho de cima e \SI{1,2}{\milli\volt}
-para o de baixo, então os neurônios ocultos rodam com \SI{4,8}{\volt}
-e o próprio terra, sem trilho negativo. Há um porém de simulação: o
-modelo de \SI{325}{\mega\hertz} força o simulador a passos de menos de
-um nanosegundo, e a rede completa com 260 desses modelos levaria dias
-de CPU. Por isso o LT1810 foi caracterizado em duas bancadas: a de
-saturação e uma cadeia de cinco somadores mais o comparador
-(\texttt{bench\_chain\_moderno.cir}), que reproduz o caminho crítico
-da rede e mede a latência de decisão (com capacitores de compensação de
-\SI{2}{\pico\farad} em paralelo com cada $R_f$ e resistores de
-equilíbrio de \SI{49,9}{\kilo\ohm} nas entradas não inversoras,
-correções que a Seção~\ref{sec:tempo-custo} explica). A mesma cadeia com o LM741
-(\texttt{bench\_chain\_741.cir}) valida a metodologia contra a
-latência medida na rede completa.
+Foram geradas três variantes do mesmo circuito, diferindo apenas no
+modelo de amplificador e nos trilhos de alimentação:
 
-A Tabela~\ref{tab:ampops} resume os três amplificadores e o
-computador, misturando o que vem da folha de dados com o que foi medido
-nas bancadas, nas simulações e no benchmark deste experimento. Em lote
-de \num{10000} imagens o Mac sobe para 12,5 milhões de imagens por
-segundo; a coluna mostra o caso de uma imagem por vez, que é o
-comparável com os circuitos.
+\begin{itemize}
+  \item \textbf{Ideal} -- macromodelo comportamental com ganho
+        $10^5$, resistência de saída de \SI{10}{\ohm} e saturação fixa
+        a \SI{0,2}{\volt} dos trilhos. Serve de referência: os desvios
+        em relação ao modelo em software medem apenas o erro estrutural
+        do circuito, sem não idealidades de dispositivo.
+  \item \textbf{LM741} -- macromodelo comercial do amplificador
+        bipolar de 1968. Como o LM741 satura cerca de \SI{1}{\volt}
+        antes de cada trilho, as alimentações foram calibradas em uma
+        bancada dedicada (\texttt{bench\_741\_sat.cir}): uma varredura
+        DC do somador unitário mede os níveis reais de recorte para
+        vários pares de trilhos, e o par escolhido
+        (\SI{5,8}{\volt} e \SI{-0,97}{\volt}) posiciona a saturação
+        dos neurônios ocultos em \SI{0}{\volt} e \SI{4,81}{\volt}, os
+        mesmos limites usados no treinamento.
+  \item \textbf{LT1810} -- amplificador bipolar rápido
+        (\SI{325}{\mega\hertz} de produto ganho-banda, slew rate de
+        \SI{350}{\volt\per\micro\second}, saída rail-to-rail), com o
+        macromodelo distribuído com o LTspice. A bancada equivalente
+        (\texttt{bench\_moderno\_sat.cir}) mediu folgas de saturação de
+        apenas \SI{2,4}{\milli\volt} e \SI{1,2}{\milli\volt}; os
+        neurônios ocultos operam com \SI{4,8}{\volt} e o próprio
+        terra, sem trilho negativo auxiliar.
+\end{itemize}
+
+A Figura~\ref{fig:vtc} apresenta o resultado final da calibração: a
+curva de transferência DC do somador unitário com os três
+amplificadores, cada um nos trilhos escolhidos. O eixo horizontal é a
+entrada equivalente $-v_{in}$ (o somador inverte, e a leitura pelo
+negativo da entrada apresenta a curva na orientação da função de
+ativação); o vertical é a tensão de saída. As três curvas exibem a
+mesma forma: corte plano em \SI{0}{\volt}, região linear de ganho
+unitário e teto em torno de \SI{4,8}{\volt} (\vVtcHiIdeal,
+\vVtcHiLm{} e \vVtcHiMod~\si{\volt} medidos). As curvas do modelo
+ideal e do LM741 calibrado coincidem visualmente, o que confirma o
+procedimento de calibração. A curva do LT1810 tem a mesma forma,
+porém deslocada \vVtcOffsetMod~\si{\volt} para a direita: é o efeito
+da sua corrente de polarização de entrada sobre os
+\SI{100}{\kilo\ohm} de realimentação, discutido na
+Seção~\ref{sec:moderno-rede}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.85\textwidth]{saturacao_vtc.png}
+  \caption{Curva de transferência DC do somador unitário
+  ($R_f = R_i = \SI{100}{\kilo\ohm}$) com os três amplificadores nos
+  trilhos calibrados: a função de ativação como o circuito a realiza.
+  O deslocamento da curva do LT1810 decorre da sua corrente de
+  polarização de entrada.}
+  \label{fig:vtc}
+\end{figure}
+
+As variantes com modelo comercial exigem ajustes numéricos de
+simulação. Com 260 macromodelos, a integração trapezoidal padrão do
+LTspice desenvolve oscilação numérica e o passo de tempo colapsa;
+ambas as variantes usam o método Gear, que amortece essa oscilação,
+além de tolerâncias relaxadas e, no caso do LM741, uma pequena
+capacitância de nó (\texttt{cshunt=100f}). A
+Tabela~\ref{tab:ampops} resume os três amplificadores e o computador
+usado na comparação de software, combinando dados de folha de dados
+com os valores medidos nas bancadas e simulações deste experimento.
 
 \begin{table}[htb]
   \centering
-  \caption{Comparação dos três AmpOps e do computador. Folga de
-  saturação e trilhos vêm das bancadas de calibração; erro, latência e
-  taxa de imagens, das simulações e do benchmark no hospedeiro.}
+  \caption{Comparação dos três amplificadores e do computador. Folga
+  de saturação e trilhos provêm das bancadas de calibração; erro,
+  latência e taxa de imagens, das simulações e do benchmark no
+  hospedeiro. Os valores do LT1810 referem-se à rede completa
+  compensada de janela reduzida (Seção~\ref{sec:moderno-resultados});
+  em lote de \num{10000} imagens o computador atinge
+  \vMacFpsLote{} imagens por segundo.}
   \label{tab:ampops}
   {\small
   \begin{tabular}{lcccc}
@@ -180,31 +329,100 @@ comparável com os circuitos.
     Origem & educacional & bipolar, 1968 & bipolar rápido & software \\
     Banda (GBW) & sem polo & \SI{1}{\mega\hertz} & \SI{325}{\mega\hertz} & -- \\
     Slew rate & ilimitado & \SI{0,5}{\volt\per\micro\second} & \SI{350}{\volt\per\micro\second} & -- \\
-    Corrente de polarização & zero & $\approx$\SI{80}{\nano\ampere} & $\approx$\SI{1,5}{\micro\ampere} & -- \\
     Folga de saturação (medida) & \SI{0,2}{\volt} & 0,99 / \SI{0,97}{\volt} & 2,4 / \SI{1,2}{\milli\volt} & -- \\
     Trilhos dos neurônios & 5 / \SI{-0,2}{\volt} & 5,8 / \SI{-0,97}{\volt} & 4,8 / \SI{0}{\volt} & -- \\
-    Erro médio vs.\ modelo & \SI{1,3}{\milli\volt} & \SI{157}{\milli\volt} & (bancadas) & é o modelo \\
-    Latência de decisão & \SI{8,9}{\micro\second} (rede) & \SI{48,4}{\micro\second} (rede) & \SI{1,9}{\micro\second} (cadeia) & \SI{9}{\micro\second} (avulsa) \\
-    Imagens por segundo & 111 853 & 20 681 & 532 146 & 111 111 \\
-    Cuidados no uso & nenhum & Gear na simulação & 2 pF + \SI{49,9}{\kilo\ohm} & -- \\
+    Erro médio de $z$ vs.\ modelo & \vErrIdealMedio~\si{\milli\volt} & \vErrLmMedio~\si{\milli\volt} & \vModRedeErrMedio~\si{\milli\volt} & é o modelo \\
+    Latência de decisão & \SI{8,9}{\micro\second} & \SI{48,4}{\micro\second} & \vModRedeLatMax~\si{\micro\second} & \SI{9}{\micro\second} \\
+    Imagens por segundo & 111\,853 & 20\,681 & \vFpsModRede & 111\,111 \\
+    Cuidados exigidos & nenhum & Gear na simulação & compensação e equilíbrio & -- \\
     \bottomrule
   \end{tabular}
   }
 \end{table}
 
-Na simulação, vinte dígitos do conjunto de teste (dois por classe)
-entram em sequência, um a cada \SI{250}{\micro\second}, por 64 fontes
-do tipo PWL (valor definido por trechos no tempo). Diretivas
-\texttt{.meas} registram as dez saídas $z_k$ e os dez
-comparadores em cada janela, e o arquivo \texttt{.raw} guarda também os
-120 neurônios ocultos, de onde saem as figuras de estado interno da
-Seção~\ref{sec:resultados}:
+\subsection{Rede completa com o LT1810}
+\label{sec:moderno-rede}
+
+A simulação da rede completa com o LT1810 na mesma janela das demais
+variantes é impraticável: o macromodelo de \SI{325}{\mega\hertz} força
+o simulador a passos de tempo inferiores a um nanosegundo e uma
+tentativa da sequência completa (vinte imagens,
+\SI{5}{\milli\second}) foi interrompida após 29 minutos de CPU tendo
+avançado apenas \SI{114}{\micro\second} de tempo simulado. Por isso a
+caracterização foi feita em duas frentes: bancadas pequenas, que
+definem as correções necessárias, e uma simulação da rede completa com
+janela reduzida, que valida essas correções em escala.
+
+A bancada de caminho crítico (\texttt{bench\_chain\_moderno.cir})
+reproduz o pior caso sequencial da rede: cinco somadores unitários em
+série seguidos do comparador. Ela revelou duas exigências do
+amplificador rápido. A primeira é de estabilidade: com
+\SI{100}{\kilo\ohm} de realimentação, a capacitância de entrada do
+LT1810 cria um polo dentro da banda da malha e cada estágio oscila. A
+correção clássica é um capacitor de \SI{2}{\pico\farad} em paralelo
+com cada $R_f$, que fecha a malha abaixo do polo e limita a banda de
+cada estágio em aproximadamente \SI{800}{\kilo\hertz}. A segunda é de
+polarização: a corrente de polarização de entrada do LT1810, por ser
+um estágio bipolar rápido, é da ordem de microampères, e sobre
+$R_f = \SI{100}{\kilo\ohm}$ produz um deslocamento sistemático na
+saída de cada estágio. Na curva de transferência da
+Figura~\ref{fig:vtc}, esse deslocamento é de \vVtcOffsetMod~\si{\volt}
+para o estágio unitário, o que corresponde a uma corrente efetiva
+próxima de \SI{7}{\micro\ampere} no macromodelo (a folha de dados
+especifica \SI{1,5}{\micro\ampere} típico com máximo de vários
+microampères). A correção é um resistor de equilíbrio entre a entrada
+não inversora e o terra, igual à resistência de Thévenin vista pelo nó
+de soma, que converte o efeito das duas correntes de polarização em um
+termo de modo comum aproximadamente cancelado. Na bancada, com
+estágios unitários, esse resistor vale
+$R_i \parallel R_f = \SI{49,9}{\kilo\ohm}$.
+
+A validação em escala usa duas simulações da rede completa com janelas
+de \SI{15}{\micro\second} por imagem (mais de sete vezes a latência de
+\SI{1,9}{\micro\second} medida na bancada), rampas de entrada de
+\SI{0,3}{\micro\second}, seis imagens (dígitos 0 a 5) e medição a
+\SI{11}{\micro\second} de cada janela. A primeira simulação usa o
+netlist tal como gerado, sem correção alguma. A segunda é produzida
+por um pós-processador (\texttt{analog\_mlp\_moderno\_comp.py}) que
+aplica as duas correções da bancada à rede inteira: um capacitor de
+\SI{2}{\pico\farad} em paralelo com cada resistor de realimentação
+(somadores e inversores) e, em cada estágio, um resistor de equilíbrio
+calculado individualmente como o paralelo exato de todos os resistores
+conectados ao seu nó de soma -- o valor varia de dezenas de
+quilo-ohms nos inversores unitários a poucos quilo-ohms nos somadores
+de maior fan-in, e o valor fixo da bancada não seria correto para
+eles. Os comparadores, sem malha de realimentação, permanecem sem
+correção. Como as duas simulações usam \texttt{.tran} com opção
+\texttt{startup}, que eleva todas as fontes em rampa nos primeiros
+\SI{20}{\micro\second}, as duas primeiras janelas registram o
+transitório de energização e são excluídas das estatísticas; as
+janelas válidas são as quatro últimas.
+
+\subsection{Protocolo de simulação}
+\label{sec:protocolo}
+
+Na sequência principal, vinte dígitos do conjunto de teste (dois por
+classe) são apresentados um a cada \SI{250}{\micro\second}. Diretivas
+\texttt{.meas} registram as dez saídas $z_k$ e os dez comparadores em
+cada janela, a \SI{200}{\micro\second} da troca; o arquivo
+\texttt{.raw} da variante ideal guarda também os 120 neurônios
+ocultos e dois nós de soma, dos quais derivam as figuras de estado
+interno da Seção~\ref{sec:resultados}. As simulações executadas foram:
 
 \begin{verbatim}
 ./claw-spice sim run experiments/analog-mlp/analog_mlp.cir --timeout 2400
 ./claw-spice sim run experiments/analog-mlp/analog_mlp_741.cir --timeout 2400
-./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
 ./claw-spice sim run experiments/analog-mlp/bench_chain_741.cir --timeout 1800
-./claw-spice code build experiments/analog-mlp/analyze_results.py \
-    --output-dir experiments/analog-mlp
+./claw-spice sim run experiments/analog-mlp/bench_chain_moderno.cir --timeout 1800
+./claw-spice sim run experiments/analog-mlp/bench_vtc.cir --timeout 600
+./claw-spice sim run experiments/analog-mlp/analog_mlp_moderno_fast.cir \
+    --timeout 2400
+./claw-spice sim run experiments/analog-mlp/analog_mlp_moderno_comp.cir \
+    --timeout 2400
 \end{verbatim}
+
+A análise (comparação com o modelo, extração de latências e geração
+das figuras e tabelas deste relatório) é feita pelos scripts
+\texttt{analyze\_results.py} e \texttt{analyze\_moderno\_rede.py},
+executados no mesmo ambiente Docker; a sequência completa de
+reprodução consta no Apêndice~\ref{ap:codigo}.

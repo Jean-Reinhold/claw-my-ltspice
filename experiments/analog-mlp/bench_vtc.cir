@@ -1,0 +1,43 @@
+* Curva de transferencia do somador inversor (Rf = Ri = 100k) com os tres
+* AmpOps da rede, cada um nos trilhos calibrados dos neuronios ocultos.
+* A varredura DC registra a funcao de ativacao como o circuito a realiza:
+* regiao linear de ganho -1 limitada pelas saturacoes reais de cada modelo.
+* Eixo de leitura: a ativacao e V(out) contra -V(vin) (soma ponderada).
+.include claw_opamps.lib
+.include models/lm741.lib
+.lib LTC.lib
+VIN vin 0 0
+
+* Modelo ideal: trilhos 5 / -0.2 V (satura a 0.2 V dos trilhos)
+VC1 vc1 0 5
+VE1 ve1 0 -0.2
+RI1 vin s1 100k
+RF1 o1 s1 100k
+X1 0 s1 vc1 ve1 o1 CLAW_IDEAL_OPAMP
+RL1 o1 0 100k
+
+* LM741: trilhos calibrados 5.8 / -0.97 V (bench_741_sat.cir)
+VC2 vc2 0 5.8
+VE2 ve2 0 -0.97
+RI2 vin s2 100k
+RF2 o2 s2 100k
+X2 0 s2 vc2 ve2 o2 LM741
+RL2 o2 0 100k
+
+* LT1810: trilhos 4.8 / 0 V (bench_moderno_sat.cir; saida rail-to-rail)
+VC3 vc3 0 4.8
+VE3 ve3 0 0
+RI3 vin s3 100k
+RF3 o3 s3 100k
+X3 0 s3 vc3 ve3 o3 LT1810
+RL3 o3 0 100k
+
+.dc VIN -6 6 0.02
+.save V(vin) V(o1) V(o2) V(o3)
+.meas DC vhigh_ideal MAX V(o1)
+.meas DC vlow_ideal MIN V(o1)
+.meas DC vhigh_741 MAX V(o2)
+.meas DC vlow_741 MIN V(o2)
+.meas DC vhigh_mod MAX V(o3)
+.meas DC vlow_mod MIN V(o3)
+.end

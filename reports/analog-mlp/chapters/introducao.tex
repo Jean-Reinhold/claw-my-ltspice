@@ -1,39 +1,63 @@
 \section{Introdução e objetivos}
 \label{sec:objetivos}
 
-Um neurônio artificial faz duas coisas: soma entradas multiplicadas por
-pesos e passa o resultado por uma função não linear. O amplificador
-operacional faz as duas. O somador inversor soma sinais com ganhos
-definidos por razões de resistores, então cada peso da rede pode virar
-um resistor. E quando a saída do amplificador encosta no trilho de
-alimentação, ela satura. Essa saturação é a função não linear. A
-pergunta do experimento: dá para treinar uma rede neural completa e
-construir o circuito inteiro com AmpOps e resistores?
+Um neurônio artificial executa duas operações: uma soma das entradas
+ponderada por pesos e a aplicação de uma função não linear ao
+resultado. Ambas possuem realização direta em eletrônica analógica com
+amplificadores operacionais. O somador inversor produz uma combinação
+linear de tensões cujos ganhos são razões de resistores, de modo que
+cada peso da rede pode ser implementado por um resistor. A saturação
+da saída do amplificador contra os trilhos de alimentação, por sua
+vez, é uma função de recorte adequada como função de ativação. Este
+experimento verifica, por simulação, se uma rede neural completa pode
+ser treinada respeitando essas regras e construída exclusivamente com
+amplificadores operacionais e resistores.
 
-Para responder, treinamos uma rede de cinco estágios
-($64\!-\!48\!-\!32\!-\!24\!-\!16\!-\!10$) que reconhece os dígitos do
-MNIST reduzidos para $8\times 8$ pixels, ou seja, 64 tensões de entrada
-entre \SI{0}{\volt} e \SI{1}{\volt}. O treinamento acontece em software,
-mas já usando as regras do circuito: a ativação é a saturação real do
-somador e cada peso precisa existir como resistor comercial da série
-E96. Depois do treino, um script converte os pesos em netlist SPICE,
-com 260 amplificadores e 5451 resistores de peso. Na saída não tem
-cálculo extra nem processador: cada dígito tem um comparador, e a
-resposta da rede é o único comparador que acende.
+A rede implementada possui cinco estágios
+($64\!-\!48\!-\!32\!-\!24\!-\!16\!-\!10$) e classifica dígitos
+manuscritos do conjunto MNIST, reduzidos para $8\times 8$ pixels e
+apresentados ao circuito como 64 tensões entre \SI{0}{\volt} e
+\SI{1}{\volt}. O treinamento é executado em software, mas incorpora as
+restrições do circuito: a função de ativação é o recorte imposto pela
+saturação do somador e todos os pesos são arredondados para valores da
+série comercial E96, de modo que o modelo avaliado em software e o
+circuito compartilham exatamente os mesmos coeficientes. Um gerador
+converte os pesos treinados no netlist da rede completa, com 260
+amplificadores operacionais e \num{5451} resistores de peso. A leitura
+da saída não requer conversão nem processamento adicional: cada dígito
+possui um comparador dedicado e a resposta da rede é o único
+comparador em nível alto.
 
-A validação foi feita no LTspice em duas rodadas da rede completa, uma
-com um modelo ideal de AmpOp e outra com o macromodelo comercial do
-LM741, usando trilhos calibrados para compensar a saturação do 741. Um
-terceiro amplificador, o LT1810, moderno e rápido, foi caracterizado em
-bancadas menores e serve de contraponto ao 741 ao longo do relatório:
-satura a milivolts dos trilhos, decide 25 vezes mais rápido e cobra o
-preço em compensação e equilíbrio de polarização.
-Todo o fluxo roda em Docker com o ferramental claw-spice do
-repositório, cada simulação em um contêiner separado.
+A validação foi conduzida no LTspice com três modelos de amplificador.
+A rede completa foi simulada com um macromodelo ideal e com o
+macromodelo comercial do LM741, este com trilhos de alimentação
+calibrados em bancada para compensar a sua saturação distante dos
+trilhos. Um terceiro amplificador, o LT1810 (\SI{325}{\mega\hertz},
+saída rail-to-rail), representa os dispositivos modernos: foi
+caracterizado em bancadas de saturação e de caminho crítico e,
+adicionalmente, teve a rede completa validada em simulações de janela
+reduzida, com e sem as correções de compensação e de equilíbrio de
+polarização que a sua velocidade exige. Todo o fluxo (treinamento,
+geração de netlist, simulações e análise) é executado em contêineres
+Docker com o ferramental claw-spice do repositório, cada simulação em
+um contêiner separado.
 
-Os objetivos do experimento são: treinar a rede sob as restrições do
-circuito e passar de \SI{97}{\percent} de acurácia no teste do MNIST;
-construir a rede só com somadores inversores, inversores de trilho e um
-comparador por dígito, e conferir no LTspice que o circuito reproduz o
-modelo; e medir o tempo de resposta do circuito, comparando com a
-inferência em software e com uma estimativa de custo de um chip.
+Os objetivos do experimento são:
+\begin{enumerate}
+  \item treinar a rede sob as restrições do circuito (ativação por
+        saturação, pesos da série E96, poda dos pesos pequenos) e
+        obter acurácia superior a \SI{97}{\percent} no conjunto de
+        teste do MNIST reduzido;
+  \item construir o circuito apenas com somadores inversores,
+        inversores de ganho unitário e comparadores, e verificar nas
+        simulações que ele reproduz o modelo em software, tanto nas
+        tensões de saída quanto na decisão final;
+  \item caracterizar o comportamento interno do circuito (saturação
+        dos neurônios, terra virtual dos nós de soma, padrões de
+        ativação) e relacioná-lo aos regimes de operação do
+        amplificador operacional;
+  \item medir a latência de decisão das variantes com LM741 e LT1810,
+        incluindo a validação da rede completa com o LT1810
+        compensado, e comparar o tempo de inferência com a execução do
+        mesmo modelo em software.
+\end{enumerate}
