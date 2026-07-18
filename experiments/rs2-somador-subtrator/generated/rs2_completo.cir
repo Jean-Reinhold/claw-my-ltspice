@@ -1,0 +1,45 @@
+* RS2 completo (21101175, modelo LM741_LEVEL1)
+.include lm741_level1.lib
+RA1 in1 suma2 11.1111k
+RA2 in2 suma2 33.3333k
+RAR vee suma2 7.5Meg
+RA3 va suma2 100k
+XA2 0 suma2 vcc vee vout1 LM741_LEVEL1
+RAF2 suma2 vout1 100k
+RA4 in3 suma1 10k
+XA1 0 suma1 vcc vee va LM741_LEVEL1
+RAF1 suma1 va 25k
+VIN1 in1 0 SINE(0 20m 500)
+VIN2 in2 0 SINE(0 20m 700)
+VIN3 in3 0 SINE(0 20m 900)
+RB3 in6 sumb2 10k
+RB4 vb sumb2 90k
+XB2 0 sumb2 vcc vee vout2 LM741_LEVEL1
+RBF2 sumb2 vout2 90k
+RB1 in4 sumb1 20k
+RB2 in5 sumb1 10k
+XB1 0 sumb1 vcc vee vb LM741_LEVEL1
+RBF1 sumb1 vb 40k
+VIN6 in6 0 SINE(0 20m 1500)
+VIN4 in4 0 SINE(0 20m 1100)
+VIN5 in5 0 SINE(0 20m 1300)
+XC1 vout1 ng1 vcc vee na LM741_LEVEL1
+XC2 vout2 ng2 vcc vee nb LM741_LEVEL1
+XC3 np nn vcc vee out LM741_LEVEL1
+RC1 ng1 na 10k
+RCG ng1 ng2 5k
+RC2 ng2 nb 10k
+RC3 na nn 10k
+RC4 nb np 10k
+RC5 nn out 25k
+RC6 np 0 25k
+RL out 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL ideal 0 V=112.5*V(in1)+37.5*V(in2)-31.25*V(in3)+25*V(in4)+50*V(in5)-112.5*V(in6)-2.5
+.tran 0 20m 0 10u
+.meas TRAN err_max MAX abs(V(out)-V(ideal))
+.meas TRAN err_rms RMS (V(out)-V(ideal))
+.meas TRAN vout_max MAX V(out)
+.meas TRAN vout_min MIN V(out)
+.end

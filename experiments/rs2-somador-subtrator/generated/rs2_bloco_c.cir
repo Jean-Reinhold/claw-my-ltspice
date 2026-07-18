@@ -1,0 +1,21 @@
+* RS2 bloco C: vout = 12.5*(vout2 - vout1), G=25 (21101175)
+.include lm741_level1.lib
+XC1 vout1 ng1 vcc vee na LM741_LEVEL1
+XC2 vout2 ng2 vcc vee nb LM741_LEVEL1
+XC3 np nn vcc vee out LM741_LEVEL1
+RC1 ng1 na 10k
+RCG ng1 ng2 5k
+RC2 ng2 nb 10k
+RC3 na nn 10k
+RC4 nb np 10k
+RC5 nn out 25k
+RC6 np 0 25k
+VN vout1 0 1
+VP vout2 0 SINE(1 0.4 1k)
+RL out 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+.tran 0 5m 0 5u
+.meas TRAN gain_diff FIND V(out)/0.4 AT=2.25m
+.meas TRAN vout_avg AVG V(out)
+.end

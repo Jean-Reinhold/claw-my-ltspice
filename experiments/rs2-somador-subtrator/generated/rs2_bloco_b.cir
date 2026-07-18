@@ -1,0 +1,21 @@
+* RS2 bloco B: vout2 = 2*vin4 + 4*vin5 - 9*vin6 (21101175)
+.include lm741_level1.lib
+RB3 in6 sumb2 10k
+RB4 vb sumb2 90k
+XB2 0 sumb2 vcc vee vout2 LM741_LEVEL1
+RBF2 sumb2 vout2 90k
+RB1 in4 sumb1 20k
+RB2 in5 sumb1 10k
+XB1 0 sumb1 vcc vee vb LM741_LEVEL1
+RBF1 sumb1 vb 40k
+VIN6 in6 0 SINE(0 0.1 1300)
+VIN4 in4 0 SINE(0 0.2 300)
+VIN5 in5 0 SINE(0 0.2 700)
+RL vout2 0 10k
+VCC vcc 0 15
+VEE vee 0 -15
+BIDEAL2 ideal2 0 V=2*V(in4)+4*V(in5)-9*V(in6)
+.tran 0 20m 0 10u
+.meas TRAN vout2_max MAX V(vout2)
+.meas TRAN err2_max MAX abs(V(vout2)-V(ideal2))
+.end
